@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adicionar Despesa</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+
+        body {
+            background-color: #0d0d0d;
+            color: #00ffea;
+            font-family: 'Orbitron', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .form-container {
+            background: rgba(20, 20, 20, 0.95);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px #00ffea;
+            width: 500px;
+            text-align: center;
+        }
+
+        h2 {
+            color: #ff0077;
+            text-shadow: 0 0 10px #ff0077;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin: 10px 0 5px;
+            text-transform: uppercase;
+            font-size: 14px;
+        }
+
+        input, select {
+            width: 90%;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #00ffea;
+            color: #00ffea;
+            font-size: 16px;
+            border-radius: 5px;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        input:focus, select:focus {
+            border-color: #ff0077;
+            box-shadow: 0 0 10px #ff0077;
+        }
+
+        .btn {
+            margin-top: 20px;
+            background: #ff0077;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            width: 90%;
+            border-radius: 5px;
+            text-transform: uppercase;
+            transition: 0.3s;
+        }
+
+        .btn:hover {
+            background: #ff00aa;
+            box-shadow: 0 0 10px #ff0077;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h2>Adicionar Despesa</h2>
+        <form id="dataForm" method="post">
+            <label for="dia">Data</label>
+            <input type="date" id="dia" name="dia" required>
+
+            <div class="input-group">
+                <label for="amount">Valor (R$):</label>
+                <input type="text" id="amount" name="amount" inputmode="numeric" placeholder="0.00">
+            </div>
+
+            <div class="form-group">
+                <label for="categoria_principal">Categoria principal:</label>
+                <select id="categoria_principal" name="categoria_principal">
+                    <option value="">Selecione a categoria</option>
+                    <option value="Supermercado">Supermercado</option>
+                    <option value="Carro">Carro</option>
+                    <option value="Casa">Casa</option>
+                    <option value="Assinaturas">Assinaturas</option>
+                    <option value="Variedades">Variedades</option>
+                    <option value="Saúde">Saúde</option>
+                </select>
+            </div>
+    
+            <div class="form-group">
+                <label for="subcategoria">Subcategoria:</label>
+                <select id="subcategoria" name="subcategoria" disabled>
+                    <option value="">Selecione a subcategoria</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="parcelas">Parcelas:</label>
+                <select id="parcelas" name="parcelas">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                    <option value="9">9</option>
+                    <option value="10">10</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="tipo">Tipo de gasto:</label>
+                <select id="tipo" name="tipo">
+                    <option value="Variável">Variável</option>
+                    <option value="Fixo">Fixo</option>
+                </select>
+            </div>
+
+            <label for="comentario">Comentário:</label>
+            <input id="comentario" type="text"></input>
+
+
+            <button type="submit" class="btn">Adicionar</button>
+        </form>
+        <div id="status"></div>
+
+        <script>
+            // Define subcategories for each categorie
+            const subcategoria_dados = {
+                Supermercado: [
+                    { value: 'Quitandas', label: 'Quitandas' },
+                    { value: 'Carnes', label: 'Carnes' },
+                    { value: 'Frutas', label: 'Frutas/Verduras' },
+                    { value: 'Ovos', label: 'Ovos' },
+                    { value: 'Queijo', label: 'Queijo' },
+                    { value: 'Ultraprocessados', label: 'Ultraprocessados' },
+                    { value: 'Álcool', label: 'Bebidas alcoólicas' },
+                    { value: 'Café', label: 'Café' },
+                    { value: 'Limpeza', label: 'Limpeza' },
+                    { value: 'Água', label: 'Água' },
+                    { value: 'Outros', label: 'Outros' },
+
+                ],
+                Carro: [
+                    { value: 'Gasolina', label: 'Gasolina' },
+                    { value: 'Manutencao', label: 'Manutenção' },
+                    { value: 'Impostos', label: 'Impostos' },
+                    { value: 'Seguro', label: 'Seguro' },
+                    { value: 'Outros', label: 'Outros' },
+                ],
+                Casa: [
+                    { value: 'Cemig', label: 'Cemig' },
+                    { value: 'Copasa', label: 'Copasa' },
+                    { value: 'Condomínio', label: 'Condomínio' },
+                    { value: 'Internet', label: 'Internet' },
+                    { value: 'Aluguel', label: 'Aluguel' },
+                    { value: 'IPTU', label: 'IPTU' },
+                    { value: 'Utensílios', label: 'Utensílios' },
+                    { value: 'Clube', label: 'Clube' },
+                    { value: 'Outros', label: 'Outros' },
+                ],
+                Variedades: [
+                    { value: 'Roupas', label: 'Roupas' },
+                    { value: 'Beleza', label: 'Beleza' },
+                    { value: 'Brinquedos', label: 'Brinquedos' },
+                    { value: 'Presentes', label: 'Presentes' },
+                    { value: 'Restaurantes', label: 'Restaurantes' },
+                    { value: 'Cabelo', label: 'Cabelo' },
+                    { value: 'UFSJ', label: 'UFSJ' },
+                    { value: 'Outros', label: 'Outros' },
+                ],
+                Assinaturas: [
+                    { value: 'Netflix', label: 'Netflix' },
+                    { value: 'Amazon', label: 'Amazon' },
+                    { value: 'Microsoft', label: 'Microsoft' },
+                    { value: 'Google', label: 'Google' },
+                    { value: 'Vivo', label: 'Vivo' },
+                    { value: 'Max', label: 'Max' },
+                    { value: 'Outros', label: 'Outros' },
+                ],
+                Saúde: [
+                    { value: 'Remédios', label: 'Remédios' },
+                    { value: 'Suplementos', label: 'Suplementos' },
+                    { value: 'Unimed', label: 'Unimed' },
+                    { value: 'Consultas', label: 'Consultas' },
+                    { value: 'Vacina', label: 'Vacina' },
+                    { value: 'Outros', label: 'Outros' },
+                ],
+
+            };
+    
+            // Get DOM elements
+            const categoriaSelect = document.getElementById('categoria_principal');
+            const subcategoriaSelect = document.getElementById('subcategoria');
+    
+            // Add event listener to categoria dropdown
+            categoriaSelect.addEventListener('change', function() {
+                // Reset subcategoria dropdown
+                subcategoriaSelect.innerHTML = '<option value="">Selecione a subcategoria</option>';
+                subcategoriaSelect.disabled = true;
+    
+                const selectedCategoria = this.value;
+    
+                // If a country is selected, populate city dropdown
+                if (selectedCategoria) {
+                    const subcategorias = subcategoria_dados[selectedCategoria];
+                    
+                    // Enable city dropdown
+                    subcategoriaSelect.disabled = false;
+    
+                    // Add cities to dropdown
+                    subcategorias.forEach(subcategoria => {
+                        const option = document.createElement('option');
+                        option.value = subcategoria.value;
+                        option.textContent = subcategoria.label;
+                        subcategoriaSelect.appendChild(option);
+                    });
+                }
+            });
+        </script>
+
+        <script>
+            const amountInput = document.getElementById('amount');
+
+            amountInput.addEventListener('input', function(e) {
+                // Remove any non-numeric characters
+                let value = this.value.replace(/[^\d]/g, '');
+                
+                // Pad with zeros if necessary
+                while (value.length < 3) {
+                    value = '0' + value;
+                }
+                
+                // Insert decimal point
+                const dollars = value.slice(0, -2);
+                const cents = value.slice(-2);
+                
+                // Format with commas for thousands
+                const formattedDollars = Number(dollars).toLocaleString('en-US');
+                
+                // Update input value
+                this.value = formattedDollars + '.' + cents;
+            });
+
+            // On focus, remove formatting
+            amountInput.addEventListener('focus', function(e) {
+                const value = this.value.replace(/[^\d.]/g, '');
+                this.value = value;
+            });
+
+            // On blur, reapply formatting
+            amountInput.addEventListener('blur', function(e) {
+                if (this.value === '') {
+                    this.value = '';
+                    return;
+                }
+                
+                let value = this.value.replace(/[^\d.]/g, '');
+                
+                // Convert to cents
+                const parts = value.split('.');
+                let cents = parseInt((parts[0] || '0') + (parts[1] || '00').padEnd(2, '0'));
+                
+                // Format back to dollars and cents
+                const dollars = Math.floor(cents / 100).toLocaleString('en-US');
+                const remainingCents = (cents % 100).toString().padStart(2, '0');
+                
+                this.value = dollars + '.' + remainingCents;
+            });
+        </script>
+
+        <script>
+            document.getElementById("dataForm").addEventListener("submit", function(event) {
+                event.preventDefault();
+
+                let formData = {
+                    data_compra: document.getElementById("dia").value,
+                    valor: document.getElementById("amount").value,
+                    categoria: document.getElementById("categoria_principal").value,
+                    subcategoria: document.getElementById("subcategoria").value,
+                    parcelas: document.getElementById("parcelas").value,
+                    tipo: document.getElementById("tipo").value,
+                    comentario: document.getElementById("comentario").value,
+                };
+
+                fetch("https://script.google.com/macros/s/AKfycbyb8xHVHJDHsBFqgWLjrUZSJ7t0TTDYYHWYhszDk7H8lVPlai55VbqGAer2XSgOp5D_hw/exec", {
+                    method: "POST",
+                    mode: "no-cors",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(formData)
+                }).then(() => {
+                    document.getElementById("status").innerText = "Form submitted successfully!";
+                    document.getElementById("dataForm").reset();
+                }).catch(error => console.error("Error:", error));
+            });
+        </script>
+    </div>
+
+</body>
+</html>
+
