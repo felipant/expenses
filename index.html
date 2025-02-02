@@ -90,29 +90,32 @@
             </div>
 
             <div class="form-group">
-                <label for="categoria_principal">Categoria principal:</label>
-                <select id="categoria_principal" name="categoria_principal">
-                    <option value="">Selecione a categoria</option>
-                    <option value="Supermercado">Supermercado</option>
-                    <option value="Carro">Carro</option>
-                    <option value="Casa">Casa</option>
-                    <option value="Assinaturas">Assinaturas</option>
-                    <option value="Variedades">Variedades</option>
-                    <option value="Saúde">Saúde</option>
+                <label for="categoria">Categoria:</label>
+                <select id="categoria" name="categoria" onchange="atualizarSubcategorias()">
+                    <option value="">Selecione uma categoria</option>
                 </select>
-            </div>
-    
-            <div class="form-group">
+
                 <label for="subcategoria">Subcategoria:</label>
-                <select id="subcategoria" name="subcategoria" disabled>
-                    <option value="">Selecione a subcategoria</option>
+                <select id="subcategoria" name="subcategoria">
+                    <option value="">Selecione uma subcategoria</option>
                 </select>
             </div>
 
             <div class="form-group">
                 <label for="parcelas">Parcelas:</label>
                 <select id="parcelas" name="parcelas">
-                    <option value="" disabled selected>Loading subjects...</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                    <option value="9">9</option>
+                    <option value="10">10</option>
+                    <option value="11">11</option>
+                    <option value="12">12</option>
             </select>
                 </select>
             </div>
@@ -134,124 +137,42 @@
         <div id="status"></div>
 
         <script>
-            async function carregarCategorias() {
+            async function carregarDados() {
                 try {
-                    const response = await fetch ('./data/categorias.json');
+                    const response = await fetch('./data/categorias.json');
                     const data = await response.json();
-
-                    //dropdown teste
-                    const select = document.getElementById('parcelas');
-                    select.innerHTML = '<option value="" disabled selected>Select a subject</option>';
-
-                    data.categorias.forEach(categorias => {
-                        const option = document.createElement('option');
-                        option.value = categorias.name;
-                        option.textContent = categorias.name;
-                        select.appendChild(option);
-                    });
+                    
+                    const categoriaSelect = document.getElementById("categoria");
+                    for (const categoria in data.categorias) {
+                        const option = document.createElement("option");
+                        option.value = categoria;
+                        option.textContent = categoria;
+                        categoriaSelect.appendChild(option);
+                    }
+                    
+                    window.subcategorias = data.categorias;
                 } catch (error) {
-                    console.error('Error loading subjects:', error);
-                    const select = document.getElementById('parcelas');
-                    select.innerHTML = '<option value="" disabled selected>Error loading subjects</option>';
+                    console.error("Erro ao carregar o arquivo JSON", error);
                 }
             }
-
-            document.addEventListener('DOMContentLoaded', carregarCategorias);
-        </script>
-
-        <script>
-            // Define subcategories for each categorie
-            const subcategoria_dados = {
-                Supermercado: [
-                    { value: 'Quitandas', label: 'Quitandas' },
-                    { value: 'Carnes', label: 'Carnes' },
-                    { value: 'Frutas', label: 'Frutas/Verduras' },
-                    { value: 'Ovos', label: 'Ovos' },
-                    { value: 'Queijo', label: 'Queijo' },
-                    { value: 'Ultraprocessados', label: 'Ultraprocessados' },
-                    { value: 'Álcool', label: 'Bebidas alcoólicas' },
-                    { value: 'Café', label: 'Café' },
-                    { value: 'Limpeza', label: 'Limpeza' },
-                    { value: 'Água', label: 'Água' },
-                    { value: 'Outros', label: 'Outros' },
-
-                ],
-                Carro: [
-                    { value: 'Gasolina', label: 'Gasolina' },
-                    { value: 'Manutencao', label: 'Manutenção' },
-                    { value: 'Impostos', label: 'Impostos' },
-                    { value: 'Seguro', label: 'Seguro' },
-                    { value: 'Outros', label: 'Outros' },
-                ],
-                Casa: [
-                    { value: 'Cemig', label: 'Cemig' },
-                    { value: 'Copasa', label: 'Copasa' },
-                    { value: 'Condomínio', label: 'Condomínio' },
-                    { value: 'Internet', label: 'Internet' },
-                    { value: 'Aluguel', label: 'Aluguel' },
-                    { value: 'IPTU', label: 'IPTU' },
-                    { value: 'Utensílios', label: 'Utensílios' },
-                    { value: 'Clube', label: 'Clube' },
-                    { value: 'Outros', label: 'Outros' },
-                ],
-                Variedades: [
-                    { value: 'Roupas', label: 'Roupas' },
-                    { value: 'Beleza', label: 'Beleza' },
-                    { value: 'Brinquedos', label: 'Brinquedos' },
-                    { value: 'Presentes', label: 'Presentes' },
-                    { value: 'Restaurantes', label: 'Restaurantes' },
-                    { value: 'Cabelo', label: 'Cabelo' },
-                    { value: 'UFSJ', label: 'UFSJ' },
-                    { value: 'Outros', label: 'Outros' },
-                ],
-                Assinaturas: [
-                    { value: 'Netflix', label: 'Netflix' },
-                    { value: 'Amazon', label: 'Amazon' },
-                    { value: 'Microsoft', label: 'Microsoft' },
-                    { value: 'Google', label: 'Google' },
-                    { value: 'Vivo', label: 'Vivo' },
-                    { value: 'Max', label: 'Max' },
-                    { value: 'Outros', label: 'Outros' },
-                ],
-                Saúde: [
-                    { value: 'Remédios', label: 'Remédios' },
-                    { value: 'Suplementos', label: 'Suplementos' },
-                    { value: 'Unimed', label: 'Unimed' },
-                    { value: 'Consultas', label: 'Consultas' },
-                    { value: 'Vacina', label: 'Vacina' },
-                    { value: 'Outros', label: 'Outros' },
-                ],
-
-            };
-    
-            // Get DOM elements
-            const categoriaSelect = document.getElementById('categoria_principal');
-            const subcategoriaSelect = document.getElementById('subcategoria');
-    
-            // Add event listener to categoria dropdown
-            categoriaSelect.addEventListener('change', function() {
-                // Reset subcategoria dropdown
-                subcategoriaSelect.innerHTML = '<option value="">Selecione a subcategoria</option>';
-                subcategoriaSelect.disabled = true;
-    
-                const selectedCategoria = this.value;
-    
-                // If a country is selected, populate city dropdown
-                if (selectedCategoria) {
-                    const subcategorias = subcategoria_dados[selectedCategoria];
-                    
-                    // Enable city dropdown
-                    subcategoriaSelect.disabled = false;
-    
-                    // Add cities to dropdown
-                    subcategorias.forEach(subcategoria => {
-                        const option = document.createElement('option');
-                        option.value = subcategoria.value;
-                        option.textContent = subcategoria.label;
+            
+            function atualizarSubcategorias() {
+                const categoriaSelecionada = document.getElementById("categoria").value;
+                const subcategoriaSelect = document.getElementById("subcategoria");
+                
+                subcategoriaSelect.innerHTML = '<option value="">Selecione uma subcategoria</option>';
+                
+                if (categoriaSelecionada && window.subcategorias[categoriaSelecionada]) {
+                    window.subcategorias[categoriaSelecionada].forEach(sub => {
+                        const option = document.createElement("option");
+                        option.value = sub;
+                        option.textContent = sub;
                         subcategoriaSelect.appendChild(option);
                     });
                 }
-            });
+            }
+            
+            carregarDados();
         </script>
 
         <script>

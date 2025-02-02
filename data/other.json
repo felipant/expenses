@@ -1,0 +1,35 @@
+{
+    "categorias": [
+      {
+        "nome": "Moradia"
+      },
+      {
+        "nome": "Alimentação"
+      },
+      {
+        "nome": "Transporte"
+      },
+      {
+        "nome": "Saúde"
+      },
+      {
+        "nome": "Educação"
+      },
+      {
+        "nome": "Lazer"
+      },
+      {
+        "nome": "Vestuário e Cuidados Pessoais"
+      },
+      {
+        "nome": "Investimentos"
+      },
+      {
+        "nome": "Família e Presentes"
+      },
+      {
+        "nome": "Imprevistos"
+      }
+
+    ]
+  }
