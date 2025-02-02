@@ -308,6 +308,9 @@
                 }).then(() => {
                     document.getElementById("status").innerText = "Form submitted successfully!";
                     document.getElementById("dataForm").reset();
+                    setTimeout(() => {
+                        document.getElementById("status").innerText = "";
+                    }, 500);
                 }).catch(error => console.error("Error:", error));
             });
         </script>
