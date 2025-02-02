@@ -1,73 +1,103 @@
 {
     "categorias": {
       "Moradia": [
-        "Aluguel/Financiamento",
+        "Aluguel",
         "Condomínio",
         "IPTU",
-        "Energia elétrica",
-        "Água e esgoto",
+        "Cemig",
+        "Copasa",
         "Gás",
         "Internet",
-        "Telefone fixo",
-        "Manutenção e reparos"
+        "Vivo",
+        "Manutenção e reparos",
+        "Faxina",
+        "Produtos de limpeza",
+        "Utensílios",
+        "Outros"
       ],
       "Alimentação": [
-        "Supermercado",
+        "Quitandas",
+        "Carnes",
+        "Queijos",
+        "Ultraprocessados",
+        "Ovos",
         "Restaurantes",
         "Delivery",
-        "Lanches e cafés",
-        "Feira e produtos naturais"
+        "Cafés",
+        "Feira e produtos naturais",
+        "Água",
+        "Outros"
       ],
       "Transporte": [
         "Combustível",
+        "Impostos",
         "Transporte público",
-        "Aplicativos de mobilidade (Uber, 99, etc.)",
+        "Uber",
         "Estacionamento",
         "Pedágios",
-        "Seguro do veículo",
-        "Manutenção e revisão"
+        "Seguro",
+        "Manutenção e revisão",
+        "Outros"
       ],
       "Saúde": [
         "Plano de saúde",
         "Consultas médicas",
         "Medicamentos",
+        "Suplementos",
         "Terapias (psicólogo, fisioterapia, etc.)",
         "Exames médicos",
-        "Odontologia"
+        "Odontologia",
+        "Vacinas",
+        "Outros"
       ],
       "Educação": [
         "Mensalidade escolar/faculdade",
         "Cursos e especializações",
+        "Congressos",
         "Material didático",
-        "Assinaturas educacionais (ex.: Udemy, Coursera)"
+        "Office",
+        "Assinaturas educacionais (ex.: Udemy, Coursera)",
+        "Outros"
       ],
       "Lazer e Entretenimento": [
-        "Viagens",
+        "Pacotes",
+        "Passagens",
+        "Clube",
+        "Restaurantes",
+        "Bebidas alcoólicas",
         "Cinema/teatro/shows",
-        "Assinaturas de streaming (Netflix, Spotify, etc.)",
+        "Netflix",
+        "Amazon",
+        "Youtube",
+        "Google",
         "Passeios e eventos",
-        "Hobbies e esportes"
+        "Hobbies e esportes",
+        "Outros"
       ],
       "Vestuário e Cuidados Pessoais": [
         "Roupas e calçados",
         "Salão de beleza/barbearia",
-        "Produtos de higiene e cosméticos"
+        "Produtos de higiene e cosméticos",
+        "Outros"
       ],
       "Dívidas e Investimentos": [
         "Parcelas de empréstimos",
         "Cartão de crédito",
         "Aplicações financeiras",
-        "Previdência privada"
+        "Previdência privada",
+        "Outros"
       ],
       "Família e Presentes": [
         "Mesada/ajuda financeira a parentes",
         "Presentes e comemorações",
-        "Cuidados com pets"
+        "Cuidados com pets",
+        "Outros"
       ],
       "Imprevistos e Reservas": [
         "Fundo emergencial",
         "Reparos inesperados",
-        "Multas e taxas inesperadas"
+        "Multas e taxas inesperadas",
+        "Outros"
       ]
     }
   }
