@@ -112,16 +112,8 @@
             <div class="form-group">
                 <label for="parcelas">Parcelas:</label>
                 <select id="parcelas" name="parcelas">
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="3">3</option>
-                    <option value="4">4</option>
-                    <option value="5">5</option>
-                    <option value="6">6</option>
-                    <option value="7">7</option>
-                    <option value="8">8</option>
-                    <option value="9">9</option>
-                    <option value="10">10</option>
+                    <option value="" disabled selected>Loading subjects...</option>
+            </select>
                 </select>
             </div>
 
@@ -140,6 +132,32 @@
             <button type="submit" class="btn">Adicionar</button>
         </form>
         <div id="status"></div>
+
+        <script>
+            async function carregarCategorias() {
+                try {
+                    const response = await fetch ('data/categorias.json');
+                    const data = await response.json();
+
+                    //dropdown teste
+                    const select = document.getElementById('parcelas');
+                    select.innerHTML = '<option value="" disabled selected>Select a subject</option>';
+
+                    data.categorias.forEach(categorias => {
+                        const option = document.createElement('option');
+                        option.value = categorias.name;
+                        option.textContent = categorias.name;
+                        select.appendChild(option);
+                    });
+                } catch (error) {
+                    console.error('Error loading subjects:', error);
+                    const select = document.getElementById('parcelas');
+                    select.innerHTML = '<option value="" disabled selected>Error loading subjects</option>';
+                }
+            }
+
+            document.addEventListener('DOMContentLoaded', loadSubjects);
+        </script>
 
         <script>
             // Define subcategories for each categorie
