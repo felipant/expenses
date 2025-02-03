@@ -229,7 +229,7 @@
             document.getElementById("dataForm").addEventListener("submit", function(event) {
                 event.preventDefault();
 
-                var val = "RR" + document.getElementById("amount").value + "RR";
+                var val = document.getElementById("amount").value.replace(/,/g, '');
 
                 let formData = {
                     data_compra: document.getElementById("dia").value,
