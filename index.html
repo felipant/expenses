@@ -229,9 +229,11 @@
             document.getElementById("dataForm").addEventListener("submit", function(event) {
                 event.preventDefault();
 
+                var val = "RR" + document.getElementById("amount").value + "RR";
+
                 let formData = {
                     data_compra: document.getElementById("dia").value,
-                    valor: document.getElementById("amount").value,
+                    valor: val,
                     categoria: document.getElementById("categoria").value,
                     subcategoria: document.getElementById("subcategoria").value,
                     parcelas: document.getElementById("parcelas").value,
