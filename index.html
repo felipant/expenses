@@ -132,7 +132,7 @@
             <input id="comentario" type="text"></input>
 
 
-            <button type="submit" class="btn">Adicionar</button>
+            <button type="submit" class="btn" id="addic">Adicionar</button>
         </form>
         <div id="status"></div>
 
@@ -228,6 +228,7 @@
         <script>
             document.getElementById("dataForm").addEventListener("submit", function(event) {
                 event.preventDefault();
+                document.getElementById("addic").innerText="Enviando...";
 
                 let formData = {
                     data_compra: document.getElementById("dia").value,
@@ -245,14 +246,23 @@
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(formData)
                 }).then(() => {
-                    document.getElementById("status").innerText = "Form submitted successfully!";
+                    document.getElementById("status").innerText = "Dados enviados com sucesso!";
                     document.getElementById("dataForm").reset();
+                    document.getElementById("addic").innerText="Adicionar";
                     setTimeout(() => {
                         document.getElementById("status").innerText = "";
                     }, 500);
                 }).catch(error => console.error("Error:", error));
             });
         </script>
+
+<script>
+    // Get today's date 
+    const today = new Date();
+  
+    // Set the value of the date input field
+    document.getElementById('dia').value = today;
+  </script>
     </div>
 
 </body>
