@@ -120,7 +120,7 @@ tr:hover {
         <h2>Adicionar Despesa</h2>
         <form id="dataForm" method="post">
             <label for="dia">Data</label>
-            <input type="date" id="dia" name="dia">
+            <input type="date" id="dia" name="dia" value="">
 
             <div class="input-group">
                 <label for="amount">Valor (R$):</label>
@@ -294,13 +294,13 @@ tr:hover {
             });
         </script>
 
-<script>
-    // Get today's date 
-    const today = new Date();
-  
-    // Set the value of the date input field
-    document.getElementById('dia').value = today;
-  </script>
+        <script>
+            // Get today's date 
+            const today = new Date();
+        
+            // Set the value of the date input field
+            document.getElementById("dia").value = today;
+        </script>
     </div>
 
 </body>
