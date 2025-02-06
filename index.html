@@ -36,9 +36,10 @@
         }
 
         label {
-            display: block;
+            display:flex;
             margin: 10px 0 5px;
             font-size: 14px;
+            align-items: center;
             font-weight: 500;
             color: #333;
         }
@@ -111,6 +112,11 @@
 
         tr:hover {
             background: #f1f1f1;
+        }
+
+        input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
         }
 
 
@@ -301,13 +307,17 @@
                     setTimeout(() => {
                         document.getElementById("status").innerText = "";
                     }, 500);
+                    atualizarDia();
                 }).catch(error => console.error("Error:", error));
             });
         </script>
 
         <script>
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById("dia").value = today;
+            function atualizarDia() {
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById("dia").value = today;
+            }
+            atualizarDia();
         </script>
 
     </div>
