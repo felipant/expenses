@@ -169,6 +169,12 @@ tr:hover {
             <label for="comentario">Comentário:</label>
             <input id="comentario" type="text"></input>
 
+            <label>
+                <input type="checkbox" name="subscribe" value="yes">
+                Receber e-mail
+            </label>
+            <br>
+
 
             <button type="submit" class="btn" id="addic">Adicionar</button>
         </form>
@@ -267,6 +273,12 @@ tr:hover {
             document.getElementById("dataForm").addEventListener("submit", function(event) {
                 event.preventDefault();
                 document.getElementById("addic").innerText="Enviando...";
+                let checkbox = document.getElementById("myCheckbox");
+                if (checkbox.checked) {
+                    let mail = "yes";
+                } else {
+                    let mail = "no";   
+                }
 
                 let formData = {
                     data_compra: document.getElementById("dia").value,
@@ -276,6 +288,7 @@ tr:hover {
                     parcelas: document.getElementById("parcelas").value,
                     tipo: document.getElementById("tipo").value,
                     comentario: document.getElementById("comentario").value,
+                    mail: mail,
                 };
 
                 fetch("https://script.google.com/macros/s/AKfycbyb8xHVHJDHsBFqgWLjrUZSJ7t0TTDYYHWYhszDk7H8lVPlai55VbqGAer2XSgOp5D_hw/exec", {
