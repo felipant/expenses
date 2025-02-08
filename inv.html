@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Investments</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #ffffff;
+            color: #000000;
+            text-align: center;
+        }
+        .container {
+            width: 50%;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #000;
+            border-radius: 10px;
+            background-color: #f9f9f9;
+        }
+        label, input {
+            display: block;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        input {
+            padding: 8px;
+            border: 1px solid #000;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #000;
+            color: #fff;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Investments</h1>
+        <form>
+            <label for="data">Data</label>
+            <input type="date" id="data" name="data">
+
+            <label for="valor">Valor</label>
+            <input type="number" id="valor" name="valor" step="0.01">
+
+            <label for="banco">Banco</label>
+            <input type="text" id="banco" name="banco">
+
+            <label for="tipo">Tipo</label>
+            <input type="text" id="tipo" name="tipo">
+
+            <button type="submit">Submit</button>
+        </form>
+        <a href="index.html">
+            <button>Go to Another Page</button>
+        </a>
+    </div>
+</body>
+</html>
