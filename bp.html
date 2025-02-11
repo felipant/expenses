@@ -191,7 +191,7 @@
 
             fetch("https://script.google.com/macros/s/AKfycbyJ3P_EBS81Et77lg4ERCdtOxON6BmVVjhr8H2lizht9EGT3OrLgGVH2raJw0jiJtyAZQ/exec", {
                 method: "POST",
-                mode:"cors",
+                mode:"no-cors",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(formData)
             }).then(() => {
