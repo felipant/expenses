@@ -126,7 +126,7 @@
     <div class="form-container">
         <h2>Controle Pressão Arterial</h2>
         <form id="dataForm" method="post">
-            <label for="date">Date</label>
+            <label for="date">Data</label>
             <input type="date" id="date" name="date" required>
 
             <label for="hora">Hora</label>
@@ -162,8 +162,10 @@
                 Receber e-mail
             </label>
             
-            <button type="submit" id="addic">Adicionar</button>
+            <button type="submit" class="btn" id="addic">Adicionar</button>
+            
         </form>
+        <div id="status"></div>
     </div>
 
     <script>
@@ -180,7 +182,7 @@
                 data_medida: document.getElementById("date").value,
                 hora: document.getElementById("hora").value,
                 periodo: document.getElementById("periodo").value,
-                momento: document.getElementById("momento").value,
+                momento: document.getElementById("moment").value,
                 sis: document.getElementById("sis").value,
                 dia: document.getElementById("dia").value,
                 comentario: document.getElementById("comentario").value,
