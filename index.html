@@ -175,7 +175,7 @@
             <label for="comentario">Comentário:</label>
             <input id="comentario" type="text"></input>
 
-            <label>
+            <label for="myCheckbox">
                 <input type="checkbox" name="subscribe" value="yes"  id="myCheckbox">
                 Receber e-mail
             </label>
@@ -307,7 +307,7 @@
                     document.getElementById("addic").innerText="Adicionar";
                     setTimeout(() => {
                         document.getElementById("status").innerText = "";
-                    }, 500);
+                    }, 1000);
                     atualizarDia();
                 }).catch(error => console.error("Error:", error));
             });

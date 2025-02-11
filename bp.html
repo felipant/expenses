@@ -155,9 +155,9 @@
             <input type="number" id="dia" name="dia" required>
             
             <label for="comentario">Comentário:</label>
-            <input id="comentario" type="text"></input>
+            <input id="comentario" type="text">
 
-            <label>
+            <label for="myCheckbox">
                 <input type="checkbox" name="subscribe" value="yes"  id="myCheckbox">
                 Receber e-mail
             </label>
@@ -191,7 +191,7 @@
 
             fetch("https://script.google.com/macros/s/AKfycbyJ3P_EBS81Et77lg4ERCdtOxON6BmVVjhr8H2lizht9EGT3OrLgGVH2raJw0jiJtyAZQ/exec", {
                 method: "POST",
-                mode: "no-cors",
+                mode:"cors",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(formData)
             }).then(() => {
@@ -200,9 +200,9 @@
                 document.getElementById("addic").innerText="Adicionar";
                 setTimeout(() => {
                     document.getElementById("status").innerText = "";
-                }, 500);
+                }, 1000);
                 atualizarDia();
-            }).catch(error => console.error("Error:", error));
+            }).catch(error => {console.error("Error:", error);document.getElementById("addic").innerText="Adicionar";});
         });
     </script>
 
