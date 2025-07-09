@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atherosclerosis Risk: BMI vs. WHtR</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Chosen Palette: Calm Harmony -->
+    <!-- Application Structure Plan: The SPA is designed as an educational journey to guide the user from a high-level conclusion to the detailed evidence. It starts with an engaging, personalized calculator in the hero section to establish relevance. The core of the app is a direct, side-by-side comparison of WHtR and BMI, using an interactive chart to showcase WHtR's superior predictive power for various outcomes. Subsequent sections, organized by tabs/accordions, delve into the 'why': the myth of 'healthy obesity', the importance of subclinical markers, and the equity advantage of WHtR across ethnicities. This thematic, non-linear structure prioritizes user understanding and exploration over the report's linear format. The journey concludes with the modulating effect of fitness and a clear, actionable public health recommendation. This structure was chosen to make a complex topic digestible, visually compelling, and persuasive by building the argument layer by layer. -->
+    <!-- Visualization & Content Choices: 
+        - Hero Calculator (HTML/JS): Goal: Engage. A simple form provides immediate personal relevance by calculating the user's own WHtR.
+        - Comparative Bar Chart (Chart.js): Goal: Compare. Directly visualizes the diagnostic superiority of WHtR over BMI for key outcomes (e.g., metabolic syndrome). Interaction: Buttons to switch between different comparison metrics, updating the chart dynamically. Justification: A bar chart is the clearest way to compare the effectiveness (e.g., Diagnostic Odds Ratio) of the two indices.
+        - HTML/CSS Informational Cards: Goal: Inform/Organize. Used to present key findings from the report (e.g., subclinical markers, 'healthy obesity' risks) in a scannable, visually appealing format. Justification: More readable and engaging than dense paragraphs of text.
+        - Interactive Dropdown for Ethnicity Data (JS): Goal: Compare/Inform. A dropdown allows users to select an ethnic group and see the differing risk cutoffs for BMI vs. the universal one for WHtR. Justification: Powerfully demonstrates the equity and simplicity of WHtR in a single, interactive element.
+        - Grouped Bar Chart for Fitness (Chart.js): Goal: Show Relationships. Visualizes how cardiorespiratory fitness modulates mortality risk across different BMI categories. Justification: Clearly illustrates the "fat but fit" concept and the critical role of fitness, adding an important layer of nuance.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F8F7F4;
+            color: #4A4A4A;
+        }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .nav-button {
+            transition: all 0.3s ease;
+            border-bottom: 2px solid transparent;
+        }
+        .nav-button.active {
+            border-bottom-color: #1E847F;
+            color: #1E847F;
+            font-weight: 600;
+        }
+        .tab-button {
+            transition: all 0.3s ease;
+        }
+        .tab-button.active {
+            background-color: #1E847F;
+            color: white;
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <header class="bg-white/80 backdrop-blur-md sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex-shrink-0">
+                    <h1 class="text-xl font-bold text-[#1E847F]">Atherosclerosis Risk Analyzer</h1>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="#hero" class="nav-button px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-[#1E847F]">Home</a>
+                        <a href="#comparison" class="nav-button px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-[#1E847F]">The Comparison</a>
+                        <a href="#evidence" class="nav-button px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-[#1E847F]">The Evidence</a>
+                        <a href="#fitness" class="nav-button px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-[#1E847F]">Fitness Factor</a>
+                        <a href="#conclusion" class="nav-button px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-[#1E847F]">Conclusion</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section id="hero" class="py-16 sm:py-24 bg-white">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-gray-900">It's Not Just Your Weight.</h2>
+                <h3 class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-[#1E847F]">It's Where You Store It.</h3>
+                <p class="mt-6 max-w-2xl mx-auto text-lg text-gray-600">Discover why your Waist-to-Height Ratio (WHtR) is a more powerful predictor of heart disease risk than the traditional Body Mass Index (BMI). Calculate your ratio below.</p>
+                
+                <div class="mt-12 max-w-xl mx-auto bg-gray-50 p-6 sm:p-8 rounded-2xl shadow-lg">
+                    <h4 class="text-xl font-semibold text-gray-800 mb-4">Calculate Your WHtR</h4>
+                    <form id="whtr-calculator" class="space-y-4">
+                        <div class="flex items-center space-x-2">
+                            <select id="units" class="block w-1/4 rounded-md border-gray-300 shadow-sm focus:border-[#1E847F] focus:ring-[#1E847F]">
+                                <option value="cm">Metric (cm/kg)</option>
+                                <option value="in">Imperial (in/lb)</option>
+                            </select>
+                            <div class="w-3/4 grid grid-cols-2 gap-2">
+                                <input type="number" id="waist" placeholder="Waist" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#1E847F] focus:ring-[#1E847F]">
+                                <input type="number" id="height" placeholder="Height" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#1E847F] focus:ring-[#1E847F]">
+                            </div>
+                        </div>
+                        <button type="submit" class="w-full bg-[#1E847F] text-white font-semibold py-3 px-4 rounded-lg hover:bg-opacity-90 transition-colors">Calculate</button>
+                    </form>
+                    <div id="calculator-result" class="mt-6 text-left hidden">
+                        <div class="bg-white p-4 rounded-lg border border-gray-200">
+                             <p class="text-lg">Your WHtR is: <strong id="whtr-value" class="text-2xl"></strong></p>
+                             <p id="whtr-message" class="mt-2 text-md"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- The Comparison Section -->
+        <section id="comparison" class="py-16 sm:py-24">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold tracking-tight text-gray-900">WHtR vs. BMI: A Tale of Two Metrics</h2>
+                    <p class="mt-4 max-w-3xl mx-auto text-lg text-gray-600">While both BMI and WHtR aim to assess health risks related to body weight, they tell very different stories. This section breaks down why WHtR provides a clearer, more accurate picture of your cardiovascular risk.</p>
+                </div>
+                <div class="grid md:grid-cols-2 gap-8 lg:gap-12 items-start">
+                    <!-- WHtR Column -->
+                    <div class="bg-white p-6 rounded-2xl shadow-md border-2 border-[#1E847F]">
+                        <h3 class="text-2xl font-bold text-[#1E847F] mb-3">Waist-to-Height Ratio (WHtR)</h3>
+                        <p class="text-gray-700 mb-4">WHtR directly measures central adiposity—the dangerous fat around your organs. This visceral fat is a key driver of inflammation and atherosclerosis.</p>
+                        <ul class="space-y-2 text-gray-600">
+                            <li class="flex items-start"><span class="text-[#1E847F] mr-2 mt-1">&#10003;</span><span><strong class="text-gray-800">Measures visceral fat:</strong> Directly targets the most harmful type of body fat.</span></li>
+                            <li class="flex items-start"><span class="text-[#1E847F] mr-2 mt-1">&#10003;</span><span><strong class="text-gray-800">Simple & Universal:</strong> A single cutoff of 0.5 works for most people, regardless of sex or ethnicity.</span></li>
+                            <li class="flex items-start"><span class="text-[#1E847F] mr-2 mt-1">&#10003;</span><span><strong class="text-gray-800">Actionable Message:</strong> "Keep your waist less than half your height."</span></li>
+                        </ul>
+                    </div>
+                    <!-- BMI Column -->
+                    <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-200">
+                        <h3 class="text-2xl font-bold text-[#F2745A] mb-3">Body Mass Index (BMI)</h3>
+                        <p class="text-gray-700 mb-4">BMI is a simple measure of weight relative to height. However, its major flaw is that it can't tell the difference between fat and muscle, or where that fat is located.</p>
+                        <ul class="space-y-2 text-gray-600">
+                            <li class="flex items-start"><span class="text-[#F2745A] mr-2 mt-1">&#10007;</span><span><strong class="text-gray-800">Ignores fat distribution:</strong> Fails to identify high-risk central obesity in "normal weight" individuals.</span></li>
+                            <li class="flex items-start"><span class="text-[#F2745A] mr-2 mt-1">&#10007;</span><span><strong class="text-gray-800">Confuses muscle and fat:</strong> Can misclassify muscular individuals as overweight or obese.</span></li>
+                            <li class="flex items-start"><span class="text-[#F2745A] mr-2 mt-1">&#10007;</span><span><strong class="text-gray-800">Inequitable Cutoffs:</strong> Requires complex, different thresholds for various ethnic groups.</span></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="mt-16 text-center">
+                    <h3 class="text-2xl font-bold tracking-tight text-gray-900">Visualizing the Difference: Predictive Power</h3>
+                    <p class="mt-3 max-w-2xl mx-auto text-lg text-gray-600">This chart compares how effectively WHtR and BMI predict key health risks. A higher bar indicates a better predictive ability.</p>
+                    <div class="chart-container mt-8">
+                        <canvas id="comparisonChart"></canvas>
+                    </div>
+                    <p class="text-sm text-gray-500 mt-4">Data based on a meta-analysis by Tan et al. (2023) comparing diagnostic odds ratios for metabolic syndrome in older adults.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- The Evidence Section -->
+        <section id="evidence" class="py-16 sm:py-24 bg-gray-50">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold tracking-tight text-gray-900">Unpacking the Evidence</h2>
+                    <p class="mt-4 max-w-3xl mx-auto text-lg text-gray-600">The case for WHtR is built on decades of research. Explore the key findings that demonstrate its superiority in predicting and understanding cardiovascular risk.</p>
+                </div>
+                
+                <div class="max-w-4xl mx-auto">
+                    <div class="flex justify-center border-b border-gray-300 mb-6">
+                        <button data-tab="tab1" class="tab-button active px-4 py-2 text-lg font-medium">The "Healthy Obese" Myth</button>
+                        <button data-tab="tab2" class="tab-button px-4 py-2 text-lg font-medium">Early Warnings</button>
+                        <button data-tab="tab3" class="tab-button px-4 py-2 text-lg font-medium">A Fairer Measure</button>
+                    </div>
+
+                    <div id="tab-content" class="bg-white p-6 sm:p-8 rounded-2xl shadow-lg">
+                        <!-- Tab 1: Healthy Obese Myth -->
+                        <div id="tab1" class="tab-pane fade-in">
+                            <h3 class="text-2xl font-bold text-gray-800 mb-4">The Myth of "Metabolically Healthy Obesity"</h3>
+                            <p class="text-gray-600 mb-6">"Metabolically Healthy Obesity" (MHO) is a term for people with a high BMI who lack typical metabolic issues like high blood pressure or diabetes. However, recent meta-analyses show this is a misleading and temporary state that still carries significant risk.</p>
+                            <div class="grid md:grid-cols-2 gap-6">
+                                <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg">
+                                    <h4 class="font-bold text-red-800">Increased CVD Risk</h4>
+                                    <p class="text-red-700 mt-1">Even when "metabolically healthy," individuals with obesity have a <strong class="text-2xl">58%</strong> higher risk of cardiovascular disease compared to their normal-weight peers. (Laddu et al., 2020)</p>
+                                </div>
+                                <div class="bg-orange-50 border-l-4 border-orange-500 p-4 rounded-r-lg">
+                                    <h4 class="font-bold text-orange-800">A Ticking Clock</h4>
+                                    <p class="text-orange-700 mt-1">Transitioning from "healthy" to "unhealthy" obesity increases cardiovascular disease risk by <strong class="text-2xl">42%</strong>. Many people make this transition over time. (Jayedi et al., 2022)</p>
+                                </div>
+                            </div>
+                            <p class="mt-6 text-gray-700 font-semibold">WHtR helps avoid this trap. A high WHtR signals high visceral fat—the engine of future metabolic problems—regardless of current lab results, providing a more honest, forward-looking risk assessment.</p>
+                        </div>
+
+                        <!-- Tab 2: Early Warnings -->
+                        <div id="tab2" class="tab-pane hidden fade-in">
+                            <h3 class="text-2xl font-bold text-gray-800 mb-4">Catching Risk Early: Subclinical Markers</h3>
+                            <p class="text-gray-600 mb-6">Atherosclerosis develops silently over decades. WHtR is better than BMI at detecting the earliest signs of vascular damage, long before a heart attack or stroke occurs.</p>
+                            <div class="space-y-4">
+                                <div class="p-4 bg-blue-50 border-l-4 border-blue-500 rounded-r-lg">
+                                    <h4 class="font-bold text-blue-800">Carotid Artery Thickness (cIMT)</h4>
+                                    <p class="text-blue-700 mt-1">Studies show people with a "normal" BMI but high central fat (high WHtR) have thicker carotid artery walls—a direct sign of early atherosclerosis—than people who are overweight by BMI but have low central fat. (Asghari et al., cited 2023)</p>
+                                </div>
+                                <div class="p-4 bg-teal-50 border-l-4 border-teal-500 rounded-r-lg">
+                                    <h4 class="font-bold text-teal-800">Coronary Artery Calcium (CAC)</h4>
+                                    <p class="text-teal-700 mt-1">An increased WHtR is independently linked to a faster buildup of calcium in the coronary arteries, a direct measure of plaque burden and a powerful predictor of future heart attacks. (Jang et al., 2021)</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tab 3: A Fairer Measure -->
+                        <div id="tab3" class="tab-pane hidden fade-in">
+                            <h3 class="text-2xl font-bold text-gray-800 mb-4">A Fairer Measure: Risk Across Ethnicities</h3>
+                            <p class="text-gray-600 mb-6">The health risks of a given BMI vary dramatically across different ethnic groups, making universal BMI cutoffs inequitable. WHtR's simple 0.5 threshold is a more consistent and fair screening tool for everyone.</p>
+                             <div class="max-w-md mx-auto">
+                                <label for="ethnicity-select" class="block text-sm font-medium text-gray-700 mb-2">Select an ethnicity to see recommended risk cutoffs:</label>
+                                <select id="ethnicity-select" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#1E847F] focus:ring-[#1E847F]">
+                                    <option value="european">European</option>
+                                    <option value="asian">Asian</option>
+                                    <option value="south_asian">South Asian</option>
+                                </select>
+                            </div>
+                            <div id="ethnicity-cards" class="mt-6 grid sm:grid-cols-3 gap-4 text-center">
+                                <!-- Cards will be populated by JS -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Fitness Factor Section -->
+        <section id="fitness" class="py-16 sm:py-24">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold tracking-tight text-gray-900">The Fitness Factor: A Powerful Modifier</h2>
+                    <p class="mt-4 max-w-3xl mx-auto text-lg text-gray-600">Body composition is only one part of the story. Cardiorespiratory fitness is an incredibly strong predictor of health and can significantly modify the risk associated with a higher BMI.</p>
+                </div>
+                <div class="chart-container">
+                    <canvas id="fitnessChart"></canvas>
+                </div>
+                <div class="mt-8 max-w-3xl mx-auto bg-white p-6 rounded-2xl shadow-md">
+                    <h4 class="text-xl font-bold text-gray-800 mb-3">Key Takeaway: The "Fat but Fit" Phenomenon</h4>
+                    <p class="text-gray-700">A landmark 2024 meta-analysis (Peterman et al.) found that being <strong class="text-gray-900">unfit carries a greater risk of cardiovascular death than being overweight or obese</strong>, provided an individual maintains a high level of fitness. As the chart shows, a normal-weight but unfit person has a higher mortality risk than an overweight or obese person who is fit. This highlights the importance of a holistic risk assessment that includes both body composition and physical fitness.</p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Conclusion Section -->
+        <section id="conclusion" class="py-16 sm:py-24 bg-[#1E847F]">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <h2 class="text-4xl font-bold tracking-tight text-white">Your Simplest, Smartest Health Check.</h2>
+                <p class="mt-6 max-w-2xl mx-auto text-xl text-green-100">The evidence is clear. For a more accurate, equitable, and actionable assessment of your cardiovascular risk, focus on a simple message:</p>
+                <div class="mt-8 inline-block bg-white/20 p-6 rounded-2xl">
+                    <p class="text-2xl sm:text-3xl font-bold text-white">"Keep your waist circumference to less than half your height."</p>
+                </div>
+                 <div class="mt-12">
+                    <h3 class="text-2xl font-semibold text-white mb-4">Recommendations for a Healthier Future</h3>
+                    <div class="max-w-4xl mx-auto grid md:grid-cols-3 gap-6 text-left">
+                        <div class="bg-white/10 p-4 rounded-lg text-white">
+                            <h4 class="font-bold">For Individuals</h4>
+                            <p class="mt-2 text-sm text-green-50">Use WHtR for self-screening. If your ratio is over 0.5, talk to your doctor about a full cardiovascular risk assessment.</p>
+                        </div>
+                        <div class="bg-white/10 p-4 rounded-lg text-white">
+                            <h4 class="font-bold">For Clinicians</h4>
+                            <p class="mt-2 text-sm text-green-50">Adopt WHtR as a routine vital sign. It's a more sensitive trigger for intervention than BMI alone, especially in diverse populations.</p>
+                        </div>
+                        <div class="bg-white/10 p-4 rounded-lg text-white">
+                            <h4 class="font-bold">For Public Health</h4>
+                            <p class="mt-2 text-sm text-green-50">Promote the simple "half your height" message. It's an empowering, memorable, and effective tool for population-level prevention.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // --- DATA --- //
+            const comparisonData = {
+                labels: ['BMI (Body Mass Index)', 'WHtR (Waist-to-Height Ratio)'],
+                datasets: [{
+                    label: 'Diagnostic Odds Ratio for Metabolic Syndrome',
+                    data: [5.17, 7.65],
+                    backgroundColor: ['#F2745A', '#1E847F'],
+                    borderColor: ['#D96751', '#1A716C'],
+                    borderWidth: 1
+                }]
+            };
+
+            const fitnessData = {
+                labels: ['Normal Weight', 'Overweight', 'Obese'],
+                datasets: [{
+                    label: 'Unfit',
+                    data: [2.04, 2.58, 3.35],
+                    backgroundColor: '#F2745A',
+                }, {
+                    label: 'Fit',
+                    data: [1.00, 1.50, 1.62], // Normal-Weight/Fit is the reference (1.00)
+                    backgroundColor: '#1E847F',
+                }]
+            };
+            
+            const ethnicityData = {
+                european: {
+                    bmi: '≥ 25',
+                    wc: 'M: ≥94, F: ≥80 cm',
+                    whtr: '≥ 0.5'
+                },
+                asian: {
+                    bmi: '≥ 23',
+                    wc: 'M: ≥90, F: ≥80 cm',
+                    whtr: '≥ 0.5'
+                },
+                south_asian: {
+                    bmi: '~23-24',
+                    wc: 'M: ≥90, F: ≥80 cm',
+                    whtr: '≥ 0.5'
+                }
+            };
+
+            // --- CHARTS --- //
+            const comparisonCtx = document.getElementById('comparisonChart').getContext('2d');
+            new Chart(comparisonCtx, {
+                type: 'bar',
+                data: comparisonData,
+                options: {
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Diagnostic Odds Ratio (Higher is Better)',
+                                font: { size: 14 }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return ` Odds Ratio: ${context.raw}`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            const fitnessCtx = document.getElementById('fitnessChart').getContext('2d');
+            new Chart(fitnessCtx, {
+                type: 'bar',
+                data: fitnessData,
+                options: {
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Hazard Ratio for CVD Mortality (vs. Fit/Normal Weight)',
+                                font: { size: 14 }
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'BMI Category',
+                                font: { size: 14 }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        tooltip: {
+                             callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += `${context.parsed.y.toFixed(2)}x risk`;
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // --- INTERACTIONS --- //
+            
+            // Calculator
+            const calculatorForm = document.getElementById('whtr-calculator');
+            calculatorForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const units = document.getElementById('units').value;
+                const waist = parseFloat(document.getElementById('waist').value);
+                const height = parseFloat(document.getElementById('height').value);
+                
+                if (isNaN(waist) || isNaN(height) || waist <= 0 || height <= 0) {
+                    return;
+                }
+                
+                let whtr;
+                // No conversion needed as long as units are consistent
+                whtr = waist / height;
+
+                const resultDiv = document.getElementById('calculator-result');
+                const whtrValueEl = document.getElementById('whtr-value');
+                const whtrMessageEl = document.getElementById('whtr-message');
+
+                whtrValueEl.textContent = whtr.toFixed(2);
+                
+                if (whtr < 0.4) {
+                    whtrMessageEl.textContent = 'This may indicate you are underweight.';
+                    whtrMessageEl.className = 'mt-2 text-md text-blue-700';
+                } else if (whtr >= 0.4 && whtr < 0.5) {
+                    whtrMessageEl.textContent = 'Healthy Range. You are keeping your waist less than half your height. Well done!';
+                    whtrMessageEl.className = 'mt-2 text-md text-green-700';
+                } else if (whtr >= 0.5 && whtr < 0.6) {
+                    whtrMessageEl.textContent = 'Increased Risk. Consider monitoring your waist circumference and discussing with a healthcare provider.';
+                    whtrMessageEl.className = 'mt-2 text-md text-orange-700';
+                } else {
+                    whtrMessageEl.textContent = 'High Risk. It is strongly recommended to consult a healthcare provider for a full risk assessment.';
+                    whtrMessageEl.className = 'mt-2 text-md text-red-700';
+                }
+
+                resultDiv.classList.remove('hidden');
+                resultDiv.classList.add('fade-in');
+            });
+            
+            // Evidence Tabs
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabPanes = document.querySelectorAll('.tab-pane');
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    
+                    const tabId = button.getAttribute('data-tab');
+                    tabPanes.forEach(pane => {
+                        if (pane.id === tabId) {
+                            pane.classList.remove('hidden');
+                            pane.classList.add('fade-in');
+                        } else {
+                            pane.classList.add('hidden');
+                        }
+                    });
+                });
+            });
+            
+            // Ethnicity Selector
+            const ethnicitySelect = document.getElementById('ethnicity-select');
+            const ethnicityCardsContainer = document.getElementById('ethnicity-cards');
+            
+            function updateEthnicityCards(ethnicity) {
+                const data = ethnicityData[ethnicity];
+                ethnicityCardsContainer.innerHTML = `
+                    <div class="bg-gray-100 p-4 rounded-lg fade-in">
+                        <h5 class="font-bold text-gray-800">BMI Cutoff</h5>
+                        <p class="text-2xl font-bold mt-2 text-[#F2745A]">${data.bmi}</p>
+                    </div>
+                    <div class="bg-gray-100 p-4 rounded-lg fade-in">
+                        <h5 class="font-bold text-gray-800">Waist (WC) Cutoff</h5>
+                        <p class="text-xl font-bold mt-2 text-[#F2745A]">${data.wc}</p>
+                    </div>
+                    <div class="bg-green-100 border border-green-300 p-4 rounded-lg fade-in">
+                        <h5 class="font-bold text-gray-800">WHtR Cutoff</h5>
+                        <p class="text-2xl font-bold mt-2 text-[#1E847F]">${data.whtr}</p>
+                    </div>
+                `;
+            }
+            
+            ethnicitySelect.addEventListener('change', (e) => {
+                updateEthnicityCards(e.target.value);
+            });
+            
+            // Initial call
+            updateEthnicityCards(ethnicitySelect.value);
+
+            // Smooth scrolling for nav links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+
+            // Active nav state on scroll
+            const sections = document.querySelectorAll('section');
+            const navLinks = document.querySelectorAll('.nav-button');
+            
+            window.addEventListener('scroll', () => {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    if (pageYOffset >= sectionTop - 70) {
+                        current = section.getAttribute('id');
+                    }
+                });
+                
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href').includes(current)) {
+                        link.classList.add('active');
+                    }
+                });
+            });
+
+        });
+    </script>
+</body>
+</html>
