@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Dashboard: Cardiovascular Risk in Diabetes</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Neutral Harmony -->
+    <!-- Application Structure Plan: A single-page dashboard with a persistent left-hand navigation sidebar and a main content area. The sidebar allows users to jump between thematic sections: (1) a high-level overview, (2) a direct comparison of T1D vs T2D risk, (3) a breakdown of specific CVD endpoints, (4) an interactive explorer for risk modulators, and (5) a summary of modern treatments. This non-linear, task-oriented structure was chosen to empower users to explore the data based on their own interests (e.g., a clinician checking treatments, a patient exploring risk factors), making the dense report more digestible and engaging than a linear document. -->
+    <!-- Visualization & Content Choices: 
+        - Overview: Goal(Inform) -> Big number cards -> Static display -> Highlights key stats immediately.
+        - T1D vs T2D: Goal(Compare) -> Interactive Bar Chart (Chart.js) -> Button-based filtering -> Directly visualizes the core report finding of disparate risk profiles.
+        - CVD Endpoints: Goal(Organize) -> Grid of cards -> Click-to-expand text -> Provides a scannable summary with on-demand detail.
+        - Risk Factors: Goal(Relationships) -> Interactive HTML/CSS "risk meter" updated with JS -> Dropdown selectors -> Allows users to simulate how different factors combine, making the concept of heterogeneous risk tangible.
+        - Treatments: Goal(Inform) -> Tabbed HTML table -> Clickable tabs -> Presents complex trial data in a clear, comparable format.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+        .nav-link {
+            transition: all 0.2s ease-in-out;
+        }
+        .nav-link.active {
+            background-color: #4f46e5;
+            color: white;
+            font-weight: 600;
+        }
+        .content-section {
+            display: none;
+        }
+        .content-section.active {
+            display: block;
+        }
+        .risk-meter-bar {
+            transition: width 0.5s ease-in-out;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <div class="flex min-h-screen">
+        <aside class="w-64 bg-white shadow-md p-4 space-y-2 fixed h-full">
+            <h1 class="text-xl font-bold text-indigo-700 mb-6 px-2">CVD & Diabetes Risk</h1>
+            <nav>
+                <a href="#overview" class="nav-link block w-full text-left py-2.5 px-4 rounded-lg text-gray-700 hover:bg-indigo-100">Overview</a>
+                <a href="#type-comparison" class="nav-link block w-full text-left py-2.5 px-4 rounded-lg text-gray-700 hover:bg-indigo-100">Risk by Diabetes Type</a>
+                <a href="#endpoints" class="nav-link block w-full text-left py-2.5 px-4 rounded-lg text-gray-700 hover:bg-indigo-100">Specific CVD Events</a>
+                <a href="#factors" class="nav-link block w-full text-left py-2.5 px-4 rounded-lg text-gray-700 hover:bg-indigo-100">Risk Factor Explorer</a>
+                <a href="#treatments" class="nav-link block w-full text-left py-2.5 px-4 rounded-lg text-gray-700 hover:bg-indigo-100">Modern Treatments</a>
+                <a href="#synthesis" class="nav-link block w-full text-left py-2.5 px-4 rounded-lg text-gray-700 hover:bg-indigo-100">Synthesis & Future</a>
+            </nav>
+        </aside>
+
+        <main class="flex-1 ml-64 p-6 md:p-10">
+            
+            <section id="overview" class="content-section">
+                <h2 class="text-3xl font-bold mb-4">The Landscape of Cardiovascular Risk in Diabetes</h2>
+                <p class="mb-8 text-lg text-gray-600">This interactive dashboard synthesizes findings from recent meta-analyses on the link between diabetes and cardiovascular disease (CVD). The data reveal a complex picture where risk is not uniform but is significantly influenced by diabetes type, specific CVD outcomes, and various patient factors. This tool allows you to explore these nuances and understand the key messages from the research.</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                        <h3 class="text-indigo-600 font-semibold mb-2">Overall CVD Risk</h3>
+                        <p class="text-5xl font-bold">~2x</p>
+                        <p class="text-gray-500 mt-1">The approximate doubling of cardiovascular disease risk for individuals with diabetes compared to those without.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                        <h3 class="text-indigo-600 font-semibold mb-2">Global Prevalence</h3>
+                        <p class="text-5xl font-bold">552M</p>
+                        <p class="text-gray-500 mt-1">The projected number of people with diabetes worldwide by 2030, highlighting a major public health challenge.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                        <h3 class="text-indigo-600 font-semibold mb-2">Residual Risk</h3>
+                        <p class="text-5xl font-bold">21%+</p>
+                        <p class="text-gray-500 mt-1">The higher risk of CVD that persists in T2DM adults even when traditional risk factors are optimally controlled.</p>
+                    </div>
+                </div>
+
+                <div class="mt-8 bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                    <h3 class="text-xl font-bold mb-3">A Story of Heterogeneity</h3>
+                    <p class="text-gray-600">While the "doubling of risk" is a useful starting point, it masks a landscape of profound variability. The true clinical challenge lies in dissecting this average to understand for whom the risk is most severe, which specific cardiovascular pathologies are most likely to occur, and how this risk is modulated by patient-specific factors like diabetes type, sex, and age of onset. Use the navigation to delve deeper into these crucial distinctions.</p>
+                </div>
+            </section>
+
+            <section id="type-comparison" class="content-section">
+                <h2 class="text-3xl font-bold mb-4">Risk by Diabetes Type: A Tale of Two Diseases</h2>
+                <p class="mb-8 text-lg text-gray-600">A critical finding in recent research is that Type 1 (T1D) and Type 2 (T2D) diabetes are not monolithic in their cardiovascular impact. T1D confers a dramatically higher relative risk for cardiovascular events compared to T2D. Select a cardiovascular outcome below to see a direct comparison of the pooled relative risk from meta-analyses.</p>
+                
+                <div class="text-center mb-6">
+                    <div id="risk-type-buttons" class="inline-flex rounded-lg shadow-sm">
+                        <button class="risk-type-btn bg-white py-2 px-4 rounded-l-lg font-medium text-gray-700 hover:bg-gray-50 focus:z-10 focus:ring-2 focus:ring-indigo-500" data-endpoint="chd">Coronary Heart Disease</button>
+                        <button class="risk-type-btn bg-white py-2 px-4 font-medium text-gray-700 hover:bg-gray-50 focus:z-10 focus:ring-2 focus:ring-indigo-500 -ml-px" data-endpoint="hf">Heart Failure</button>
+                        <button class="risk-type-btn bg-white py-2 px-4 font-medium text-gray-700 hover:bg-gray-50 focus:z-10 focus:ring-2 focus:ring-indigo-500 -ml-px" data-endpoint="stroke">Stroke</button>
+                        <button class="risk-type-btn bg-white py-2 px-4 rounded-r-lg font-medium text-gray-700 hover:bg-gray-50 focus:z-10 focus:ring-2 focus:ring-indigo-500 -ml-px" data-endpoint="all">Overall CVD</button>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                     <div class="chart-container">
+                        <canvas id="typeComparisonChart"></canvas>
+                    </div>
+                    <div id="type-comparison-text" class="mt-4 text-center text-gray-600 max-w-3xl mx-auto"></div>
+                </div>
+            </section>
+
+            <section id="endpoints" class="content-section">
+                <h2 class="text-3xl font-bold mb-4">A Granular Look at CVD Endpoints</h2>
+                 <p class="mb-8 text-lg text-gray-600">Diabetes does not increase the risk for all cardiovascular events equally. Recent evidence shows that some conditions, like Heart Failure and Peripheral Arterial Disease, are often the *first* sign of cardiovascular trouble in people with diabetes, challenging older models of disease progression. Click on each card to learn more about the specific risk for each endpoint.</p>
+                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="endpoint-card bg-white p-6 rounded-xl shadow-sm border border-gray-200 cursor-pointer hover:shadow-lg transition-shadow">
+                        <h3 class="text-xl font-semibold mb-2">Heart Failure (HF)</h3>
+                        <p class="text-3xl font-bold text-indigo-600">RR: 4.29 (T1D)</p>
+                        <p class="text-3xl font-bold text-indigo-600">RR: 1.78 (T2D)</p>
+                        <div class="endpoint-details hidden mt-4 text-gray-600">
+                            <p>Heart Failure is a preeminent threat, often appearing as the *initial* CVD event. Diabetes promotes myocardial dysfunction across the spectrum, independent of coronary artery disease, leading to the concept of a "diabetic cardiomyopathy."</p>
+                        </div>
+                    </div>
+                     <div class="endpoint-card bg-white p-6 rounded-xl shadow-sm border border-gray-200 cursor-pointer hover:shadow-lg transition-shadow">
+                        <h3 class="text-xl font-semibold mb-2">Peripheral Arterial Disease (PAD)</h3>
+                        <p class="text-3xl font-bold text-indigo-600">HR: 2.98 (T2D)</p>
+                        <div class="endpoint-details hidden mt-4 text-gray-600">
+                            <p>PAD showed the highest relative risk among 12 manifestations in one large T2D cohort. It's a key indicator of severe, systemic atherosclerosis, not just a "peripheral" issue.</p>
+                        </div>
+                    </div>
+                    <div class="endpoint-card bg-white p-6 rounded-xl shadow-sm border border-gray-200 cursor-pointer hover:shadow-lg transition-shadow">
+                        <h3 class="text-xl font-semibold mb-2">Coronary Heart Disease (CHD)</h3>
+                        <p class="text-3xl font-bold text-indigo-600">RR: 9.38 (T1D)</p>
+                         <p class="text-3xl font-bold text-indigo-600">RR: ~2.0 (T2D)</p>
+                        <div class="endpoint-details hidden mt-4 text-gray-600">
+                            <p>The bedrock of diabetic CVD risk, driven by accelerated and more diffuse atherosclerosis. The risk is exceptionally high in T1D, establishing it as a potent risk factor for premature coronary events.</p>
+                        </div>
+                    </div>
+                     <div class="endpoint-card bg-white p-6 rounded-xl shadow-sm border border-gray-200 cursor-pointer hover:shadow-lg transition-shadow">
+                        <h3 class="text-xl font-semibold mb-2">Stroke</h3>
+                        <p class="text-3xl font-bold text-indigo-600">RR: 4.08 (T1D)</p>
+                        <p class="text-3xl font-bold text-indigo-600">HR: 1.72 (T2D)</p>
+                        <div class="endpoint-details hidden mt-4 text-gray-600">
+                            <p>The risk for cerebrovascular disease is substantially increased, particularly for ischemic stroke. The risk amplification is, again, much more dramatic in the T1D population.</p>
+                        </div>
+                    </div>
+                 </div>
+            </section>
+            
+            <section id="factors" class="content-section">
+                <h2 class="text-3xl font-bold mb-4">Risk Factor Explorer</h2>
+                <p class="mb-8 text-lg text-gray-600">A person's cardiovascular risk from diabetes is not a single number; it's a dynamic profile modified by many factors. Use the controls below to see how different variables interact to change the overall risk landscape. This tool illustrates why personalized risk assessment is crucial.</p>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                    <div class="lg:col-span-1 space-y-4">
+                        <div>
+                            <label for="factor-sex" class="block text-sm font-medium text-gray-700">Sex</label>
+                            <select id="factor-sex" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="factor-onset" class="block text-sm font-medium text-gray-700">Age of T1D Onset</label>
+                            <select id="factor-onset" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                <option value="late">Late (26-30 yrs)</option>
+                                <option value="early">Early (<10 yrs)</option>
+                            </select>
+                        </div>
+                         <div>
+                            <label for="factor-glycemic" class="block text-sm font-medium text-gray-700">Glycemic Variability</label>
+                            <select id="factor-glycemic" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                <option value="low">Low & Stable</option>
+                                <option value="high">High Variability</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="lg:col-span-2">
+                        <h3 class="text-xl font-semibold text-center mb-4">Relative Risk Profile</h3>
+                        <div class="bg-gray-200 rounded-full h-8 w-full overflow-hidden">
+                            <div id="risk-meter-bar" class="risk-meter-bar h-full rounded-full flex items-center justify-end pr-4">
+                                <span id="risk-meter-label" class="text-white font-bold text-sm"></span>
+                            </div>
+                        </div>
+                        <div id="risk-factor-text" class="mt-4 text-gray-600"></div>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="treatments" class="content-section">
+                <h2 class="text-3xl font-bold mb-4">Evolving Treatment Paradigms</h2>
+                <p class="mb-8 text-lg text-gray-600">The understanding of diabetes as a cardiovascular risk factor has revolutionized treatment. The focus has shifted from merely controlling blood sugar to a comprehensive strategy of cardiorenal risk reduction. This was driven by landmark trials for new drug classes—SGLT2 inhibitors and GLP-1 receptor agonists—which showed profound benefits beyond their glucose-lowering effects.</p>
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                    <h3 class="text-xl font-bold mb-3">Key Findings from CVOT Meta-Analyses (in T2DM)</h3>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Drug Class</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Endpoint</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Risk Reduction (HR)</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">SGLT2 Inhibitors</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-gray-500">Major Adverse CV Events (MACE)</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-gray-500 font-semibold">10% (HR 0.90)</td>
+                                </tr>
+                                 <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">SGLT2 Inhibitors</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-gray-500">Hospitalization for Heart Failure</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-gray-500 font-semibold">32% (HR 0.68)</td>
+                                </tr>
+                                 <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">GLP-1 Receptor Agonists</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-gray-500">Major Adverse CV Events (MACE)</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-gray-500 font-semibold">14% (HR 0.86)</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">GLP-1 Receptor Agonists</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-gray-500">All-Cause Mortality</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-gray-500 font-semibold">14% Reduction</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <p class="mt-4 text-gray-600">These findings underscore why modern guidelines recommend these agents for high-risk individuals, often irrespective of HbA1c levels. They target the 'residual risk' that persists even with good control of blood pressure and lipids.</p>
+                </div>
+            </section>
+            
+            <section id="synthesis" class="content-section">
+                <h2 class="text-3xl font-bold mb-4">Synthesis and Future Directions</h2>
+                <p class="mb-6 text-lg text-gray-600">The evidence paints a clear picture: cardiovascular risk in diabetes is complex, severe, and highly variable. The era of viewing it as a single disease with a uniform risk profile is over. A multi-dimensional understanding is now the clinical mandate.</p>
+                
+                <div class="space-y-6">
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                        <h3 class="text-xl font-bold mb-3">Key Conclusions</h3>
+                        <ul class="list-disc list-inside space-y-2 text-gray-600">
+                            <li>A significant <strong>residual risk</strong> persists beyond traditional risk factor control.</li>
+                            <li><strong>Type 1 Diabetes</strong> confers a substantially more severe risk profile than Type 2.</li>
+                            <li><strong>Heart Failure</strong> has emerged as a primary, often initial, complication.</li>
+                            <li>Risk is a dynamic construct modulated by <strong>sex, age of onset, and glycemic variability</strong>.</li>
+                            <li>Therapy has shifted to a <strong>cardiorenal-centric model</strong>, leveraging SGLT2i and GLP-1 RAs.</li>
+                            <li>Accurate risk stratification requires <strong>diabetes-specific prediction models</strong>.</li>
+                        </ul>
+                    </div>
+                     <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                        <h3 class="text-xl font-bold mb-3">Agenda for Future Research</h3>
+                         <ul class="list-disc list-inside space-y-2 text-gray-600">
+                             <li>Elucidating the mechanisms behind the greater <strong>relative risk in women</strong>.</li>
+                            <li>Developing and implementing <strong>T1D-specific risk scores</strong> and testing early interventions.</li>
+                            <li>Addressing health disparities by ensuring <strong>diverse enrollment in clinical trials</strong>.</li>
+                            <li>Determining optimal <strong>sequencing and combination therapy</strong> strategies.</li>
+                            <li>Quantifying the role of <strong>intensive lifestyle interventions</strong> alongside modern pharmacotherapy.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const navLinks = document.querySelectorAll('.nav-link');
+            const contentSections = document.querySelectorAll('.content-section');
+            const typeComparisonChartCtx = document.getElementById('typeComparisonChart').getContext('2d');
+            
+            let typeComparisonChart;
+
+            const riskData = {
+                chd: { T1: 9.38, T2: 2.0, text: 'For Coronary Heart Disease (CHD), the risk amplification in Type 1 Diabetes is staggering, representing a more than nine-fold increase compared to non-diabetics. This stands in sharp contrast to the approximate doubling of risk seen in Type 2 Diabetes, establishing T1D as a highly aggressive vasculopathy.' },
+                hf: { T1: 4.29, T2: 1.78, text: 'For Heart Failure (HF), the risk is substantially elevated in both types but is particularly pronounced in Type 1 Diabetes. This highlights that diabetes damages the heart muscle directly, a process often occurring even before significant coronary events.' },
+                stroke: { T1: 4.08, T2: 1.72, text: 'For Stroke, individuals with Type 1 Diabetes face a four-fold increase in relative risk. While the risk in Type 2 Diabetes is also significant, the magnitude in T1D underscores a more severe impact on cerebrovascular health.' },
+                all: { T1: 5.09, T2: 2.0, text: 'For overall Cardiovascular Disease (CVD), individuals with Type 1 Diabetes have over five times the risk of the general population. This is more than double the generalized risk seen in Type 2 Diabetes, demanding a separate and more aggressive approach to risk management.' }
+            };
+
+            const riskFactorData = {
+                male: { base: 1.0, text: 'Men with diabetes have a higher absolute risk of CVD.' },
+                female: { base: 1.44, text: 'Women with diabetes experience a greater <strong>relative</strong> increase in CHD risk (44% higher RR than men with diabetes), effectively erasing their natural cardioprotective advantage more profoundly.'},
+                late: { mult: 3.85, text: 'A T1D diagnosis between ages 26-30 is associated with a 3.85x increase in CVD risk.'},
+                early: { mult: 11.44, text: 'An early T1D diagnosis (before age 10) is devastating, associated with an <strong>11.44x increase</strong> in CVD risk and a loss of 14-18 life-years.'},
+                low: { mult: 1.0, text: 'Stable blood sugar levels are associated with better outcomes.' },
+                high: { mult: 2.38, text: 'High glycemic variability (swings in blood sugar) is a powerful independent predictor, nearly <strong>2.5 times</strong> the risk of major adverse cardiovascular events compared to stable control.'}
+            };
+            
+            function navigate(hash) {
+                if (!hash) hash = '#overview';
+
+                navLinks.forEach(link => {
+                    if (link.getAttribute('href') === hash) {
+                        link.classList.add('active');
+                    } else {
+                        link.classList.remove('active');
+                    }
+                });
+
+                contentSections.forEach(section => {
+                    if ('#' + section.id === hash) {
+                        section.classList.add('active');
+                    } else {
+                        section.classList.remove('active');
+                    }
+                });
+            }
+            
+            function updateTypeComparisonChart(endpoint) {
+                const data = riskData[endpoint];
+                document.getElementById('type-comparison-text').innerHTML = data.text;
+                
+                if (typeComparisonChart) {
+                    typeComparisonChart.data.datasets[0].data = [data.T1];
+                    typeComparisonChart.data.datasets[1].data = [data.T2];
+                    typeComparisonChart.options.plugins.title.text = `Relative Risk for ${endpoint.toUpperCase()}`;
+                    typeComparisonChart.update();
+                } else {
+                     typeComparisonChart = new Chart(typeComparisonChartCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: [''],
+                            datasets: [
+                                {
+                                    label: 'Type 1 Diabetes',
+                                    data: [data.T1],
+                                    backgroundColor: 'rgba(199, 210, 254, 1)',
+                                    borderColor: 'rgba(79, 70, 229, 1)',
+                                    borderWidth: 2
+                                },
+                                {
+                                    label: 'Type 2 Diabetes',
+                                    data: [data.T2],
+                                    backgroundColor: 'rgba(254, 202, 202, 1)',
+                                    borderColor: 'rgba(220, 38, 38, 1)',
+                                    borderWidth: 2
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    position: 'top',
+                                },
+                                title: {
+                                    display: true,
+                                    text: `Relative Risk for ${endpoint.toUpperCase()}`,
+                                    font: { size: 18 }
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            return `${context.dataset.label}: ${context.raw.toFixed(2)}x risk`;
+                                        }
+                                    }
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    title: {
+                                        display: true,
+                                        text: 'Relative Risk (RR) vs. No Diabetes'
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+                
+                document.querySelectorAll('.risk-type-btn').forEach(btn => {
+                    if(btn.dataset.endpoint === endpoint) {
+                        btn.classList.add('bg-indigo-100', 'text-indigo-700');
+                    } else {
+                        btn.classList.remove('bg-indigo-100', 'text-indigo-700');
+                    }
+                });
+            }
+
+            function updateRiskFactorExplorer() {
+                const sex = document.getElementById('factor-sex').value;
+                const onset = document.getElementById('factor-onset').value;
+                const glycemic = document.getElementById('factor-glycemic').value;
+                
+                const sexData = riskFactorData[sex];
+                const onsetData = riskFactorData[onset];
+                const glycemicData = riskFactorData[glycemic];
+                
+                const finalRiskScore = sexData.base * onsetData.mult * glycemicData.mult;
+                
+                let meterPercent, meterColor, meterLabel;
+                
+                if(finalRiskScore < 10) {
+                    meterPercent = (finalRiskScore / 10) * 33;
+                    meterColor = 'bg-yellow-400';
+                    meterLabel = 'High';
+                } else if (finalRiskScore < 20) {
+                    meterPercent = 33 + ((finalRiskScore - 10) / 10) * 33;
+                    meterColor = 'bg-orange-500';
+                    meterLabel = 'Very High';
+                } else {
+                    meterPercent = 66 + Math.min(34, ((finalRiskScore - 20)/20) * 34);
+                    meterColor = 'bg-red-600';
+                    meterLabel = 'Extreme';
+                }
+
+                const meterBar = document.getElementById('risk-meter-bar');
+                meterBar.style.width = `${meterPercent}%`;
+                meterBar.className = `risk-meter-bar h-full rounded-full flex items-center justify-end pr-4 ${meterColor}`;
+                
+                document.getElementById('risk-meter-label').textContent = meterLabel;
+
+                document.getElementById('risk-factor-text').innerHTML = `
+                    <p class="mb-2">${sexData.text}</p>
+                    <p class="mb-2">${onsetData.text}</p>
+                    <p class="mb-2">${glycemicData.text}</p>
+                `;
+            }
+
+            window.addEventListener('hashchange', () => navigate(window.location.hash));
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    window.location.hash = link.getAttribute('href');
+                });
+            });
+
+            document.querySelectorAll('.risk-type-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    updateTypeComparisonChart(e.currentTarget.dataset.endpoint);
+                });
+            });
+            
+            document.querySelectorAll('.endpoint-card').forEach(card => {
+                card.addEventListener('click', () => {
+                   const details = card.querySelector('.endpoint-details');
+                   details.classList.toggle('hidden');
+                });
+            });
+
+            document.getElementById('factor-sex').addEventListener('change', updateRiskFactorExplorer);
+            document.getElementById('factor-onset').addEventListener('change', updateRiskFactorExplorer);
+            document.getElementById('factor-glycemic').addEventListener('change', updateRiskFactorExplorer);
+
+            navigate(window.location.hash);
+            updateTypeComparisonChart('chd');
+            updateRiskFactorExplorer();
+        });
+    </script>
+</body>
+</html>
