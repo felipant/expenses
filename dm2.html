@@ -1,415 +1,438 @@
 <!DOCTYPE html>
-<html lang="pt-BR" class="scroll-smooth">
-
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-B">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manejo da Hipertensão Arterial: 20 Casos Clínicos</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>Gerador de Receita Médica</title>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
     <style>
+        /* Define a fonte Arial para todo o documento, como solicitado */
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
         }
-        .case-card {
-            scroll-margin-top: 100px;
+
+        h1, h2 {
+            text-align: center;
+            color: #333;
+        }
+
+        /* Container principal */
+        .container {
+            max-width: 1000px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Estilos do formulário */
+        #prescriptionForm {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .form-paciente {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .form-group input {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-family: 'Arial', sans-serif;
+            font-size: 14px;
+        }
+
+        /* Estilos da tabela */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            table-layout: fixed; 
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+            vertical-align: top; 
+        }
+
+        th {
+            background-color: #f0f0f0;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        td input, td select, td textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box; 
+            font-family: 'Arial', sans-serif;
+            font-size: 14px;
+        }
+        
+        td textarea {
+            resize: vertical; 
+        }
+
+        .col-dose, .col-qtd {
+            width: 90px;
+        }
+        .col-orient {
+            width: 250px;
+        }
+
+        /* Estilos dos botões */
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'Arial', sans-serif;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-add {
+            background-color: #e0e0e0;
+            color: #333;
+            align-self: flex-start;
+            margin-top: 10px;
+        }
+        .btn-add:hover {
+            background-color: #d4d4d4;
+        }
+
+        .btn-submit {
+            background-color: #007bff;
+            color: white;
+            margin-top: 20px;
+        }
+        .btn-submit:hover {
+            background-color: #0056b3;
         }
     </style>
 </head>
+<body>
 
-<body class="bg-gray-50 text-gray-800">
-
-    <!-- Header -->
-    <header class="bg-white shadow-md sticky top-0 z-10">
-        <div class="container mx-auto px-6 py-4">
-            <h1 class="text-2xl md:text-3xl font-bold text-blue-800">Manejo da Hipertensão Arterial</h1>
-            <p class="text-md text-gray-600">20 Casos Clínicos Baseados nas Diretrizes Brasileiras de Hipertensão Arterial - 2020</p>
-        </div>
-    </header>
-
-    <div class="container mx-auto px-6 py-8 flex flex-col lg:flex-row gap-8">
+    <div class="container">
+        <h1>Gerador de Receita Médica</h1>
         
-        <!-- Navigation Sidebar -->
-        <aside class="lg:w-1/4">
-            <div class="sticky top-24">
-                <h2 class="font-bold text-lg mb-4 text-blue-700">Navegar pelos Casos</h2>
-                <ul class="space-y-2 text-sm">
-                    <li><a href="#caso1" class="text-blue-600 hover:underline">Caso 1: HAS Estágio 1, Baixo Risco</a></li>
-                    <li><a href="#caso2" class="text-blue-600 hover:underline">Caso 2: HAS Estágio 1, Intolerância a IECA</a></li>
-                    <li><a href="#caso3" class="text-blue-600 hover:underline">Caso 3: HAS Estágio 1 em Afrodescendente</a></li>
-                    <li><a href="#caso4" class="text-blue-600 hover:underline">Caso 4: HAS Estágio 2, Terapia Dupla Inicial</a></li>
-                    <li><a href="#caso5" class="text-blue-600 hover:underline">Caso 5: HAS Estágio 2, Alto Risco CV</a></li>
-                    <li><a href="#caso6" class="text-blue-600 hover:underline">Caso 6: HAS Sistólica Isolada no Idoso</a></li>
-                    <li><a href="#caso7" class="text-blue-600 hover:underline">Caso 7: HAS e Diabetes Mellitus Tipo 2</a></li>
-                    <li><a href="#caso8" class="text-blue-600 hover:underline">Caso 8: Falha na Terapia Dupla (Terapia Tripla)</a></li>
-                    <li><a href="#caso9" class="text-blue-600 hover:underline">Caso 9: HAS e Síndrome Metabólica</a></li>
-                    <li><a href="#caso10" class="text-blue-600 hover:underline">Caso 10: HAS e Doença Renal Crônica</a></li>
-                    <li><a href="#caso11" class="text-blue-600 hover:underline">Caso 11: HAS e Insuficiência Cardíaca</a></li>
-                    <li><a href="#caso12" class="text-blue-600 hover:underline">Caso 12: Hipertensão Arterial Resistente (HAR)</a></li>
-                    <li><a href="#caso13" class="text-blue-600 hover:underline">Caso 13: HAR com Apneia do Sono</a></li>
-                    <li><a href="#caso14" class="text-blue-600 hover:underline">Caso 14: Hipertensão Refratária (HARf)</a></li>
-                    <li><a href="#caso15" class="text-blue-600 hover:underline">Caso 15: HAS e Doença Arterial Coronariana</a></li>
-                    <li><a href="#caso16" class="text-blue-600 hover:underline">Caso 16: HAS no Idoso Muito Frágil (>80 anos)</a></li>
-                    <li><a href="#caso17" class="text-blue-600 hover:underline">Caso 17: Urgência Hipertensiva</a></li>
-                    <li><a href="#caso18" class="text-blue-600 hover:underline">Caso 18: HAS e Hiperplasia Prostática Benigna</a></li>
-                    <li><a href="#caso19" class="text-blue-600 hover:underline">Caso 19: HAS Crônica na Gestação</a></li>
-                    <li><a href="#caso20" class="text-blue-600 hover:underline">Caso 20: HARf com necessidade de Vasodilatador</a></li>
-                </ul>
+        <form id="prescriptionForm">
+            
+            <h2>Dados do Paciente</h2>
+            <div class="form-paciente">
+                <div class="form-group">
+                    <label for="nome">Nome:</label>
+                    <input type="text" id="nome" required>
+                </div>
+                <div class="form-group">
+                    <label for="idade">Idade:</label>
+                    <input type="text" id="idade" required>
+                </div>
+                <div class="form-group">
+                    <label for="data">Data:</label>
+                    <input type="text" id="data" required>
+                </div>
             </div>
-        </aside>
 
-        <!-- Main Content with Clinical Cases -->
-        <main class="lg:w-3/4">
-            <div class="space-y-8">
-                
-                <!-- Introduction -->
-                <div class="bg-white p-6 rounded-lg shadow">
-                    <h2 class="text-xl font-bold text-blue-800 mb-3">Princípios do Tratamento Farmacológico</h2>
-                    <p class="mb-2">O objetivo do tratamento da hipertensão arterial (HA) é a redução da pressão arterial (PA) para diminuir os desfechos cardiovasculares e a mortalidade. A escolha da terapia deve ser individualizada, considerando o estágio da HA, o risco cardiovascular (CV) do paciente, comorbidades e as características dos fármacos.</p>
-                    <p>As classes preferenciais são: Diuréticos (DIU), Bloqueadores dos Canais de Cálcio (BCC), Inibidores da Enzima Conversora de Angiotensina (IECA) e Bloqueadores dos Receptores da Angiotensina II (BRA). Os Betabloqueadores (BB) são indicados em situações específicas. A terapia combinada é a estratégia inicial para a maioria dos pacientes.</p>
-                </div>
-                
-                <!-- Medication Classes -->
-                <div class="bg-white p-6 rounded-lg shadow">
-                    <h2 class="text-xl font-bold text-blue-800 mb-4">Classes de Medicamentos Anti-Hipertensivos</h2>
-                    <div class="space-y-4 text-sm">
-                        <div>
-                            <h4 class="font-semibold text-blue-700">1. Diuréticos (DIU)</h4>
-                            <p class="ml-4 text-gray-700"><strong>Mecanismo de Ação:</strong> Atuam nos rins aumentando a excreção de sódio e água (natriurese), o que reduz o volume sanguíneo. A longo prazo, também diminuem a resistência vascular periférica.</p>
-                             <p class="ml-4 mt-2 text-gray-700"><strong>Exemplos e Doses Típicas (mg/dia):</strong> Hidroclorotiazida (12,5-25), Clortalidona (12,5-25), Indapamida (1,5).</p>
-                        </div>
-                        <div>
-                            <h4 class="font-semibold text-blue-700">2. Inibidores da Enzima Conversora de Angiotensina (IECA)</h4>
-                            <p class="ml-4 text-gray-700"><strong>Mecanismo de Ação:</strong> Inibem a enzima que converte angiotensina I em angiotensina II (um potente vasoconstritor). Isso resulta em vasodilatação e redução da produção de aldosterona, diminuindo a retenção de sódio e água.</p>
-                            <p class="ml-4 mt-2 text-gray-700"><strong>Exemplos e Doses Típicas (mg/dia):</strong> Captopril (25-150), Enalapril (5-40), Lisinopril (10-40), Ramipril (2,5-20).</p>
-                        </div>
-                        <div>
-                            <h4 class="font-semibold text-blue-700">3. Bloqueadores dos Receptores de Angiotensina II (BRA)</h4>
-                            <p class="ml-4 text-gray-700"><strong>Mecanismo de Ação:</strong> Bloqueiam seletivamente a ligação da angiotensina II aos seus receptores (AT1), impedindo diretamente sua ação vasoconstritora e de liberação de aldosterona.</p>
-                             <p class="ml-4 mt-2 text-gray-700"><strong>Exemplos e Doses Típicas (mg/dia):</strong> Losartana (50-100), Valsartana (80-320), Candesartana (8-32), Olmesartana (20-40).</p>
-                        </div>
-                        <div>
-                            <h4 class="font-semibold text-blue-700">4. Bloqueadores dos Canais de Cálcio (BCC)</h4>
-                            <p class="ml-4 text-gray-700"><strong>Mecanismo de Ação:</strong> Impedem a entrada de íons de cálcio nas células musculares lisas das artérias, o que leva ao relaxamento da musculatura vascular, resultando em vasodilatação e redução da resistência periférica.</p>
-                            <p class="ml-4 mt-2 text-gray-700"><strong>Exemplos e Doses Típicas (mg/dia):</strong> Anlodipino (2,5-10), Nifedipino Retard (20-60), Lercanidipino (10-20), Diltiazem (120-360).</p>
-                        </div>
-                        <div>
-                            <h4 class="font-semibold text-blue-700">5. Betabloqueadores (BB)</h4>
-                            <p class="ml-4 text-gray-700"><strong>Mecanismo de Ação:</strong> Bloqueiam os receptores beta-adrenérgicos, principalmente no coração, reduzindo a frequência cardíaca e a força de contração (débito cardíaco). Também diminuem a secreção de renina pelos rins.</p>
-                            <p class="ml-4 mt-2 text-gray-700"><strong>Exemplos e Doses Típicas (mg/dia):</strong> Atenolol (25-100), Metoprolol (50-200), Bisoprolol (2,5-10), Carvedilol (12,5-50), Nebivolol (5).</p>
-                        </div>
-                        <div>
-                            <h4 class="font-semibold text-blue-700">6. Antagonistas Mineralocorticoides (Poupadores de Potássio)</h4>
-                            <p class="ml-4 text-gray-700"><strong>Mecanismo de Ação:</strong> (Ex: Espironolactona) Bloqueiam os receptores da aldosterona nos rins, promovendo a excreção de sódio e água, enquanto poupam potássio. São chave no tratamento da Hipertensão Resistente.</p>
-                            <p class="ml-4 mt-2 text-gray-700"><strong>Exemplos e Doses Típicas (mg/dia):</strong> Espironolactona (25-100).</p>
-                        </div>
-                        <div>
-                            <h4 class="font-semibold text-blue-700">7. Alfabloqueadores</h4>
-                            <p class="ml-4 text-gray-700"><strong>Mecanismo de Ação:</strong> Bloqueiam os receptores alfa-1 adrenérgicos nos vasos sanguíneos, causando relaxamento e vasodilatação. São úteis em pacientes com Hiperplasia Prostática Benigna associada.</p>
-                            <p class="ml-4 mt-2 text-gray-700"><strong>Exemplos e Doses Típicas (mg/dia):</strong> Doxazosina (1-16).</p>
-                        </div>
-                        <div>
-                            <h4 class="font-semibold text-blue-700">8. Simpatolíticos de Ação Central</h4>
-                            <p class="ml-4 text-gray-700"><strong>Mecanismo de Ação:</strong> (Ex: Clonidina, Metildopa) Agem no sistema nervoso central para diminuir os sinais simpáticos para os vasos sanguíneos, resultando em menor resistência vascular e redução da PA.</p>
-                            <p class="ml-4 mt-2 text-gray-700"><strong>Exemplos e Doses Típicas (mg/dia):</strong> Metildopa (500-2000), Clonidina (0,1-0,6).</p>
-                        </div>
-                        <div>
-                            <h4 class="font-semibold text-blue-700">9. Vasodilatadores Diretos</h4>
-                            <p class="ml-4 text-gray-700"><strong>Mecanismo de Ação:</strong> (Ex: Hidralazina) Atuam diretamente relaxando a musculatura lisa das artérias, causando vasodilatação e diminuindo a resistência vascular periférica.</p>
-                            <p class="ml-4 mt-2 text-gray-700"><strong>Exemplos e Doses Típicas (mg/dia):</strong> Hidralazina (50-200).</p>
-                        </div>
-                    </div>
-                </div>
+            <h2>Medicamentos</h2>
+            <table id="medicationTable">
+                <thead>
+                    <tr>
+                        <th>Medicamento</th>
+                        <th class="col-dose">Dose</th>
+                        <th>Forma</th>
+                        <th>Unidade</th>
+                        <th>Via de Adm.</th>
+                        <th class="col-qtd">Quantidade</th>
+                        <th class="col-orient">Orientações</th>
+                    </tr>
+                </thead>
+                <tbody id="medicationTbody">
+                    <tr>
+                        <td><input type="text" class="med-nome"></td>
+                        <td class="col-dose"><input type="text" class="med-dose"></td>
+                        <td>
+                            <input type="text" class="med-forma" list="lista-formas">
+                        </td>
+                        <td>
+                            <input type="text" class="med-unidade" list="lista-unidades">
+                        </td>
+                        <td>
+                            <input type="text" class="med-via" list="lista-vias">
+                        </td>
+                        <td class="col-qtd"><input type="text" class="med-qtd"></td>
+                        <td class="col-orient">
+                            <textarea class="med-orient" rows="3"></textarea>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
 
-                <!-- Case 1 -->
-                <div id="caso1" class="case-card bg-white p-6 rounded-lg shadow">
-                    <h3 class="text-lg font-bold text-blue-700 border-b pb-2 mb-3">Caso 1: HAS Estágio 1 em Paciente Jovem de Baixo Risco</h3>
-                    <div class="space-y-3 text-sm">
-                        <p><strong class="font-semibold">História Clínica:</strong> João, 35 anos, programador. Assintomático, descobriu PA elevada em medição de rotina. Nega comorbidades. Pai hipertenso. Tabagista (10 cigarros/dia), sedentário.</p>
-                        <p><strong class="font-semibold">Exame Físico:</strong> PA 145/92 mmHg (média de 3 medidas). FC 78 bpm. IMC 26 kg/m².</p>
-                        <p><strong class="font-semibold">Exames:</strong> Glicemia 95 mg/dL, Colesterol total 210 mg/dL, Creatinina 0.9 mg/dL. ECG sem HVE.</p>
-                        <p><strong class="font-semibold">Diagnóstico e Risco:</strong> Hipertensão Arterial Estágio 1. Risco Cardiovascular Baixo.</p>
-                        <p><strong class="font-semibold">Conduta:</strong>
-                            <br><strong>- Meta:</strong> PA < 140/90 mmHg, buscando < 130/80 mmHg se bem tolerado.
-                            <br><strong>- Não Medicamentoso:</strong> Aconselhamento para cessação do tabagismo, dieta DASH, atividade física regular.
-                            <br><strong>- Medicamentoso:</strong> Iniciar monoterapia após 3 meses se MEV ineficaz. <strong class="text-green-700">Classe: Diurético Tiazídico.</strong> Prescrição: Hidroclorotiazida 12,5 mg/dia. Justificativa: Monoterapia é recomendada para HA Estágio 1 de baixo risco (Figura 9.1 da diretriz). DIU é uma das classes preferenciais.
-                        </p>
-                    </div>
-                </div>
-
-                <!-- Case 2 -->
-                <div id="caso2" class="case-card bg-white p-6 rounded-lg shadow">
-                    <h3 class="text-lg font-bold text-blue-700 border-b pb-2 mb-3">Caso 2: HAS Estágio 1 com Intolerância a IECA</h3>
-                    <div class="space-y-3 text-sm">
-                        <p><strong class="font-semibold">História Clínica:</strong> Maria, 48 anos, professora. Queixa-se de cefaleia ocasional. Diagnosticada com HA há 1 ano, tentou usar captopril, mas apresentou tosse seca persistente.</p>
-                        <p><strong class="font-semibold">Exame Físico:</strong> PA 150/95 mmHg. FC 72 bpm. IMC 28 kg/m².</p>
-                        <p><strong class="font-semibold">Exames:</strong> Rotina sem alterações significativas.</p>
-                        <p><strong class="font-semibold">Diagnóstico e Risco:</strong> Hipertensão Arterial Estágio 1. Risco Cardiovascular Moderado (2 Fatores de Risco: HAS + Sobrepeso).</p>
-                        <p><strong class="font-semibold">Conduta:</strong>
-                            <br><strong>- Meta:</strong> PA < 140/90 mmHg.
-                            <br><strong>- Não Medicamentoso:</strong> Reforçar dieta e exercícios.
-                            <br><strong>- Medicamentoso:</strong> <strong class="text-green-700">Classe: Bloqueador do Receptor de Angiotensina II (BRA).</strong> Prescrição: Losartana 50 mg/dia. Justificativa: BRAs são alternativa preferencial aos IECAs em caso de tosse, pois não interferem no metabolismo da bradicinina.
-                        </p>
-                    </div>
-                </div>
-
-                <!-- Case 3 -->
-                <div id="caso3" class="case-card bg-white p-6 rounded-lg shadow">
-                    <h3 class="text-lg font-bold text-blue-700 border-b pb-2 mb-3">Caso 3: HAS Estágio 1 em Paciente Afrodescendente</h3>
-                    <div class="space-y-3 text-sm">
-                        <p><strong class="font-semibold">História Clínica:</strong> Carlos, 52 anos, motorista, afrodescendente. Hipertenso há 2 anos, em uso irregular de medicação.</p>
-                        <p><strong class="font-semibold">Exame Físico:</strong> PA 148/94 mmHg. IMC 27,5 kg/m².</p>
-                        <p><strong class="font-semibold">Exames:</strong> Normais.</p>
-                        <p><strong class="font-semibold">Diagnóstico e Risco:</strong> Hipertensão Arterial Estágio 1. Risco Cardiovascular Moderado.</p>
-                        <p><strong class="font-semibold">Conduta:</strong>
-                            <br><strong>- Meta:</strong> PA < 140/90 mmHg.
-                            <br><strong>- Não Medicamentoso:</strong> Orientar adesão e MEV.
-                            <br><strong>- Medicamentoso:</strong> <strong class="text-green-700">Classe: Bloqueador de Canal de Cálcio (BCC).</strong> Prescrição: Anlodipino 5 mg/dia. Justificativa: Pacientes afrodescendentes tendem a apresentar melhor resposta a diuréticos e BCCs em monoterapia, devido a um perfil de hipertensão com renina mais baixa.
-                        </p>
-                    </div>
-                </div>
-
-                <!-- Add more cases here following the same structure -->
-                <div id="caso4" class="case-card bg-white p-6 rounded-lg shadow">
-                    <h3 class="text-lg font-bold text-blue-700 border-b pb-2 mb-3">Caso 4: HAS Estágio 2, Terapia Dupla Inicial</h3>
-                    <div class="space-y-3 text-sm">
-                        <p><strong class="font-semibold">História Clínica:</strong> Laura, 55 anos, gerente comercial. Diagnosticada com HA na consulta atual.</p>
-                        <p><strong class="font-semibold">Exame Físico:</strong> PA 165/102 mmHg. FC 80 bpm. IMC 29 kg/m².</p>
-                        <p><strong class="font-semibold">Exames:</strong> Colesterol total 230 mg/dL.</p>
-                        <p><strong class="font-semibold">Diagnóstico e Risco:</strong> Hipertensão Arterial Estágio 2. Risco Cardiovascular Moderado.</p>
-                        <p><strong class="font-semibold">Conduta:</strong>
-                            <br><strong>- Meta:</strong> PA < 140/90 mmHg.
-                            <br><strong>- Não Medicamentoso:</strong> Iniciar MEV imediatamente.
-                            <br><strong>- Medicamentoso:</strong> Iniciar terapia combinada. <strong class="text-green-700">Classes: IECA + Diurético Tiazídico.</strong> Prescrição: Combinação fixa de Enalapril 20 mg + Hidroclorotiazida 12,5 mg, 1x/dia. Justificativa: Para HA Estágio 2, a terapia dupla inicial é preferencial para um controle mais rápido e eficaz (Figura 9.1). A combinação IECA+DIU é uma das preferenciais (Figura 9.2).
-                        </p>
-                    </div>
-                </div>
-
-                <div id="caso5" class="case-card bg-white p-6 rounded-lg shadow">
-                    <h3 class="text-lg font-bold text-blue-700 border-b pb-2 mb-3">Caso 5: HAS Estágio 2 e Alto Risco Cardiovascular</h3>
-                    <div class="space-y-3 text-sm">
-                        <p><strong class="font-semibold">História Clínica:</strong> Ricardo, 60 anos, aposentado. Dislipidêmico, ex-tabagista. Pai teve infarto aos 55 anos.</p>
-                        <p><strong class="font-semibold">Exame Físico:</strong> PA 162/98 mmHg. IMC 31 kg/m². Sopro carotídeo à esquerda.</p>
-                        <p><strong class="font-semibold">Exames:</strong> US de carótidas com placa aterosclerótica. LDL 150 mg/dL.</p>
-                        <p><strong class="font-semibold">Diagnóstico e Risco:</strong> Hipertensão Arterial Estágio 2. Alto Risco Cardiovascular (≥3 Fatores de Risco + LOA).</p>
-                        <p><strong class="font-semibold">Conduta:</strong>
-                            <br><strong>- Meta:</strong> PA < 130/80 mmHg.
-                            <br><strong>- Não Medicamentoso:</strong> MEV e iniciar estatina em alta potência.
-                            <br><strong>- Medicamentoso:</strong> Terapia dupla. <strong class="text-green-700">Classes: BRA + BCC.</strong> Prescrição: Combinação fixa de Valsartana 160 mg + Anlodipino 5 mg, 1x/dia. Justificativa: Em pacientes de alto risco, a combinação de um bloqueador do SRAA com um BCC demonstrou superioridade (estudo ACCOMPLISH).
-                        </p>
-                    </div>
-                </div>
-
-                <div id="caso6" class="case-card bg-white p-6 rounded-lg shadow">
-                    <h3 class="text-lg font-bold text-blue-700 border-b pb-2 mb-3">Caso 6: HAS Sistólica Isolada no Idoso</h3>
-                    <div class="space-y-3 text-sm">
-                        <p><strong class="font-semibold">História Clínica:</strong> Helena, 72 anos, viúva, hígida. Queixa de tontura leve.</p>
-                        <p><strong class="font-semibold">Exame Físico:</strong> PA 170/85 mmHg. IMC 26 kg/m². Sem outros achados relevantes.</p>
-                        <p><strong class="font-semibold">Diagnóstico e Risco:</strong> Hipertensão Arterial Sistólica Isolada Estágio 2. Risco Cardiovascular Alto (Idade + HAS Estágio 2).</p>
-                        <p><strong class="font-semibold">Conduta:</strong>
-                            <br><strong>- Meta:</strong> PAS entre 130-139 mmHg (se tolerado).
-                            <br><strong>- Medicamentoso:</strong> Terapia dupla. <strong class="text-green-700">Classes: Diurético Similar a Tiazídico + BCC.</strong> Prescrição: Clortalidona 12,5 mg + Anlodipino 5 mg. Justificativa: Diuréticos e BCCs são particularmente eficazes na HAS sistólica isolada do idoso, que é caracterizada por maior rigidez arterial e sensibilidade ao sal.
-                        </p>
-                    </div>
-                </div>
-
-                <div id="caso7" class="case-card bg-white p-6 rounded-lg shadow">
-                    <h3 class="text-lg font-bold text-blue-700 border-b pb-2 mb-3">Caso 7: HAS e Diabetes Mellitus Tipo 2</h3>
-                    <div class="space-y-3 text-sm">
-                        <p><strong class="font-semibold">História Clínica:</strong> Roberto, 58 anos, contador. DM tipo 2 há 5 anos, em uso de metformina.</p>
-                        <p><strong class="font-semibold">Exame Físico:</strong> PA 155/92 mmHg. IMC 32 kg/m².</p>
-                        <p><strong class="font-semibold">Exames:</strong> HbA1c 7.5%. Microalbuminúria presente.</p>
-                        <p><strong class="font-semibold">Diagnóstico e Risco:</strong> Hipertensão Arterial Estágio 1. Alto Risco Cardiovascular (DM + LOA).</p>
-                        <p><strong class="font-semibold">Conduta:</strong>
-                            <br><strong>- Meta:</strong> PA < 130/80 mmHg.
-                            <br><strong>- Medicamentoso:</strong> Terapia dupla. <strong class="text-green-700">Classes: IECA + BCC.</strong> Prescrição: Ramipril 5 mg + Anlodipino 5 mg. Justificativa: Bloqueadores do SRAA (IECA/BRA) são preferenciais em diabéticos, especialmente com albuminúria, pelo efeito nefroprotetor. A associação com BCC é metabolicamente neutra e eficaz.
-                        </p>
-                    </div>
-                </div>
-
-                <div id="caso8" class="case-card bg-white p-6 rounded-lg shadow">
-                    <h3 class="text-lg font-bold text-blue-700 border-b pb-2 mb-3">Caso 8: Falha na Terapia Dupla (Necessidade de Terapia Tripla)</h3>
-                    <div class="space-y-3 text-sm">
-                        <p><strong class="font-semibold">História Clínica:</strong> Paciente do Caso 4 (Laura, 55 anos), retorna após 3 meses. Aderente à medicação (Enalapril/HCTZ) e MEV, mas PA permanece elevada.</p>
-                        <p><strong class="font-semibold">Exame Físico:</strong> PA 150/94 mmHg.</p>
-                        <p><strong class="font-semibold">Conduta:</strong>
-                            <br><strong>- Meta:</strong> PA < 140/90 mmHg.
-                            <br><strong>- Medicamentoso:</strong> Otimizar para terapia tripla. <strong class="text-green-700">Classes: IECA + Diurético + BCC.</strong> Prescrição: Associar Anlodipino 5 mg ao esquema existente. Alternativa: Usar combinação fixa tripla de Enalapril + HCTZ + Anlodipino. Justificativa: Conforme o fluxograma (Figura 9.1), a falha da terapia dupla leva à associação do terceiro fármaco de primeira linha.
-                        </p>
-                    </div>
-                </div>
-
-                <div id="caso9" class="case-card bg-white p-6 rounded-lg shadow">
-                    <h3 class="text-lg font-bold text-blue-700 border-b pb-2 mb-3">Caso 9: HAS e Síndrome Metabólica</h3>
-                    <div class="space-y-3 text-sm">
-                        <p><strong class="font-semibold">História Clínica:</strong> Fátima, 50 anos, comerciante. Sedentária.</p>
-                        <p><strong class="font-semibold">Exame Físico:</strong> PA 168/105 mmHg. Circunferência abdominal 95 cm. IMC 33 kg/m².</p>
-                        <p><strong class="font-semibold">Exames:</strong> Glicemia de jejum 115 mg/dL. Triglicerídeos 250 mg/dL. HDL 35 mg/dL.</p>
-                        <p><strong class="font-semibold">Diagnóstico e Risco:</strong> Hipertensão Arterial Estágio 2 com Síndrome Metabólica. Alto Risco CV.</p>
-                        <p><strong class="font-semibold">Conduta:</strong>
-                            <br><strong>- Meta:</strong> PA < 130/80 mmHg.
-                            <br><strong>- Medicamentoso:</strong> Terapia tripla inicial devido aos níveis de PA. <strong class="text-green-700">Classes: BRA + BCC + Diurético similar a tiazídico.</strong> Prescrição: Olmesartana 40 mg + Anlodipino 10 mg + Clortalidona 25 mg. Justificativa: Escolha de fármacos metabolicamente neutros (BRA, BCC). A clortalidona é mais potente que a HCTZ, sendo uma boa opção para controle mais difícil.
-                        </p>
-                    </div>
-                </div>
-
-                <div id="caso10" class="case-card bg-white p-6 rounded-lg shadow">
-                    <h3 class="text-lg font-bold text-blue-700 border-b pb-2 mb-3">Caso 10: HAS e Doença Renal Crônica (DRC)</h3>
-                    <div class="space-y-3 text-sm">
-                        <p><strong class="font-semibold">História Clínica:</strong> Geraldo, 68 anos, com DRC estágio 4 (RFG-e < 30 mL/min).</p>
-                        <p><strong class="font-semibold">Exame Físico:</strong> PA 170/95 mmHg. Edema de membros inferiores 2+/4+.</p>
-                        <p><strong class="font-semibold">Diagnóstico e Risco:</strong> Hipertensão Arterial Estágio 2, DRC. Alto Risco Cardiovascular.</p>
-                        <p><strong class="font-semibold">Conduta:</strong>
-                            <br><strong>- Meta:</strong> PA < 130/80 mmHg.
-                            <br><strong>- Medicamentoso:</strong> Terapia tripla. <strong class="text-green-700">Classes: BRA + BCC + Diurético de Alça.</strong> Prescrição: Candesartana 16 mg + Anlodipino 5 mg + Furosemida 40 mg 2x/dia. Justificativa: Em DRC com RFG-e < 30 mL/min, diuréticos de alça são mais eficazes que os tiazídicos. Bloqueadores do SRAA são mandatórios pela nefroproteção.
-                        </p>
-                    </div>
-                </div>
-
-                <div id="caso11" class="case-card bg-white p-6 rounded-lg shadow">
-                    <h3 class="text-lg font-bold text-blue-700 border-b pb-2 mb-3">Caso 11: HAS e Insuficiência Cardíaca com Fração de Ejeção Reduzida (ICFEr)</h3>
-                    <div class="space-y-3 text-sm">
-                        <p><strong class="font-semibold">História Clínica:</strong> Teresa, 65 anos, com histórico de infarto e ICFEr (FEVE 35%).</p>
-                        <p><strong class="font-semibold">Exame Físico:</strong> PA 145/88 mmHg. FC 85 bpm. Sinais de congestão leve.</p>
-                        <p><strong class="font-semibold">Diagnóstico e Risco:</strong> Hipertensão Arterial Estágio 1, IC. Alto Risco Cardiovascular.</p>
-                        <p><strong class="font-semibold">Conduta:</strong>
-                            <br><strong>- Meta:</strong> PA < 130/80 mmHg.
-                            <br><strong>- Medicamentoso:</strong> Terapia otimizada para IC que também trata HA. <strong class="text-green-700">Classes: IECA + Betabloqueador + Diurético.</strong> Prescrição: Lisinopril 20 mg + Bisoprolol 5 mg + Furosemida 20 mg. Justificativa: IECAs e BBs são mandatórios na ICFEr por reduzirem mortalidade. O diurético controla a volemia.
-                        </p>
-                    </div>
-                </div>
-                
-                <div id="caso12" class="case-card bg-white p-6 rounded-lg shadow">
-                    <h3 class="text-lg font-bold text-blue-700 border-b pb-2 mb-3">Caso 12: Hipertensão Arterial Resistente (HAR)</h3>
-                    <div class="space-y-3 text-sm">
-                        <p><strong class="font-semibold">História Clínica:</strong> Paciente do Caso 9 (Fátima), em uso de Olmesartana 40mg + Anlodipino 10mg + Clortalidona 25mg, retorna com PA ainda elevada.</p>
-                        <p><strong class="font-semibold">Exame Físico:</strong> PA 155/96 mmHg. Adesão confirmada. Causas secundárias investigadas e afastadas.</p>
-                        <p><strong class="font-semibold">Diagnóstico e Risco:</strong> Hipertensão Arterial Resistente. Alto Risco Cardiovascular.</p>
-                        <p><strong class="font-semibold">Conduta:</strong>
-                            <br><strong>- Meta:</strong> PA < 130/80 mmHg.
-                            <br><strong>- Medicamentoso:</strong> Adicionar quarto fármaco. <strong class="text-green-700">Classe: Antagonista Mineralocorticoide (Poupador de Potássio).</strong> Prescrição: Adicionar Espironolactona 25 mg/dia. Justificativa: A espironolactona é o quarto fármaco de escolha na HAR, conforme o estudo PATHWAY-2 e as diretrizes.
-                        </p>
-                    </div>
-                </div>
-
-                <div id="caso13" class="case-card bg-white p-6 rounded-lg shadow">
-                    <h3 class="text-lg font-bold text-blue-700 border-b pb-2 mb-3">Caso 13: HAR com Apneia Obstrutiva do Sono (AOS)</h3>
-                    <div class="space-y-3 text-sm">
-                        <p><strong class="font-semibold">História Clínica:</strong> Mário, 59 anos, obeso, com roncos intensos e sonolência diurna. PA não controlada com 4 fármacos (IECA+BCC+DIU+Espironolactona).</p>
-                        <p><strong class="font-semibold">Exame Físico:</strong> PA 160/98 mmHg. FC 88 bpm. IMC 35 kg/m².</p>
-                        <p><strong class="font-semibold">Exames:</strong> Polissonografia confirma AOS grave.</p>
-                        <p><strong class="font-semibold">Diagnóstico e Risco:</strong> Hipertensão Arterial Resistente, AOS. Alto Risco CV.</p>
-                        <p><strong class="font-semibold">Conduta:</strong>
-                            <br><strong>- Meta:</strong> PA < 130/80 mmHg.
-                            <br><strong>- Não Medicamentoso:</strong> Iniciar CPAP, perda de peso.
-                            <br><strong>- Medicamentoso:</strong> Adicionar quinto fármaco. <strong class="text-green-700">Classe: Betabloqueador com ação vasodilatadora.</strong> Prescrição: Adicionar Carvedilol 12,5 mg 2x/dia. Justificativa: Pacientes com HAR frequentemente apresentam hiperatividade simpática, onde o BB pode ser benéfico. Os com ação vasodilatadora têm perfil metabólico mais favorável.
-                        </p>
-                    </div>
-                </div>
-
-                <div id="caso14" class="case-card bg-white p-6 rounded-lg shadow">
-                    <h3 class="text-lg font-bold text-blue-700 border-b pb-2 mb-3">Caso 14: Hipertensão Refratária (HARf)</h3>
-                    <div class="space-y-3 text-sm">
-                        <p><strong class="font-semibold">História Clínica:</strong> Paciente do Caso 13 (Mário), mesmo com 5 fármacos em doses máximas e uso de CPAP, mantém PA elevada.</p>
-                        <p><strong class="font-semibold">Exame Físico:</strong> PA 152/95 mmHg.</p>
-                        <p><strong class="font-semibold">Diagnóstico e Risco:</strong> Hipertensão Arterial Refratária. Alto Risco CV.</p>
-                        <p><strong class="font-semibold">Conduta:</strong>
-                            <br><strong>- Meta:</strong> Melhor controle possível, tolerando níveis mais altos.
-                            <br><strong>- Medicamentoso:</strong> Adicionar sexto fármaco. <strong class="text-green-700">Classe: Simpatolítico de Ação Central.</strong> Prescrição: Adicionar Clonidina 0,100 mg 2x/dia. Justificativa: Na HARf, a hiperatividade simpática é um mecanismo predominante. A clonidina atua centralmente para reduzir o tônus simpático.
-                        </p>
-                    </div>
-                </div>
-
-                <div id="caso15" class="case-card bg-white p-6 rounded-lg shadow">
-                    <h3 class="text-lg font-bold text-blue-700 border-b pb-2 mb-3">Caso 15: HAS e Doença Arterial Coronariana (DAC)</h3>
-                    <div class="space-y-3 text-sm">
-                        <p><strong class="font-semibold">História Clínica:</strong> Valdir, 62 anos, com angina estável e histórico de infarto há 3 anos.</p>
-                        <p><strong class="font-semibold">Exame Físico:</strong> PA 142/85 mmHg. FC 65 bpm.</p>
-                        <p><strong class="font-semibold">Diagnóstico e Risco:</strong> Hipertensão Arterial Estágio 1, DAC. Alto Risco Cardiovascular.</p>
-                        <p><strong class="font-semibold">Conduta:</strong>
-                            <br><strong>- Meta:</strong> PA < 130/80 mmHg, com PAD > 70 mmHg.
-                            <br><strong>- Medicamentoso:</strong> <strong class="text-green-700">Classes: Betabloqueador + IECA.</strong> Prescrição: Succinato de Metoprolol 100 mg + Ramipril 10 mg. Justificativa: BBs e IECAs são mandatórios em pacientes pós-infarto para redução de mortalidade e eventos isquêmicos.
-                        </p>
-                    </div>
-                </div>
-
-                <div id="caso16" class="case-card bg-white p-6 rounded-lg shadow">
-                    <h3 class="text-lg font-bold text-blue-700 border-b pb-2 mb-3">Caso 16: HAS no Idoso Muito Frágil (>80 anos)</h3>
-                    <div class="space-y-3 text-sm">
-                        <p><strong class="font-semibold">História Clínica:</strong> Amélia, 88 anos, vive em casa de repouso, com dificuldade de locomoção e histórico de quedas.</p>
-                        <p><strong class="font-semibold">Exame Físico:</strong> PA 165/80 mmHg. IMC 21 kg/m². Sarcopênica.</p>
-                        <p><strong class="font-semibold">Diagnóstico e Risco:</strong> Hipertensão Arterial Sistólica Isolada Estágio 2. Idosa frágil.</p>
-                        <p><strong class="font-semibold">Conduta:</strong>
-                            <br><strong>- Meta:</strong> PAS entre 140-149 mmHg, priorizando evitar hipotensão e quedas.
-                            <br><strong>- Medicamentoso:</strong> Iniciar com cautela. <strong class="text-green-700">Classe: IECA.</strong> Prescrição: Lisinopril 5 mg/dia, com aumento gradual e monitoramento de hipotensão ortostática. Justificativa: Em idosos frágeis, o tratamento deve ser iniciado com monoterapia em baixa dose, com aumentos lentos para garantir a tolerabilidade.
-                        </p>
-                    </div>
-                </div>
-                
-                <div id="caso17" class="case-card bg-white p-6 rounded-lg shadow">
-                    <h3 class="text-lg font-bold text-blue-700 border-b pb-2 mb-3">Caso 17: Urgência Hipertensiva</h3>
-                    <div class="space-y-3 text-sm">
-                        <p><strong class="font-semibold">História Clínica:</strong> Sérgio, 54 anos, chega ao pronto-socorro com cefaleia intensa, turvação visual e ansiedade. Hipertenso conhecido, mas parou de tomar os remédios há uma semana.</p>
-                        <p><strong class="font-semibold">Exame Físico:</strong> PA 190/125 mmHg. Exame neurológico e fundoscopia sem alterações agudas. Sem sinais de EAP ou SCA.</p>
-                        <p><strong class="font-semibold">Diagnóstico:</strong> Urgência Hipertensiva (elevação acentuada da PA sem lesão de órgão-alvo aguda).</p>
-                        <p><strong class="font-semibold">Conduta:</strong>
-                            <br><strong>- Manejo:</strong> Repouso em ambiente calmo.
-                            <br><strong>- Medicamentoso:</strong> Medicação oral para redução gradual da PA. <strong class="text-green-700">Classe: IECA de ação curta.</strong> Prescrição: Captopril 25 mg via oral. Reavaliar em 60-90 minutos. Justificativa: Na UH, a PA deve ser reduzida gradualmente em 24-48h com medicação oral. O Captopril é uma opção segura e eficaz.
-                        </p>
-                    </div>
-                </div>
-
-                <div id="caso18" class="case-card bg-white p-6 rounded-lg shadow">
-                    <h3 class="text-lg font-bold text-blue-700 border-b pb-2 mb-3">Caso 18: HAS e Hiperplasia Prostática Benigna (HPB)</h3>
-                    <div class="space-y-3 text-sm">
-                        <p><strong class="font-semibold">História Clínica:</strong> Francisco, 66 anos, hipertenso em uso de Losartana + HCTZ. Queixa-se de sintomas urinários obstrutivos (jato fraco, noctúria).</p>
-                        <p><strong class="font-semibold">Exame Físico:</strong> PA 145/90 mmHg. Toque retal com próstata aumentada.</p>
-                        <p><strong class="font-semibold">Diagnóstico:</strong> HAS Estágio 1 não controlada e HPB sintomática.</p>
-                        <p><strong class="font-semibold">Conduta:</strong>
-                            <br><strong>- Meta:</strong> PA < 140/90 mmHg e melhora dos sintomas urinários.
-                            <br><strong>- Medicamentoso:</strong> Associar fármaco que trate ambas as condições. <strong class="text-green-700">Classe: Alfabloqueador.</strong> Prescrição: Associar Doxazosina 2 mg/dia (iniciar à noite para evitar hipotensão postural). Justificativa: Alfabloqueadores reduzem a PA e relaxam a musculatura da próstata e colo vesical, sendo uma excelente opção para pacientes com ambas as condições.
-                        </p>
-                    </div>
-                </div>
-                
-                <div id="caso19" class="case-card bg-white p-6 rounded-lg shadow">
-                    <h3 class="text-lg font-bold text-blue-700 border-b pb-2 mb-3">Caso 19: HAS Crônica na Gestação</h3>
-                    <div class="space-y-3 text-sm">
-                        <p><strong class="font-semibold">História Clínica:</strong> Ana, 32 anos, hipertensa crônica, planeja engravidar. Em uso de Enalapril.</p>
-                        <p><strong class="font-semibold">Exame Físico:</strong> PA 135/85 mmHg.</p>
-                        <p><strong class="font-semibold">Conduta:</strong>
-                            <br><strong>- Manejo Pré-concepcional:</strong> Substituir medicação teratogênica.
-                            <br><strong>- Medicamentoso:</strong> <strong class="text-green-700">Classe: Simpatolítico de Ação Central.</strong> Prescrição: Suspender Enalapril e iniciar Metildopa 250 mg 2x/dia. Ajustar dose para manter PA < 140/90 mmHg. Justificativa: IECAs e BRAs são contraindicados na gestação. Metildopa é o fármaco de primeira linha com maior perfil de segurança para a gestante e o feto.
-                        </p>
-                    </div>
-                </div>
-                
-                <div id="caso20" class="case-card bg-white p-6 rounded-lg shadow">
-                    <h3 class="text-lg font-bold text-blue-700 border-b pb-2 mb-3">Caso 20: HARf com necessidade de Vasodilatador Direto</h3>
-                    <div class="space-y-3 text-sm">
-                        <p><strong class="font-semibold">História Clínica:</strong> Paciente do Caso 14 (Mário), com 6 fármacos, incluindo clonidina, ainda com PA 150/92 mmHg e taquicardia (FC 95 bpm) devido à alta carga simpática.</p>
-                        <p><strong class="font-semibold">Diagnóstico:</strong> Hipertensão Arterial Refratária.</p>
-                        <p><strong class="font-semibold">Conduta:</strong>
-                            <br><strong>- Medicamentoso:</strong> Trocar a clonidina por um vasodilatador direto, mantendo o betabloqueador para controlar a taquicardia reflexa. <strong class="text-green-700">Classe: Vasodilatador Direto.</strong> Prescrição: Suspender Clonidina e iniciar Hidralazina 25 mg 2x/dia, mantendo os outros 5 fármacos (IECA, BCC, Diurético, Espironolactona, Carvedilol). Justificativa: Em casos refratários, vasodilatadores diretos podem ser uma opção, mas requerem o uso concomitante de diurético e simpatolítico (como um BB) para mitigar a retenção de sódio e a taquicardia reflexa.
-                        </p>
-                    </div>
-                </div>
-
-            </div>
-        </main>
+            <button type="button" class="btn btn-add" id="addRowBtn">Adicionar Medicamento</button>
+            
+            <button type="submit" class="btn btn-submit" id="generatePdfBtn">Gerar Receita em PDF</button>
+        </form>
     </div>
 
-    <!-- Footer -->
-    <footer class="bg-blue-800 text-white mt-12">
-        <div class="container mx-auto px-6 py-4 text-center text-sm">
-            <p>Conteúdo elaborado com base nas "Diretrizes Brasileiras de Hipertensão Arterial - 2020".</p>
-            <p>Este material é para fins educacionais e não substitui a avaliação e conduta médica individualizada.</p>
-        </div>
-    </footer>
+    <datalist id="lista-formas">
+        <option value="Comprimido(s)"></option>
+        <option value="Drágea(s)"></option>
+        <option value="Cápsula(s)"></option>
+        <option value="Xarope"></option>
+        <option value="Suspensão"></option>
+        <option value="Solução Oral"></option>
+        <option value="Gotas"></option>
+        <option value="Injetável"></option>
+        <option value="Creme"></option>
+        <option value="Pomada"></option>
+        <option value="Gel"></option>
+        <option value="Supositório(s)"></option>
+    </datalist>
+
+    <datalist id="lista-unidades">
+        <option value="Caixa(s)"></option>
+        <option value="Frasco(s)"></option>
+        <option value="Tubo(s)"></option>
+        <option value="Uso Contínuo"></option>
+        <option value="Comprimido(s)"></option>
+        <option value="Drágea(s)"></option>
+        <option value="Cápsula(s)"></option>
+        <option value="Ampola"></option>
+    </datalist>
+
+    <datalist id="lista-vias">
+        <option value="Uso Interno"></option>
+        <option value="Uso Externo"></option>
+        <option value="Uso Oral"></option>
+        <option value="Uso Tópico"></option>
+        <option value="Uso Intramuscular"></option>
+        <option value="Uso Subcutâneo"></option>
+        <option value="Uso Endovenoso"></option>
+    </datalist>
+
+
+    <script>
+        // 5. Lógica JavaScript
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            // --- Preencher a data automaticamente ---
+            function preencherDataAtual() {
+                const today = new Date();
+                const dd = String(today.getDate());
+                const yyyy = today.getFullYear();
+                const monthName = new Intl.DateTimeFormat('pt-BR', { month: 'long' }).format(today);
+                
+                const fullDate = `${dd} de ${monthName} de ${yyyy}`;
+                document.getElementById('data').value = fullDate;
+            }
+            preencherDataAtual();
+
+            
+            const tableBody = document.getElementById('medicationTbody');
+
+            // --- Lógica do "Uso Contínuo" ---
+            function handleUsoContinuo(inputElement) {
+                const selectedValue = inputElement.value.trim();
+                const row = inputElement.closest('tr');
+                const qtdInput = row.querySelector('.med-qtd');
+                
+                if (selectedValue === 'Uso Contínuo') {
+                    qtdInput.disabled = true;
+                    qtdInput.value = ''; 
+                } else {
+                    qtdInput.disabled = false;
+                }
+            }
+
+            tableBody.addEventListener('input', function(e) {
+                if (e.target.classList.contains('med-unidade')) {
+                    handleUsoContinuo(e.target);
+                }
+            });
+
+
+            // --- Ação para Adicionar Nova Linha na Tabela ---
+            document.getElementById('addRowBtn').addEventListener('click', function() {
+                const firstRow = tableBody.rows[0];
+                const newRow = firstRow.cloneNode(true); 
+
+                newRow.querySelectorAll('input, textarea').forEach(el => {
+                    el.value = '';
+                    if (el.classList.contains('med-qtd')) {
+                        el.disabled = false;
+                    }
+                });
+                
+                tableBody.appendChild(newRow); 
+            });
+
+            // --- Ação Principal: Gerar o PDF ---
+            document.getElementById('prescriptionForm').addEventListener('submit', function(e) {
+                e.preventDefault(); 
+
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF('p', 'mm', 'a4');
+                doc.setFont('helvetica');
+
+                const nome = document.getElementById('nome').value;
+                const idade = document.getElementById('idade').value;
+                const data = document.getElementById('data').value;
+
+                const pageW = doc.internal.pageSize.getWidth();
+                const centerX = pageW / 2;
+                const leftMargin = 20;
+                const rightMargin = pageW - 20; 
+                let y = 20; 
+
+                // --- 1. Cabeçalho (COM AS ALTERAÇÕES) ---
+                
+                // Linha 1: Título
+                doc.setFontSize(20);
+                doc.setFont('helvetica', 'bold');
+                doc.text("ESF BOM PASTOR", centerX, y, { align: 'center' });
+                y += 7; // Espaçamento menor
+
+                // Linha 2: Endereço (NOVO)
+                doc.setFontSize(12);
+                doc.setFont('helvetica', 'normal');
+                doc.text("R. Geraldo Lara, n° 100 - Bom Pastor, Divinópolis - MG", centerX, y, { align: 'center' });
+                y += 7;
+                doc.text("(37) 3229-6092", centerX, y, { align: 'center' });
+                y += 20; // Espaçamento após endereço
+
+                // Linha 3: Paciente (Alinhado à esquerda)
+                doc.setFontSize(14);
+                doc.text(`Nome: ${nome}   Idade: ${idade}`, leftMargin, y);
+                y += 15; 
+
+                // Linha 4: "Receituário Médico"
+                doc.setFont('helvetica', 'bold');
+                doc.text("Receituário Médico", centerX, y, { align: 'center' });
+                y += 15; 
+                
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(12);
+
+                // --- 2. Coleta e Agrupamento dos Medicamentos ---
+                const medications = [];
+                const tableRows = tableBody.rows;
+                
+                for (let row of tableRows) {
+                    const medNome = row.querySelector('.med-nome').value;
+                    
+                    if (medNome) {
+                        medications.push({
+                            nome: medNome,
+                            dose: row.querySelector('.med-dose').value,
+                            forma: row.querySelector('.med-forma').value, 
+                            unidade: row.querySelector('.med-unidade').value, 
+                            via: row.querySelector('.med-via').value || 'Uso não especificado', 
+                            qtd: row.querySelector('.med-qtd').value, 
+                            orient: row.querySelector('.med-orient').value,
+                        });
+                    }
+                }
+
+                // Agrupa os medicamentos pela 'via de administração'
+                const groupedByVia = medications.reduce((acc, med) => {
+                    const via = med.via.trim();
+                    if (!acc[via]) {
+                        acc[via] = [];
+                    }
+                    acc[via].push(med);
+                    return acc;
+                }, {});
+
+                // --- 3. Construção do Corpo (Lista de Medicamentos) ---
+                for (const via of Object.keys(groupedByVia)) {
+                    if (y > 260) { doc.addPage(); y = 20; }
+                    
+                    doc.setFont('helvetica', 'bold');
+                    doc.text(via, centerX, y, { align: 'center' });
+                    y += 8;
+                    doc.setFont('helvetica', 'normal');
+
+                    const medsInGroup = groupedByVia[via];
+                    
+                    for (let i = 0; i < medsInGroup.length; i++) {
+                        const med = medsInGroup[i];
+                        const num = i + 1;
+
+                        if (y > 270) { doc.addPage(); y = 20; }
+
+                        // Constrói a linha principal
+                        const leftText = `${num}. ${med.nome} ${med.dose}`;
+                        
+                        let rightText = '';
+                        if (med.unidade.trim().toLowerCase() === 'uso contínuo') {
+                            rightText = 'Uso Contínuo';
+                        } else {
+                            rightText = `${med.qtd} ${med.unidade}`.trim();
+                        }
+                        
+                        doc.text(leftText, leftMargin, y);
+                        doc.text(rightText, rightMargin, y, { align: 'right' });
+
+                        // Desenha o traço longo (________)
+                        const leftWidth = doc.getTextWidth(leftText);
+                        const rightWidth = doc.getTextWidth(rightText);
+                        const x1 = leftMargin + leftWidth + 2; 
+                        const x2 = rightMargin - rightWidth - 2; 
+
+                        if (x1 < x2) { 
+                            doc.setLineWidth(0.3);
+                            doc.line(x1, y - 1, x2, y - 1); 
+                        }
+                        
+                        y += 7; 
+
+                        // --- Linha de Orientações ---
+                        doc.setFontSize(10); 
+                        const orientText = doc.splitTextToSize(med.orient, rightMargin - leftMargin - 5);
+                        doc.text(orientText, leftMargin + 5, y); 
+                        
+                        y += (orientText.length * 4) + 4; 
+                        
+                        doc.setFontSize(12); 
+                        y += 4; 
+                    }
+                    y += 7; 
+                }
+
+                // --- 4. Construção do Rodapé (Centralizado) ---
+                doc.text(`Divinópolis, ${data}`, centerX, 280, { align: 'center' });
+
+                // --- 5. Salvar o PDF ---
+                doc.save('receita_medica.pdf');
+            });
+        });
+    </script>
 
 </body>
-
 </html>
-
