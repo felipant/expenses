@@ -25,6 +25,10 @@
         "Cafés",
         "Feira e produtos naturais",
         "Água",
+        "Manteiga",
+        "Azeite",
+        "Iogurte",
+        "Pasta de amendoim",
         "Outros"
       ],
       "Transporte": [
@@ -56,7 +60,7 @@
         "Congressos",
         "Material didático",
         "Office",
-        "Assinaturas educacionais (ex.: Udemy, Coursera)",
+        "Assinaturas educacionais",
         "Outros"
       ],
       "Lazer e Entretenimento": [
