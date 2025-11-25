@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Mapa do Brasil — Estados selecionáveis</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+  <style>
+    html,body,#map { height:100%; margin:0; }
+    body { background:#f1f4ee; }
+    #map { box-shadow:0 8px 24px rgba(0,0,0,0.12); }
+    .state-label{ font-weight:700; font-size:12px; text-shadow: 0 1px 0 rgba(255,255,255,0.6); }
+    .label-selected{ background: rgba(255,255,255,0.95); padding:2px 6px; border-radius:4px; box-shadow:0 1px 2px rgba(0,0,0,0.15);} 
+    .legend{ position:absolute; right:12px; bottom:12px; background:white; padding:8px 10px; border-radius:6px; box-shadow:0 6px 18px rgba(0,0,0,0.12); font-family:Arial; }
+    .loading{ position:absolute; left:12px; bottom:12px; background:rgba(255,255,255,0.9); padding:8px 10px; border-radius:6px; font-family:Arial; box-shadow:0 6px 18px rgba(0,0,0,0.06);} 
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <div class="legend"><strong>Interação:</strong><br>clique em um estado para selecionar / desmarcar</div>
+  <div id="loading" class="loading">Carregando limites dos estados...</div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/@turf/turf@6.5.0/turf.min.js"></script>
+  <script>
+    // Inicializa mapa centrado no Brasil
+    const map = L.map('map', { zoomControl:true }).setView([-14.2350, -51.9253], 4);
+
+    // camada base vazia (sem tiles) para manter o fundo #f1f4ee visível
+    L.tileLayer('', { attribution: '' }).addTo(map);
+
+    // estilo padrão para estados
+    function style(feature){
+      return {
+        fillColor: 'transparent',
+        weight: 1.2,
+        opacity: 1,
+        color: '#000', // divisas em preto
+        fillOpacity: 0.9
+      };
+    }
+
+    // camada para armazenar estados e labels
+    let statesLayer;
+    const labelLayer = L.layerGroup().addTo(map);
+
+    const LOCALE_STORAGE_KEY = 'br_states_geojson_v1';
+    const CACHE_TTL_MS = 1000 * 60 * 60 * 24; // 24h
+
+    // mapeamento de capitais (nome). Pode ser substituído por lat/lngs se desejar precisão absoluta.
+    const capitals = {
+      'Acre':'Rio Branco','Alagoas':'Maceió','Amapá':'Macapá','Amazonas':'Manaus','Bahia':'Salvador','Ceará':'Fortaleza',
+      'Distrito Federal':'Brasília','Espírito Santo':'Vitória','Goiás':'Goiânia','Maranhão':'São Luís','Mato Grosso':'Cuiabá',
+      'Mato Grosso do Sul':'Campo Grande','Minas Gerais':'Belo Horizonte','Pará':'Belém','Paraíba':'João Pessoa','Paraná':'Curitiba',
+      'Pernambuco':'Recife','Piauí':'Teresina','Rio de Janeiro':'Rio de Janeiro','Rio Grande do Norte':'Natal','Rio Grande do Sul':'Porto Alegre',
+      'Rondônia':'Porto Velho','Roraima':'Boa Vista','Santa Catarina':'Florianópolis','São Paulo':'São Paulo','Sergipe':'Aracaju','Tocantins':'Palmas'
+    };
+
+    // Lista de fontes alternativas para GeoJSON — caso uma retorne 429 (rate limit) tentamos a próxima.
+    const GEOJSON_SOURCES = [
+      // alternativa 1 (codeforgermany)
+      'https://raw.githubusercontent.com/codeforgermany/click_that_hood/main/public/data/brazil-states.geojson',
+      // alternativa 2 (fork com outro caminho)
+      'https://raw.githubusercontent.com/kelvins/Municipios-Brasileiros/master/estados.geojson',
+      // alternativa 3 (backup do autor original usado antes)
+      'https://raw.githubusercontent.com/giuliano-macedo/geodata-br-states/master/geojson/br_states.json'
+    ];
+
+    const loadingEl = document.getElementById('loading');
+
+    // tenta carregar geojson do localStorage (cache)
+    function loadFromCache(){
+      try{
+        const raw = localStorage.getItem(LOCALE_STORAGE_KEY);
+        if(!raw) return null;
+        const parsed = JSON.parse(raw);
+        if(!parsed || !parsed.timestamp || (Date.now() - parsed.timestamp) > CACHE_TTL_MS) return null;
+        return parsed.geojson;
+      }catch(e){ return null; }
+    }
+
+    function saveToCache(geojson){
+      try{ localStorage.setItem(LOCALE_STORAGE_KEY, JSON.stringify({timestamp: Date.now(), geojson})); }catch(e){}
+    }
+
+    // Tenta buscar o GeoJSON sequencialmente nas fontes listadas, ignorando 429s e outros erros temporários
+    async function fetchWithFallback(sources){
+      let lastErr = null;
+      for(const url of sources){
+        try{
+          const resp = await fetch(url, {cache: 'no-store'});
+          if(resp.status === 429){
+            console.warn('Fonte rate-limited (429):', url);
+            lastErr = new Error('Rate-limited: ' + url);
+            continue; // tenta próximo
+          }
+          if(!resp.ok) throw new Error('HTTP '+resp.status+' from '+url);
+          const j = await resp.json();
+          return j;
+        }catch(err){
+          console.warn('Erro ao buscar GeoJSON de', url, err);
+          lastErr = err;
+          // continua para a próxima URL
+        }
+      }
+      throw lastErr || new Error('Todas as fontes falharam');
+    }
+
+    async function init(){
+      // 1) tenta cache
+      const cached = loadFromCache();
+      if(cached){
+        console.log('Usando GeoJSON em cache');
+        return handleGeoJSON(cached);
+      }
+
+      // 2) tenta buscar nas fontes com fallback
+      try{
+        const geojson = await fetchWithFallback(GEOJSON_SOURCES);
+        saveToCache(geojson);
+        return handleGeoJSON(geojson);
+      }catch(err){
+        console.error('Erro ao carregar GeoJSON:', err);
+        loadingEl.textContent = 'Erro ao carregar limites dos estados. (ver console)';
+        alert('Erro ao carregar o GeoJSON dos estados: ' + (err && err.message ? err.message : err));
+      }
+    }
+
+    function handleGeoJSON(geojson){
+      loadingEl.style.display = 'none';
+
+      statesLayer = L.geoJSON(geojson, {
+        style: style,
+        onEachFeature: onEachState
+      }).addTo(map);
+
+      // ajusta zoom para mostrar todo o país
+      try{ map.fitBounds(statesLayer.getBounds(), {padding:[20,20]}); }catch(e){}
+    }
+
+    function onEachState(feature, layer){
+      const props = feature.properties || {};
+      // Nome do estado — tente diferentes chaves (alguns geojsons usam 'name', 'nome', 'STATE', 'st_nome')
+      const stateName = props.name || props.nome || props.STATE || props.st_nome || props.state || props.nomeuf || 'Estado sem nome';
+
+      // compute centroid (usando Turf) para posicionar o rótulo — funciona bem para a maioria dos estados
+      let centroidLatLng = null;
+      try{
+        const centroid = turf.centroid(feature);
+        const [lng,lat] = centroid.geometry.coordinates;
+        centroidLatLng = [lat,lng];
+      }catch(e){
+        // se falhar, usa bounds center
+        const c = layer.getBounds().getCenter();
+        centroidLatLng = [c.lat, c.lng];
+      }
+
+      // label (nome da capital em negrito). Se capital não estiver no mapeamento, mostramos o próprio nome do estado em itálico.
+      const capitalName = capitals[stateName] || (props.capital || props.capita || props.capital_name || null);
+      const labelText = capitalName ? ('<strong>'+capitalName+'</strong>') : ('<strong style="font-style:italic">'+stateName+'</strong>');
+
+      const icon = L.divIcon({
+        className: 'state-label',
+        html: labelText,
+        iconSize: null
+      });
+
+      const marker = L.marker(centroidLatLng, {icon: icon, interactive:false}).addTo(labelLayer);
+
+      // estado clicável: alterna seleção
+      layer.on('click', function(e){
+        const selected = layer.selected || false;
+        if(!selected){
+          layer.setStyle({fillColor:'#55634c', fillOpacity:1});
+          // destacar label (adiciona classe)
+          const el = marker.getElement(); if(el) el.classList.add('label-selected');
+          layer.selected = true;
+        } else {
+          layer.setStyle({fillColor:'transparent', fillOpacity:0.9});
+          const el = marker.getElement(); if(el) el.classList.remove('label-selected');
+          layer.selected = false;
+        }
+      });
+
+      // destaque visual ao passar o mouse
+      layer.on('mouseover', function(){ layer.setStyle({weight:2.2}); });
+      layer.on('mouseout', function(){ layer.setStyle({weight:1.2}); });
+
+    }
+
+    // Inicia
+    init();
+
+  </script>
+</body>
+</html>
