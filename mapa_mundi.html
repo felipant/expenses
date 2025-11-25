@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive World Map</title>
+    <!-- Tailwind CSS for layout -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- D3.js and TopoJSON -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://unpkg.com/topojson-client@3"></script>
+
+    <style>
+        /* Map Specific Styles */
+        body {
+            background-color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        #map-container {
+            width: 100%;
+            height: 70vh;
+            background-color: #ffffff;
+            overflow: hidden;
+            position: relative;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+        }
+
+        svg {
+            display: block;
+            margin: auto;
+        }
+
+        /* The Country Paths */
+        .country {
+            fill: #ffffff;      /* White background */
+            stroke: #000000;    /* Black outline */
+            stroke-width: 0.5px;
+            cursor: pointer;
+            transition: fill 0.2s ease;
+        }
+
+        /* Hover State */
+        .country:hover {
+            fill: #e0e0e0;
+        }
+
+        /* Selected State */
+        .country.selected {
+            fill: #90EE90 !important; /* Light green */
+        }
+
+        /* Tooltip */
+        #tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s;
+            z-index: 10;
+        }
+        
+        /* Loading Overlay */
+        #loading {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(255,255,255,0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 20;
+            font-weight: bold;
+            color: #333;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8 max-w-7xl mx-auto">
+
+    <div class="mb-6 space-y-4">
+        <h1 class="text-3xl font-bold text-gray-800">World Map Selector</h1>
+        <p class="text-gray-600">Click individual countries to select them, or use the buttons below to select entire continents.</p>
+        
+        <!-- Controls -->
+        <div class="flex flex-wrap gap-2" id="controls">
+            <button onclick="selectContinent('Americas')" class="px-4 py-2 bg-blue-100 hover:bg-blue-200 text-blue-800 rounded transition">Americas</button>
+            <button onclick="selectContinent('Europe')" class="px-4 py-2 bg-blue-100 hover:bg-blue-200 text-blue-800 rounded transition">Europe</button>
+            <button onclick="selectContinent('Africa')" class="px-4 py-2 bg-blue-100 hover:bg-blue-200 text-blue-800 rounded transition">Africa</button>
+            <button onclick="selectContinent('Asia')" class="px-4 py-2 bg-blue-100 hover:bg-blue-200 text-blue-800 rounded transition">Asia</button>
+            <button onclick="selectContinent('Oceania')" class="px-4 py-2 bg-blue-100 hover:bg-blue-200 text-blue-800 rounded transition">Oceania</button>
+            <div class="w-px h-8 bg-gray-300 mx-2"></div>
+            <button onclick="resetMap()" class="px-4 py-2 bg-red-100 hover:bg-red-200 text-red-800 rounded transition">Clear All</button>
+        </div>
+    </div>
+
+    <!-- Map Visualization -->
+    <div id="map-container" class="shadow-lg">
+        <div id="loading">Loading Map Data...</div>
+        <div id="tooltip"></div>
+    </div>
+    
+    <div class="mt-4 text-sm text-gray-500 text-center">
+        Selection Count: <span id="count" class="font-bold">0</span> countries
+    </div>
+
+    <script>
+        // Configuration
+        const width = 960;
+        const height = 500;
+        let countriesData = [];
+        let metadata = {}; // To store mapping from ID to Continent/Name
+
+        // Select DOM elements
+        const svg = d3.select("#map-container")
+            .append("svg")
+            .attr("viewBox", `0 0 ${width} ${height}`)
+            .attr("preserveAspectRatio", "xMidYMid meet")
+            .style("width", "100%")
+            .style("height", "100%");
+
+        const tooltip = d3.select("#tooltip");
+        const countSpan = document.getElementById("count");
+        const loadingDiv = document.getElementById("loading");
+
+        // Map Projection (Mercator)
+        const projection = d3.geoMercator()
+            .scale(140)
+            .translate([width / 2, height / 1.4]);
+
+        const path = d3.geoPath().projection(projection);
+
+        // Group for map features
+        const g = svg.append("g");
+
+        // Zoom Behavior
+        const zoom = d3.zoom()
+            .scaleExtent([1, 8])
+            .on("zoom", (event) => {
+                g.attr("transform", event.transform);
+            });
+
+        svg.call(zoom);
+
+        // --- Data Fetching & Initialization ---
+        
+        Promise.all([
+            // 1. Fetch World Topology (The shapes)
+            d3.json("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json"),
+            
+            // 2. Fetch Metadata (Codes to Names and Regions)
+            // We use this to know which country belongs to which continent
+            d3.json("https://raw.githubusercontent.com/lukes/ISO-3166-Countries-with-Regional-Codes/master/all/all.json")
+        ]).then(([topology, metaJson]) => {
+            
+            // Process Metadata
+            // Create a lookup: Numeric Code -> { name, region, subregion }
+            metaJson.forEach(item => {
+                const numericCode = parseInt(item["country-code"], 10);
+                metadata[numericCode] = {
+                    name: item.name,
+                    region: item.region, // e.g., "Americas", "Europe"
+                    subregion: item["sub-region"]
+                };
+            });
+
+            // Convert TopoJSON to GeoJSON
+            countriesData = topojson.feature(topology, topology.objects.countries).features;
+
+            // Render Map
+            renderMap();
+            
+            // Hide Loader
+            loadingDiv.style.display = 'none';
+
+        }).catch(err => {
+            console.error(err);
+            loadingDiv.innerText = "Error loading map data. Please check connection.";
+        });
+
+        // --- Rendering Logic ---
+
+        function renderMap() {
+            g.selectAll("path")
+                .data(countriesData)
+                .enter()
+                .append("path")
+                .attr("d", path)
+                .attr("class", "country")
+                .attr("id", d => `country-${d.id}`) // Add ID for easier selection
+                .on("mouseover", function(event, d) {
+                    const info = metadata[parseInt(d.id)];
+                    const name = info ? info.name : "Unknown Country";
+                    
+                    tooltip.transition().duration(200).style("opacity", .9);
+                    tooltip.html(name)
+                        .style("left", (event.pageX + 10) + "px")
+                        .style("top", (event.pageY - 28) + "px");
+                })
+                .on("mouseout", function() {
+                    tooltip.transition().duration(500).style("opacity", 0);
+                })
+                .on("click", function(event, d) {
+                    // Toggle selection class
+                    const el = d3.select(this);
+                    const isSelected = el.classed("selected");
+                    el.classed("selected", !isSelected);
+                    updateCount();
+                });
+        }
+
+        // --- Continent Selection Logic ---
+
+        function selectContinent(targetRegion) {
+            // targetRegion strings match the ISO dataset: "Americas", "Europe", "Africa", "Asia", "Oceania"
+            
+            const paths = g.selectAll("path");
+            
+            // Determine if we are selecting or deselecting the whole continent
+            // Logic: If all countries in region are already selected, deselect them. Otherwise, select all.
+            let allAlreadySelected = true;
+            
+            paths.each(function(d) {
+                const id = parseInt(d.id);
+                const info = metadata[id];
+                if (info && info.region === targetRegion) {
+                    if (!d3.select(this).classed("selected")) {
+                        allAlreadySelected = false;
+                    }
+                }
+            });
+
+            // Apply changes
+            paths.classed("selected", function(d) {
+                const id = parseInt(d.id);
+                const info = metadata[id];
+                const currentClass = d3.select(this).classed("selected");
+
+                if (info && info.region === targetRegion) {
+                    // If all were selected, we turn them off (toggle behavior for group)
+                    // If mixed or none selected, we turn them all on.
+                    return !allAlreadySelected; 
+                }
+                return currentClass; // Leave others alone
+            });
+
+            updateCount();
+        }
+
+        function resetMap() {
+            g.selectAll("path").classed("selected", false);
+            updateCount();
+        }
+
+        function updateCount() {
+            const count = g.selectAll(".country.selected").size();
+            countSpan.innerText = count;
+        }
+
+    </script>
+</body>
+</html>
