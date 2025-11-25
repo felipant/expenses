@@ -46,9 +46,13 @@
             fill: #e0e0e0;
         }
 
-        /* Selected State */
-        .country.selected {
+        /* Selected States */
+        .country.green {
             fill: #90EE90 !important; /* Light green */
+        }
+        
+        .country.red {
+            fill: #FF9999 !important; /* Light red */
         }
 
         /* Tooltip */
@@ -71,11 +75,25 @@
             top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(255,255,255,0.9);
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             z-index: 20;
             font-weight: bold;
             color: #333;
+            gap: 1rem;
+        }
+        
+        .retry-btn {
+            padding: 8px 16px;
+            background-color: #3b82f6;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+            border: none;
+        }
+        .retry-btn:hover {
+            background-color: #2563eb;
         }
     </style>
 </head>
@@ -83,28 +101,46 @@
 
     <div class="mb-6 space-y-4">
         <h1 class="text-3xl font-bold text-gray-800">World Map Selector</h1>
-        <p class="text-gray-600">Click individual countries to select them, or use the buttons below to select entire continents.</p>
         
-        <!-- Controls -->
+        <!-- Color Selection Controls -->
+        <div class="flex flex-col md:flex-row gap-4 items-start md:items-center bg-gray-50 p-4 rounded-lg border">
+            <span class="font-bold text-gray-700">1. Select Color:</span>
+            <div class="flex gap-2">
+                <button id="btn-green" onclick="setMode('green')" class="px-4 py-2 bg-green-200 border-2 border-green-600 text-green-900 rounded font-bold shadow-sm transition">
+                    Green Mode
+                </button>
+                <button id="btn-red" onclick="setMode('red')" class="px-4 py-2 bg-red-100 border-2 border-transparent hover:bg-red-200 text-red-900 rounded transition">
+                    Red Mode
+                </button>
+            </div>
+            <span class="text-sm text-gray-500 italic ml-2">Current click will paint countries this color.</span>
+        </div>
+
+        <p class="text-gray-600">2. Click countries on the map or use the continent buttons below.</p>
+        
+        <!-- Continent Controls -->
         <div class="flex flex-wrap gap-2" id="controls">
-            <button onclick="selectContinent('Americas')" class="px-4 py-2 bg-blue-100 hover:bg-blue-200 text-blue-800 rounded transition">Americas</button>
-            <button onclick="selectContinent('Europe')" class="px-4 py-2 bg-blue-100 hover:bg-blue-200 text-blue-800 rounded transition">Europe</button>
-            <button onclick="selectContinent('Africa')" class="px-4 py-2 bg-blue-100 hover:bg-blue-200 text-blue-800 rounded transition">Africa</button>
-            <button onclick="selectContinent('Asia')" class="px-4 py-2 bg-blue-100 hover:bg-blue-200 text-blue-800 rounded transition">Asia</button>
-            <button onclick="selectContinent('Oceania')" class="px-4 py-2 bg-blue-100 hover:bg-blue-200 text-blue-800 rounded transition">Oceania</button>
-            <div class="w-px h-8 bg-gray-300 mx-2"></div>
-            <button onclick="resetMap()" class="px-4 py-2 bg-red-100 hover:bg-red-200 text-red-800 rounded transition">Clear All</button>
+            <button onclick="selectContinent('Americas')" class="px-3 py-1 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded transition text-sm">Americas</button>
+            <button onclick="selectContinent('Europe')" class="px-3 py-1 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded transition text-sm">Europe</button>
+            <button onclick="selectContinent('Africa')" class="px-3 py-1 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded transition text-sm">Africa</button>
+            <button onclick="selectContinent('Asia')" class="px-3 py-1 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded transition text-sm">Asia</button>
+            <button onclick="selectContinent('Oceania')" class="px-3 py-1 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded transition text-sm">Oceania</button>
+            <div class="w-px h-6 bg-gray-300 mx-1"></div>
+            <button onclick="resetMap()" class="px-3 py-1 bg-red-600 hover:bg-red-700 text-white rounded transition text-sm">Clear Map</button>
         </div>
     </div>
 
     <!-- Map Visualization -->
     <div id="map-container" class="shadow-lg">
-        <div id="loading">Loading Map Data...</div>
+        <div id="loading">
+            <span>Loading Map Data...</span>
+        </div>
         <div id="tooltip"></div>
     </div>
     
-    <div class="mt-4 text-sm text-gray-500 text-center">
-        Selection Count: <span id="count" class="font-bold">0</span> countries
+    <div class="mt-4 flex gap-8 justify-center text-sm text-gray-600">
+        <div>Green Count: <span id="count-green" class="font-bold text-green-600 text-lg">0</span></div>
+        <div>Red Count: <span id="count-red" class="font-bold text-red-600 text-lg">0</span></div>
     </div>
 
     <script>
@@ -112,7 +148,8 @@
         const width = 960;
         const height = 500;
         let countriesData = [];
-        let metadata = {}; // To store mapping from ID to Continent/Name
+        let metadata = {}; 
+        let currentMode = 'green'; // Default mode
 
         // Select DOM elements
         const svg = d3.select("#map-container")
@@ -123,17 +160,20 @@
             .style("height", "100%");
 
         const tooltip = d3.select("#tooltip");
-        const countSpan = document.getElementById("count");
+        const countGreenSpan = document.getElementById("count-green");
+        const countRedSpan = document.getElementById("count-red");
         const loadingDiv = document.getElementById("loading");
 
-        // Map Projection (Mercator)
+        const btnGreen = document.getElementById("btn-green");
+        const btnRed = document.getElementById("btn-red");
+
+        // Map Projection
         const projection = d3.geoMercator()
             .scale(140)
             .translate([width / 2, height / 1.4]);
 
         const path = d3.geoPath().projection(projection);
 
-        // Group for map features
         const g = svg.append("g");
 
         // Zoom Behavior
@@ -145,52 +185,74 @@
 
         svg.call(zoom);
 
-        // --- Data Fetching & Initialization ---
-        
-        Promise.all([
-            // 1. Fetch World Topology (The shapes)
-            d3.json("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json"),
-            
-            // 2. Fetch Metadata (Codes to Names and Regions)
-            // We use this to know which country belongs to which continent
-            d3.json("https://raw.githubusercontent.com/lukes/ISO-3166-Countries-with-Regional-Codes/master/all/all.json")
-        ]).then(([topology, metaJson]) => {
-            
-            // Process Metadata
-            // Create a lookup: Numeric Code -> { name, region, subregion }
-            metaJson.forEach(item => {
-                const numericCode = parseInt(item["country-code"], 10);
-                metadata[numericCode] = {
-                    name: item.name,
-                    region: item.region, // e.g., "Americas", "Europe"
-                    subregion: item["sub-region"]
-                };
+        // --- Data Fetching ---
+        function loadData() {
+            loadingDiv.innerHTML = '<span>Loading Map Data...</span>';
+            loadingDiv.style.display = 'flex';
+
+            // Use jsdelivr for both to ensure better caching and avoid GitHub raw rate limits (429)
+            const topologyUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
+            // Switched to jsdelivr CDN for the GitHub file to avoid raw.githubusercontent 429 errors
+            const metadataUrl = "https://cdn.jsdelivr.net/gh/lukes/ISO-3166-Countries-with-Regional-Codes@master/all/all.json";
+
+            Promise.all([
+                d3.json(topologyUrl),
+                d3.json(metadataUrl)
+            ]).then(([topology, metaJson]) => {
+                
+                metaJson.forEach(item => {
+                    const numericCode = parseInt(item["country-code"], 10);
+                    metadata[numericCode] = {
+                        name: item.name,
+                        region: item.region,
+                        subregion: item["sub-region"]
+                    };
+                });
+
+                countriesData = topojson.feature(topology, topology.objects.countries).features;
+                renderMap();
+                loadingDiv.style.display = 'none';
+
+            }).catch(err => {
+                console.error(err);
+                loadingDiv.innerHTML = `
+                    <span class="text-red-600 mb-2">Error loading map data (Rate Limit).</span>
+                    <button class="retry-btn" onclick="loadData()">Retry</button>
+                `;
             });
+        }
 
-            // Convert TopoJSON to GeoJSON
-            countriesData = topojson.feature(topology, topology.objects.countries).features;
+        // Initialize loading
+        loadData();
 
-            // Render Map
-            renderMap();
+        // --- UI Logic ---
+
+        function setMode(mode) {
+            currentMode = mode;
             
-            // Hide Loader
-            loadingDiv.style.display = 'none';
-
-        }).catch(err => {
-            console.error(err);
-            loadingDiv.innerText = "Error loading map data. Please check connection.";
-        });
+            // Update Button Styling
+            if (mode === 'green') {
+                btnGreen.className = "px-4 py-2 bg-green-200 border-2 border-green-600 text-green-900 rounded font-bold shadow-sm transition";
+                btnRed.className = "px-4 py-2 bg-red-100 border-2 border-transparent hover:bg-red-200 text-red-900 rounded transition";
+            } else {
+                btnGreen.className = "px-4 py-2 bg-green-100 border-2 border-transparent hover:bg-green-200 text-green-900 rounded transition";
+                btnRed.className = "px-4 py-2 bg-red-200 border-2 border-red-600 text-red-900 rounded font-bold shadow-sm transition";
+            }
+        }
 
         // --- Rendering Logic ---
 
         function renderMap() {
+            // Clear existing paths if any (for re-render safety)
+            g.selectAll("path").remove();
+
             g.selectAll("path")
                 .data(countriesData)
                 .enter()
                 .append("path")
                 .attr("d", path)
                 .attr("class", "country")
-                .attr("id", d => `country-${d.id}`) // Add ID for easier selection
+                .attr("id", d => `country-${d.id}`)
                 .on("mouseover", function(event, d) {
                     const info = metadata[parseInt(d.id)];
                     const name = info ? info.name : "Unknown Country";
@@ -204,60 +266,89 @@
                     tooltip.transition().duration(500).style("opacity", 0);
                 })
                 .on("click", function(event, d) {
-                    // Toggle selection class
                     const el = d3.select(this);
-                    const isSelected = el.classed("selected");
-                    el.classed("selected", !isSelected);
+                    
+                    const isCurrentColor = el.classed(currentMode);
+
+                    // Reset classes first
+                    if (isCurrentColor) {
+                        el.classed("green", false);
+                        el.classed("red", false);
+                    } else {
+                        // Remove others, add current
+                        el.classed("green", false);
+                        el.classed("red", false);
+                        el.classed(currentMode, true);
+                    }
+                    
                     updateCount();
                 });
         }
 
-        // --- Continent Selection Logic ---
-
         function selectContinent(targetRegion) {
-            // targetRegion strings match the ISO dataset: "Americas", "Europe", "Africa", "Asia", "Oceania"
-            
+            if (countriesData.length === 0) return;
+
             const paths = g.selectAll("path");
+            let allAlreadyCurrentColor = true;
             
-            // Determine if we are selecting or deselecting the whole continent
-            // Logic: If all countries in region are already selected, deselect them. Otherwise, select all.
-            let allAlreadySelected = true;
-            
+            // Check state of continent relative to CURRENT MODE
             paths.each(function(d) {
                 const id = parseInt(d.id);
                 const info = metadata[id];
                 if (info && info.region === targetRegion) {
-                    if (!d3.select(this).classed("selected")) {
-                        allAlreadySelected = false;
+                    if (!d3.select(this).classed(currentMode)) {
+                        allAlreadyCurrentColor = false;
                     }
                 }
             });
 
-            // Apply changes
-            paths.classed("selected", function(d) {
-                const id = parseInt(d.id);
-                const info = metadata[id];
-                const currentClass = d3.select(this).classed("selected");
-
-                if (info && info.region === targetRegion) {
-                    // If all were selected, we turn them off (toggle behavior for group)
-                    // If mixed or none selected, we turn them all on.
-                    return !allAlreadySelected; 
-                }
-                return currentClass; // Leave others alone
+            paths.classed("green", function(d) {
+                return updateClass(this, d, targetRegion, "green", allAlreadyCurrentColor);
+            });
+            
+            paths.classed("red", function(d) {
+                return updateClass(this, d, targetRegion, "red", allAlreadyCurrentColor);
             });
 
             updateCount();
         }
 
+        // Helper to update classes safely for continents
+        function updateClass(element, d, targetRegion, classColor, allSelected) {
+            const id = parseInt(d.id);
+            const info = metadata[id];
+            const el = d3.select(element);
+            
+            // If this country is in the target region
+            if (info && info.region === targetRegion) {
+                // If we are applying THIS color mode
+                if (currentMode === classColor) {
+                    // Toggle: if all were selected, deselect. Else select.
+                    return !allSelected;
+                } else {
+                    // If this is the OTHER color mode, we must remove it if we are selecting
+                    // If we are deselecting (allSelected is true), we technically just leave it?
+                    // Let's assume selecting a continent overwrites previous colors.
+                    return false; 
+                }
+            }
+            // Preserve existing state for non-target countries
+            return el.classed(classColor);
+        }
+
         function resetMap() {
-            g.selectAll("path").classed("selected", false);
+            g.selectAll("path")
+                .classed("green", false)
+                .classed("red", false);
             updateCount();
         }
 
         function updateCount() {
-            const count = g.selectAll(".country.selected").size();
-            countSpan.innerText = count;
+            const greenCount = g.selectAll(".country.green").size();
+            const redCount = g.selectAll(".country.red").size();
+            
+            countGreenSpan.innerText = greenCount;
+            countRedSpan.innerText = redCount;
         }
 
     </script>
