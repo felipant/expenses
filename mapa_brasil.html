@@ -1,196 +1,361 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Mapa do Brasil — Estados selecionáveis</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
-  <style>
-    html,body,#map { height:100%; margin:0; }
-    body { background:#f1f4ee; }
-    #map { box-shadow:0 8px 24px rgba(0,0,0,0.12); }
-    .state-label{ font-weight:700; font-size:12px; text-shadow: 0 1px 0 rgba(255,255,255,0.6); }
-    .label-selected{ background: rgba(255,255,255,0.95); padding:2px 6px; border-radius:4px; box-shadow:0 1px 2px rgba(0,0,0,0.15);} 
-    .legend{ position:absolute; right:12px; bottom:12px; background:white; padding:8px 10px; border-radius:6px; box-shadow:0 6px 18px rgba(0,0,0,0.12); font-family:Arial; }
-    .loading{ position:absolute; left:12px; bottom:12px; background:rgba(255,255,255,0.9); padding:8px 10px; border-radius:6px; font-family:Arial; box-shadow:0 6px 18px rgba(0,0,0,0.06);} 
-  </style>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mapa do Brasil — Cidades Específicas</title>
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    
+    <style>
+        html, body, #map { 
+            height: 100%; 
+            margin: 0; 
+            padding: 0;
+            background-color: #f1f4ee; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        #map { 
+            background: #f1f4ee; 
+            outline: none;
+        }
+
+        /* Loading Overlay */
+        #loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            font-weight: 600;
+            color: #333;
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .spinner {
+            width: 24px;
+            height: 24px;
+            border: 3px solid #ddd;
+            border-top-color: #55634c;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Estilo dos Rótulos */
+        .city-label {
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 700;
+            color: #333;
+            text-align: center;
+            line-height: 1.2;
+            white-space: nowrap;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+            pointer-events: none; /* Permite clicar através do rótulo */
+            transition: all 0.2s ease;
+            padding: 2px 6px;
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+
+        /* Rótulo selecionado */
+        .city-label.selected-label {
+            color: #fff;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+            background: #55634c;
+            transform: scale(1.1);
+            z-index: 1000;
+            border-color: #333;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+
+        /* Painel de Legenda */
+        .info-panel {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 1000;
+            min-width: 200px;
+        }
+
+        .info-panel h4 { margin: 0 0 8px 0; color: #333; font-size: 16px; }
+        .info-panel p { margin: 0; font-size: 13px; color: #666; }
+        .counter-badge {
+            background: #55634c;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 12px;
+        }
+    </style>
 </head>
 <body>
-  <div id="map"></div>
-  <div class="legend"><strong>Interação:</strong><br>clique em um estado para selecionar / desmarcar</div>
-  <div id="loading" class="loading">Carregando limites dos estados...</div>
 
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="https://unpkg.com/@turf/turf@6.5.0/turf.min.js"></script>
-  <script>
-    // Inicializa mapa centrado no Brasil
-    const map = L.map('map', { zoomControl:true }).setView([-14.2350, -51.9253], 4);
+    <div id="map"></div>
 
-    // camada base vazia (sem tiles) para manter o fundo #f1f4ee visível
-    L.tileLayer('', { attribution: '' }).addTo(map);
+    <div id="loading">
+        <div class="spinner"></div>
+        <span id="loading-text">Carregando mapa...</span>
+    </div>
 
-    // estilo padrão para estados
-    function style(feature){
-      return {
-        fillColor: 'transparent',
-        weight: 1.2,
-        opacity: 1,
-        color: '#000', // divisas em preto
-        fillOpacity: 0.9
-      };
-    }
+    <div class="info-panel">
+        <h4>Cidades em Destaque</h4>
+        <p>Clique nos estados para selecionar.</p>
+        <div style="margin-top:10px; display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 13px; font-weight: 600;">Selecionados:</span>
+            <span id="counter" class="counter-badge">0</span>
+        </div>
+    </div>
 
-    // camada para armazenar estados e labels
-    let statesLayer;
-    const labelLayer = L.layerGroup().addTo(map);
+    <!-- Bibliotecas JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
-    const LOCALE_STORAGE_KEY = 'br_states_geojson_v1';
-    const CACHE_TTL_MS = 1000 * 60 * 60 * 24; // 24h
+    <script>
+        // --- CONFIGURAÇÃO ---
+        const LOCALE_STORAGE_KEY = 'br_states_geojson_v5'; 
+        const CACHE_TTL_MS = 1000 * 60 * 60 * 24 * 7; // 7 dias
+        
+        // Fontes de GeoJSON
+        const GEOJSON_SOURCES = [
+            'https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/brazil-states.geojson',
+            'https://raw.githubusercontent.com/giuliano-macedo/geodata-br-states/master/geojson/br_states.json',
+            'https://raw.githubusercontent.com/kelvins/Municipios-Brasileiros/master/estados.geojson'
+        ];
 
-    // mapeamento de capitais (nome). Pode ser substituído por lat/lngs se desejar precisão absoluta.
-    const capitals = {
-      'Acre':'Rio Branco','Alagoas':'Maceió','Amapá':'Macapá','Amazonas':'Manaus','Bahia':'Salvador','Ceará':'Fortaleza',
-      'Distrito Federal':'Brasília','Espírito Santo':'Vitória','Goiás':'Goiânia','Maranhão':'São Luís','Mato Grosso':'Cuiabá',
-      'Mato Grosso do Sul':'Campo Grande','Minas Gerais':'Belo Horizonte','Pará':'Belém','Paraíba':'João Pessoa','Paraná':'Curitiba',
-      'Pernambuco':'Recife','Piauí':'Teresina','Rio de Janeiro':'Rio de Janeiro','Rio Grande do Norte':'Natal','Rio Grande do Sul':'Porto Alegre',
-      'Rondônia':'Porto Velho','Roraima':'Boa Vista','Santa Catarina':'Florianópolis','São Paulo':'São Paulo','Sergipe':'Aracaju','Tocantins':'Palmas'
-    };
+        // --- DADOS DAS CIDADES ESPECÍFICAS ---
+        // Mapeamento por Sigla do Estado -> Dados da Cidade
+        const targetCities = {
+            'CE': { name: 'Fortaleza', lat: -3.71722, lng: -38.5434 },
+            'SC': { name: 'Florianópolis', lat: -27.5959, lng: -48.5480 },
+            'MG': { name: 'Montes Claros', lat: -16.7181, lng: -43.8641 },
+            'PR': { name: 'Colombo', lat: -25.2917, lng: -49.2242 },
+            'RS': { name: 'Pelotas', lat: -31.7654, lng: -52.3376 }
+        };
 
-    // Lista de fontes alternativas para GeoJSON — caso uma retorne 429 (rate limit) tentamos a próxima.
-    const GEOJSON_SOURCES = [
-      // alternativa 1 (codeforgermany)
-      'https://raw.githubusercontent.com/codeforgermany/click_that_hood/main/public/data/brazil-states.geojson',
-      // alternativa 2 (fork com outro caminho)
-      'https://raw.githubusercontent.com/kelvins/Municipios-Brasileiros/master/estados.geojson',
-      // alternativa 3 (backup do autor original usado antes)
-      'https://raw.githubusercontent.com/giuliano-macedo/geodata-br-states/master/geojson/br_states.json'
-    ];
+        // --- INICIALIZAÇÃO DO MAPA ---
+        const map = L.map('map', {
+            zoomControl: true,
+            zoomSnap: 0.1,
+            attributionControl: false
+        }).setView([-14.2350, -51.9253], 4.2);
 
-    const loadingEl = document.getElementById('loading');
+        L.control.attribution({position: 'bottomleft'}).addAttribution('&copy; OpenStreetMap').addTo(map);
 
-    // tenta carregar geojson do localStorage (cache)
-    function loadFromCache(){
-      try{
-        const raw = localStorage.getItem(LOCALE_STORAGE_KEY);
-        if(!raw) return null;
-        const parsed = JSON.parse(raw);
-        if(!parsed || !parsed.timestamp || (Date.now() - parsed.timestamp) > CACHE_TTL_MS) return null;
-        return parsed.geojson;
-      }catch(e){ return null; }
-    }
+        // --- VARIÁVEIS DE ESTADO ---
+        const selectedStates = new Set(); 
+        let geojsonLayer; 
+        const labelsMap = {}; // Armazena { label: Marker, dot: CircleMarker }
+        const loadingEl = document.getElementById('loading');
+        const loadingText = document.getElementById('loading-text');
 
-    function saveToCache(geojson){
-      try{ localStorage.setItem(LOCALE_STORAGE_KEY, JSON.stringify({timestamp: Date.now(), geojson})); }catch(e){}
-    }
-
-    // Tenta buscar o GeoJSON sequencialmente nas fontes listadas, ignorando 429s e outros erros temporários
-    async function fetchWithFallback(sources){
-      let lastErr = null;
-      for(const url of sources){
-        try{
-          const resp = await fetch(url, {cache: 'no-store'});
-          if(resp.status === 429){
-            console.warn('Fonte rate-limited (429):', url);
-            lastErr = new Error('Rate-limited: ' + url);
-            continue; // tenta próximo
-          }
-          if(!resp.ok) throw new Error('HTTP '+resp.status+' from '+url);
-          const j = await resp.json();
-          return j;
-        }catch(err){
-          console.warn('Erro ao buscar GeoJSON de', url, err);
-          lastErr = err;
-          // continua para a próxima URL
+        // --- SISTEMA DE CACHE & FETCH ---
+        async function fetchWithFallback(sources) {
+            let lastError;
+            for (const url of sources) {
+                try {
+                    loadingText.textContent = "Baixando dados...";
+                    const resp = await fetch(url);
+                    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+                    return await resp.json();
+                } catch (err) {
+                    console.warn(`Falha na fonte ${url}:`, err);
+                    lastError = err;
+                }
+            }
+            throw lastError || new Error("Todas as fontes falharam. Verifique sua conexão.");
         }
-      }
-      throw lastErr || new Error('Todas as fontes falharam');
-    }
 
-    async function init(){
-      // 1) tenta cache
-      const cached = loadFromCache();
-      if(cached){
-        console.log('Usando GeoJSON em cache');
-        return handleGeoJSON(cached);
-      }
+        function loadGeoJSON() {
+            try {
+                const cached = localStorage.getItem(LOCALE_STORAGE_KEY);
+                if (cached) {
+                    const { timestamp, data } = JSON.parse(cached);
+                    if (Date.now() - timestamp < CACHE_TTL_MS) {
+                        console.log("Usando cache local.");
+                        renderMap(data);
+                        return;
+                    }
+                }
+            } catch (e) { console.warn("Erro ao ler cache", e); }
 
-      // 2) tenta buscar nas fontes com fallback
-      try{
-        const geojson = await fetchWithFallback(GEOJSON_SOURCES);
-        saveToCache(geojson);
-        return handleGeoJSON(geojson);
-      }catch(err){
-        console.error('Erro ao carregar GeoJSON:', err);
-        loadingEl.textContent = 'Erro ao carregar limites dos estados. (ver console)';
-        alert('Erro ao carregar o GeoJSON dos estados: ' + (err && err.message ? err.message : err));
-      }
-    }
-
-    function handleGeoJSON(geojson){
-      loadingEl.style.display = 'none';
-
-      statesLayer = L.geoJSON(geojson, {
-        style: style,
-        onEachFeature: onEachState
-      }).addTo(map);
-
-      // ajusta zoom para mostrar todo o país
-      try{ map.fitBounds(statesLayer.getBounds(), {padding:[20,20]}); }catch(e){}
-    }
-
-    function onEachState(feature, layer){
-      const props = feature.properties || {};
-      // Nome do estado — tente diferentes chaves (alguns geojsons usam 'name', 'nome', 'STATE', 'st_nome')
-      const stateName = props.name || props.nome || props.STATE || props.st_nome || props.state || props.nomeuf || 'Estado sem nome';
-
-      // compute centroid (usando Turf) para posicionar o rótulo — funciona bem para a maioria dos estados
-      let centroidLatLng = null;
-      try{
-        const centroid = turf.centroid(feature);
-        const [lng,lat] = centroid.geometry.coordinates;
-        centroidLatLng = [lat,lng];
-      }catch(e){
-        // se falhar, usa bounds center
-        const c = layer.getBounds().getCenter();
-        centroidLatLng = [c.lat, c.lng];
-      }
-
-      // label (nome da capital em negrito). Se capital não estiver no mapeamento, mostramos o próprio nome do estado em itálico.
-      const capitalName = capitals[stateName] || (props.capital || props.capita || props.capital_name || null);
-      const labelText = capitalName ? ('<strong>'+capitalName+'</strong>') : ('<strong style="font-style:italic">'+stateName+'</strong>');
-
-      const icon = L.divIcon({
-        className: 'state-label',
-        html: labelText,
-        iconSize: null
-      });
-
-      const marker = L.marker(centroidLatLng, {icon: icon, interactive:false}).addTo(labelLayer);
-
-      // estado clicável: alterna seleção
-      layer.on('click', function(e){
-        const selected = layer.selected || false;
-        if(!selected){
-          layer.setStyle({fillColor:'#55634c', fillOpacity:1});
-          // destacar label (adiciona classe)
-          const el = marker.getElement(); if(el) el.classList.add('label-selected');
-          layer.selected = true;
-        } else {
-          layer.setStyle({fillColor:'transparent', fillOpacity:0.9});
-          const el = marker.getElement(); if(el) el.classList.remove('label-selected');
-          layer.selected = false;
+            fetchWithFallback(GEOJSON_SOURCES)
+                .then(data => {
+                    try {
+                        localStorage.setItem(LOCALE_STORAGE_KEY, JSON.stringify({
+                            timestamp: Date.now(),
+                            data: data
+                        }));
+                    } catch (e) { console.warn("Cache indisponível"); }
+                    renderMap(data);
+                })
+                .catch(err => {
+                    loadingEl.style.display = 'flex';
+                    loadingText.innerHTML = "Erro ao carregar mapa.<br><span style='font-size:0.8em'>Tente recarregar.</span>";
+                    loadingText.style.color = "#d32f2f";
+                });
         }
-      });
 
-      // destaque visual ao passar o mouse
-      layer.on('mouseover', function(){ layer.setStyle({weight:2.2}); });
-      layer.on('mouseout', function(){ layer.setStyle({weight:1.2}); });
+        // --- HELPER FUNCTIONS ---
+        function getStateId(feature) {
+            if (!feature || !feature.properties) return "UNKNOWN";
+            const p = feature.properties;
+            return p.sigla || p.SIGLA || p.abbreviation || p.name || p.nome || "UNKNOWN_" + Math.random();
+        }
 
-    }
+        // --- RENDERIZAÇÃO ---
+        function style(feature) {
+            const id = getStateId(feature);
+            const isSelected = selectedStates.has(id);
+            return {
+                fillColor: isSelected ? '#55634c' : 'transparent',
+                weight: isSelected ? 1.5 : 1.0,
+                opacity: 1,
+                color: '#333', 
+                fillOpacity: isSelected ? 1 : 0.0,
+            };
+        }
 
-    // Inicia
-    init();
+        function highlightFeature(e) {
+            const layer = e.target;
+            const feature = layer.feature;
+            if (!feature) return;
 
-  </script>
+            const id = getStateId(feature);
+
+            if (selectedStates.has(id)) {
+                // DESMARCAR
+                selectedStates.delete(id);
+                
+                if (labelsMap[id]) {
+                    // Restaura estilo padrão do texto
+                    labelsMap[id].label.getElement().classList.remove('selected-label');
+                    // Restaura cor do ponto para preto
+                    labelsMap[id].dot.setStyle({ fillColor: '#333', color: '#fff' });
+                }
+                
+                layer.setStyle({
+                    fillColor: 'transparent',
+                    fillOpacity: 0.0,
+                    weight: 1.0,
+                    color: '#333'
+                });
+            } else {
+                // SELECIONAR
+                selectedStates.add(id);
+                
+                if (labelsMap[id]) {
+                    // Destaca texto
+                    labelsMap[id].label.getElement().classList.add('selected-label');
+                    // Muda ponto para branco
+                    labelsMap[id].dot.setStyle({ fillColor: '#fff', color: '#333' });
+                }
+                
+                layer.setStyle({
+                    fillColor: '#55634c',
+                    fillOpacity: 1,
+                    weight: 1.5,
+                    color: '#1a1a1a'
+                });
+                layer.bringToFront();
+            }
+
+            document.getElementById('counter').innerText = selectedStates.size;
+        }
+
+        function onEachFeature(feature, layer) {
+            const id = getStateId(feature);
+
+            layer.on({
+                click: highlightFeature,
+                mouseover: (e) => {
+                    if (!selectedStates.has(id)) {
+                        e.target.setStyle({ weight: 2.0, color: '#000' });
+                    }
+                },
+                mouseout: (e) => {
+                    if (!selectedStates.has(id)) {
+                        geojsonLayer.resetStyle(e.target);
+                    } else {
+                        e.target.setStyle({
+                            fillColor: '#55634c',
+                            fillOpacity: 1,
+                            weight: 1.5,
+                            color: '#1a1a1a'
+                        });
+                    }
+                }
+            });
+
+            // Verificar se este estado possui uma cidade alvo
+            if (targetCities[id]) {
+                const city = targetCities[id];
+                const latLng = [city.lat, city.lng];
+
+                // 1. Cria o Ponto (Dot)
+                const dotMarker = L.circleMarker(latLng, {
+                    radius: 4,          // Tamanho do ponto
+                    fillColor: '#333',  // Cor interna inicial (preto)
+                    color: '#fff',      // Borda branca para contraste
+                    weight: 1,
+                    opacity: 1,
+                    fillOpacity: 1,
+                    interactive: false  // Não interfere no clique do estado
+                }).addTo(map);
+
+                // 2. Cria o Rótulo (Texto)
+                const labelIcon = L.divIcon({
+                    className: 'city-label',
+                    html: `<div>${city.name}</div>`,
+                    iconSize: null,
+                    // Offset para o texto ficar levemente acima do ponto
+                    iconAnchor: [30, 15] 
+                });
+
+                const textMarker = L.marker(latLng, { 
+                    icon: labelIcon, 
+                    interactive: false 
+                }).addTo(map);
+
+                // Salva referência de AMBOS para interação
+                labelsMap[id] = { 
+                    label: textMarker, 
+                    dot: dotMarker 
+                };
+            }
+        }
+
+        function renderMap(data) {
+            loadingEl.style.display = 'none';
+            
+            if (geojsonLayer) map.removeLayer(geojsonLayer);
+
+            geojsonLayer = L.geoJSON(data, {
+                style: style,
+                onEachFeature: onEachFeature
+            }).addTo(map);
+
+            try {
+                map.fitBounds(geojsonLayer.getBounds(), { padding: [30, 30] });
+            } catch(e) { console.log("Erro ao ajustar zoom", e); }
+        }
+
+        loadGeoJSON();
+
+    </script>
 </body>
 </html>
