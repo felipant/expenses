@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="820" height="160" viewBox="0 0 820 160" role="img" aria-label="Linha do tempo: dados coletados entre fevereiro de 2018 e setembro de 2019">
+  <style>
+    .bg { fill: #f1f4ee; }
+    .axis { stroke: #333; stroke-width: 2; }
+    .tick { stroke: #666; stroke-width: 1; }
+    .label { font-family: "Segoe UI", Roboto, Arial, sans-serif; font-size: 12px; fill: #222; }
+    .period { fill: #2b8cbe; fill-opacity: 0.18; stroke: #1f6f9a; stroke-opacity: 0.9; rx:6; ry:6; }
+    .period-label { font-weight: 700; font-size: 13px; fill: #0b3b52; }
+    .marker { fill: #1f6f9a; }
+    .year { font-weight: 600; font-size: 12px; }
+  </style>
+
+  <!-- fundo -->
+  <rect class="bg" x="0" y="0" width="820" height="160"/>
+
+  <!-- margem / variáveis de layout -->
+  <!-- inner axis starts at x=50, ends at x=750 -->
+  <!-- timeline domain: Jan 2017 (index 0) ... Dec 2020 (index 47) -->
+  <!-- fev2018 index = 13 ; set2019 index = 32 -->
+
+  <!-- eixo -->
+  <line class="axis" x1="50" y1="90" x2="750" y2="90" />
+
+  <!-- sombreado do período (posições calculadas) -->
+  <!-- start x = 50 + (13/47)*700 ≈ 244 ; end x = 50 + (32/47)*700 ≈ 527 -->
+  <rect class="period" x="244" y="64" width="283" height="52" rx="8" ry="8"/>
+
+  <!-- marcador de início: Fev/2018 -->
+  <circle class="marker" cx="244" cy="90" r="4"/>
+  <text class="label" x="244" y="54" text-anchor="middle">Fev 2018</text>
+
+  <!-- marcador de fim: Set/2019 -->
+  <circle class="marker" cx="527" cy="90" r="4"/>
+  <text class="label" x="527" y="54" text-anchor="middle">Set 2019</text>
+
+  <!-- etiqueta do período sobre o retângulo -->
+  <text class="period-label" x=" (244 + 527) / 2 " y="86" text-anchor="middle" dominant-baseline="middle">
+    Dados coletados
+  </text>
+
+  <!-- ticks e rótulos de anos: Jan 2017, Jan 2018, Jan 2019, Jan 2020, Jan 2021 -->
+  <!-- calcular posições: x = 50 + (monthIndex/47)*700 ; Jan2017 idx 0, Jan2018 idx 12, Jan2019 idx 24, Jan2020 idx 36, Jan2021 idx 48 -> extrapolar para 48 -->
+  <!-- aqui colocamos ticks para 2017..2021 alinhados visualmente -->
+  <!-- Jan 2017 -->
+  <line class="tick" x1="50" y1="84" x2="50" y2="96"/>
+  <text class="year" x="50" y="112" text-anchor="middle">2017</text>
+
+  <!-- Jan 2018 (index 12 -> x ≈ 50 + (12/47)*700 ≈ 229) -->
+  <line class="tick" x1="229" y1="84" x2="229" y2="96"/>
+  <text class="year" x="229" y="112" text-anchor="middle">2018</text>
+
+  <!-- Jan 2019 (index 24 -> x ≈ 408) -->
+  <line class="tick" x1="408" y1="84" x2="408" y2="96"/>
+  <text class="year" x="408" y="112" text-anchor="middle">2019</text>
+
+  <!-- Jan 2020 (index 36 -> x ≈ 587) -->
+  <line class="tick" x1="587" y1="84" x2="587" y2="96"/>
+  <text class="year" x="587" y="112" text-anchor="middle">2020</text>
+
+  <!-- Jan 2021 (visually at end) -->
+  <line class="tick" x1="750" y1="84" x2="750" y2="96"/>
+  <text class="year" x="750" y="112" text-anchor="middle">2021</text>
+
+  <!-- legenda mini -->
+  <rect x="60" y="20" width="14" height="10" class="period" />
+  <text class="label" x="82" y="30" alignment-baseline="middle">Período de coleta</text>
+</svg>

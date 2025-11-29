@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="820" height="160" viewBox="0 0 820 160" role="img" aria-label="Linha do tempo: Janeiro a Agosto de 2019">
+  <style>
+    .bg { fill: #f1f4ee; }
+    .axis { stroke: #333; stroke-width: 2; }
+    .tick { stroke: #666; stroke-width: 1; }
+    .label { font-family: "Segoe UI", Roboto, Arial, sans-serif; font-size: 12px; fill: #222; }
+    .period { fill: #2b8cbe; fill-opacity: 0.18; stroke: #1f6f9a; stroke-opacity: 0.9; rx:6; ry:6; }
+    .period-label { font-weight: 700; font-size: 13px; fill: #0b3b52; }
+    .marker { fill: #1f6f9a; }
+    .year { font-weight: 600; font-size: 12px; }
+  </style>
+
+  <rect class="bg" x="0" y="0" width="820" height="160"/>
+
+  <line class="axis" x1="50" y1="90" x2="750" y2="90" />
+
+  <rect class="period" x="400" y="64" width="204" height="52" rx="8" ry="8"/>
+
+  <circle class="marker" cx="400" cy="90" r="4"/>
+  <text class="label" x="400" y="54" text-anchor="middle">Jan 2019</text>
+
+  <circle class="marker" cx="604" cy="90" r="4"/>
+  <text class="label" x="604" y="54" text-anchor="middle">Ago 2019</text>
+
+
+  <line class="tick" x1="50" y1="84" x2="50" y2="96"/>
+  <text class="year" x="50" y="112" text-anchor="middle">2018</text>
+
+  <line class="tick" x1="400" y1="84" x2="400" y2="96"/>
+  <text class="year" x="400" y="112" text-anchor="middle">2019</text>
+
+  <line class="tick" x1="750" y1="84" x2="750" y2="96"/>
+  <text class="year" x="750" y="112" text-anchor="middle">2020</text>
+
+  <rect x="60" y="20" width="14" height="10" class="period" />
+  <text class="label" x="82" y="30" alignment-baseline="middle">Intervalo de dados</text>
+</svg>
