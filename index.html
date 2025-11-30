@@ -6,121 +6,172 @@
     <title>Adicionar Despesa</title>
     <link rel="icon" type="image/png" href="dol.png">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&display=swap');
-
-        body {
-            background-color: #f8f8f8; /* Soft white background */
-            color: #222; /* Dark gray for readability */
-            font-family: 'Inter', sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-
-        .form-container {
-            background: #ffffff;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-            width: 400px;
-            text-align: center;
-            border: 1px solid #ddd; /* Light border */
-        }
-
-        h2 {
-            color: #000;
-            font-weight: 700;
-            margin-bottom: 20px;
-            font-size: 20px;
-        }
-
-        label {
-            display:flex    ;
-            margin: 10px 0 5px;
-            font-size: 14px;
-            align-items: center;
-            font-weight: 500;
-            color: #333;
-        }
-
-        input, select {
-            width: 100%;
-            padding: 10px;
-            background: #fff;
-            border: 1px solid #bbb;
-            color: #222;
-            font-size: 16px;
-            border-radius: 5px;
-            outline: none;
-            transition: 0.2s ease-in-out;
-        }
-
-        input:focus, select:focus {
-            border-color: #000;
-            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
-        }
-
-        .btn {
-            margin-top: 20px;
-            background: #000;
-            color: white;
-            padding: 12px;
-            border: none;
-            cursor: pointer;
-            font-size: 16px;
-            width: 100%;
-            border-radius: 5px;
-            font-weight: bold;
-            transition: 0.2s ease-in-out;
-        }
-
-        .btn:hover {
-            background: #333;
-        }
-
-        .table-container {
-            overflow-x: auto; /* Enables scrolling for large tables */
-            border-radius: 8px;
-            padding: 10px;
-            background: #ffffff;
-            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
-            border: 1px solid #ddd;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 14px;
-        }
-
-        th, td {
-            padding: 12px;
-            border: 1px solid #ddd;
-            text-align: center;
-        }
-
-        th {
-            background: #f1f1f1;
-            font-weight: bold;
-            color: #000;
-        }
-
-        tr:nth-child(even) {
-            background: #f9f9f9;
-        }
-
-        tr:hover {
-            background: #f1f1f1;
-        }
-
-        input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
-        }
-
-
+         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&display=swap'); 
+  
+         /* --- LIGHT MODE (Default) --- */
+         body { 
+             background-color: #f8f8f8; /* Soft white background */ 
+             color: #222; /* Dark gray for readability */ 
+             font-family: 'Inter', sans-serif; 
+             display: flex; 
+             justify-content: center; 
+             align-items: center; 
+             height: 100vh; 
+             margin: 0; 
+         } 
+  
+         .form-container { 
+             background: #ffffff; 
+             padding: 30px; 
+             border-radius: 8px; 
+             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */ 
+             width: 400px; 
+             text-align: center; 
+             border: 1px solid #ddd; /* Light border */ 
+         } 
+  
+         h2 { 
+             color: #000; 
+             font-weight: 700; 
+             margin-bottom: 20px; 
+             font-size: 20px; 
+         } 
+  
+         label { 
+             display:flex    ; 
+             margin: 10px 0 5px; 
+             font-size: 14px; 
+             align-items: center; 
+             font-weight: 500; 
+             color: #333; 
+         } 
+  
+         input, select { 
+             width: 100%; 
+             padding: 10px; 
+             background: #fff; 
+             border: 1px solid #bbb; 
+             color: #222; 
+             font-size: 16px; 
+             border-radius: 5px; 
+             outline: none; 
+             transition: 0.2s ease-in-out; 
+         } 
+  
+         input:focus, select:focus { 
+             border-color: #000; 
+             box-shadow: 0 0 5px rgba(0, 0, 0, 0.2); 
+         } 
+  
+         .btn { 
+             margin-top: 20px; 
+             background: #000; 
+             color: white; 
+             padding: 12px; 
+             border: none; 
+             cursor: pointer; 
+             font-size: 16px; 
+             width: 100%; 
+             border-radius: 5px; 
+             font-weight: bold; 
+             transition: 0.2s ease-in-out; 
+         } 
+  
+         .btn:hover { 
+             background: #333; 
+         } 
+  
+         .table-container { 
+             overflow-x: auto; /* Enables scrolling for large tables */ 
+             border-radius: 8px; 
+             padding: 10px; 
+             background: #ffffff; 
+             box-shadow: 0 0 5px rgba(0, 0, 0, 0.1); 
+             border: 1px solid #ddd; 
+         } 
+  
+         th, td { 
+             padding: 12px; 
+             border: 1px solid #ddd; 
+             text-align: center; 
+         } 
+  
+         th { 
+             background: #f1f1f1; 
+             font-weight: bold; 
+             color: #000; 
+         } 
+  
+         tr:nth-child(even) { 
+             background: #f9f9f9; 
+         } 
+  
+         tr:hover { 
+             background: #f1f1f1; 
+         } 
+  
+         input[type="checkbox"] { 
+             width: 20px; 
+             height: 20px; 
+         } 
+  
+         /* --- DARK MODE STYLES --- */
+         @media (prefers-color-scheme: dark) {
+             :root {
+                 color-scheme: dark; /* Helps browser handle scrollbars, forms, etc. */
+             }
+             body {
+                 background-color: #121212; /* Very dark background */
+                 color: #e0e0e0; /* Light text */
+             }
+             .form-container {
+                 background: #1e1e1e; /* Slightly lighter dark background for the container */
+                 box-shadow: 0 0 15px rgba(0, 0, 0, 0.5); 
+                 border: 1px solid #333;
+             }
+             h2 {
+                 color: #ffffff; /* White title */
+             }
+             label {
+                 color: #cccccc;
+             }
+             input, select {
+                 background: #2b2b2b; /* Darker inputs */
+                 border: 1px solid #444;
+                 color: #e0e0e0;
+             }
+             input:focus, select:focus {
+                 border-color: #888;
+                 box-shadow: 0 0 5px rgba(255, 255, 255, 0.2); 
+             }
+             .btn {
+                 background: #bb86fc; /* Purple/Accent color for dark mode buttons */
+                 color: #121212;
+             }
+             .btn:hover {
+                 background: #9a67ea; 
+             }
+             
+             /* Styles for the (currently unused) table elements */
+             .table-container { 
+                 background: #1e1e1e; 
+                 border: 1px solid #333; 
+             }
+             th { 
+                 background: #333; 
+                 color: #e0e0e0; 
+             } 
+             td {
+                 border: 1px solid #333;
+             }
+             tr:nth-child(even) { 
+                 background: #252525; 
+             } 
+             tr:hover { 
+                 background: #353535; 
+             } 
+         }
+  
     </style>
 </head>
 <body>
@@ -134,6 +185,12 @@
                 <label for="amount">Valor (R$):</label>
                 <input type="text" id="amount" name="amount" inputmode="numeric" placeholder="0.00">
             </div>
+
+            <label for="comentario">Comentário/Item:</label>
+            <input id="comentario" type="text" list="itemSuggestions">
+             
+            <datalist id="itemSuggestions">
+            </datalist>
 
             <div class="form-group">
                 <label for="categoria">Categoria:</label>
@@ -172,9 +229,6 @@
                     <option value="Fixo">Fixo</option>
                 </select>
             </div>
-
-            <label for="comentario">Comentário:</label>
-            <input id="comentario" type="text"></input>
 
             <label for="myCheckbox">
                 <input type="checkbox" name="subscribe" value="yes"  id="myCheckbox">
@@ -224,6 +278,75 @@
             }
             
             carregarDados();
+        </script>
+
+        <script>
+            // Global variable to store the mapping data from itens.json
+            let itemMapping = {};
+
+            // --- 1. Load Item Data and Populate Datalist ---
+            async function carregarItens() {
+                try {
+                    // NOTE: Ensure your itens.json is accessible at this path
+                    const response = await fetch('./data/itens.json'); 
+                    const data = await response.json();
+                    
+                    // Store the mapping globally for quick lookup
+                    itemMapping = data.itens; 
+
+                    const datalist = document.getElementById("itemSuggestions");
+                    
+                    for (const item in itemMapping) {
+                        const option = document.createElement("option");
+                        option.value = item;
+                        // You can optionally add a label, but 'value' is what appears in the suggestion box
+                        // option.textContent = item; 
+                        datalist.appendChild(option);
+                    }
+                } catch (error) {
+                    console.error("Erro ao carregar o arquivo itens.json", error);
+                }
+            }
+            
+            // --- 2. Categorization Logic ---
+            function categorizarAutomaticamente() {
+                const comentarioInput = document.getElementById("comentario");
+                const categoriaSelect = document.getElementById("categoria");
+                const subcategoriaSelect = document.getElementById("subcategoria");
+                
+                // Get the exact value currently in the input field
+                const typedItem = comentarioInput.value.trim();
+                
+                // Check if the typed item exists in our loaded map
+                if (itemMapping.hasOwnProperty(typedItem)) {
+                    const mapping = itemMapping[typedItem];
+                    
+                    // Auto-fill fields
+                    categoriaSelect.value = mapping.categoria;
+                    // The 'atualizarSubcategorias()' function needs to run before setting the subcategory value
+                    atualizarSubcategorias(); 
+                    subcategoriaSelect.value = mapping.subcategoria;
+                    
+                    console.log(`Preenchimento automático: ${mapping.categoria} - ${mapping.subcategoria}`);
+                    
+                } else {
+                    // If the item is not found, clear the category/subcategory fields
+                    // and require manual selection, as requested.
+                    categoriaSelect.value = "";
+                    atualizarSubcategorias(); // Clears subcategory list
+                    
+                    console.log("Item não encontrado na lista. Seleção manual necessária.");
+                }
+            }
+
+            // --- 3. Event Listener Setup ---
+            document.addEventListener('DOMContentLoaded', () => {
+                carregarItens(); // Load the item data when the page loads
+
+                // Listen for the 'input' event to provide instant feedback and categorization
+                document.getElementById("comentario").addEventListener("input", categorizarAutomaticamente);
+            });
+
         </script>
 
         <script>
