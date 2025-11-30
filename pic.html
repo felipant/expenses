@@ -1,67 +1,610 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="820" height="160" viewBox="0 0 820 160" role="img" aria-label="Linha do tempo: dados coletados entre fevereiro de 2018 e setembro de 2019">
-  <style>
-    .bg { fill: #f1f4ee; }
-    .axis { stroke: #333; stroke-width: 2; }
-    .tick { stroke: #666; stroke-width: 1; }
-    .label { font-family: "Segoe UI", Roboto, Arial, sans-serif; font-size: 12px; fill: #222; }
-    .period { fill: #2b8cbe; fill-opacity: 0.18; stroke: #1f6f9a; stroke-opacity: 0.9; rx:6; ry:6; }
-    .period-label { font-weight: 700; font-size: 13px; fill: #0b3b52; }
-    .marker { fill: #1f6f9a; }
-    .year { font-weight: 600; font-size: 12px; }
-  </style>
+<!DOCTYPE html> 
+ <html lang="pt"> 
+ <head> 
+     <meta charset="UTF-8"> 
+     <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+     <title>Adicionar Despesa</title> 
+     <link rel="icon" type="image/png" href="dol.png"> 
+     <style> 
+         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&display=swap'); 
+  
+         /* --- LIGHT MODE (Default) --- */
+         body { 
+             background-color: #f8f8f8; /* Soft white background */ 
+             color: #222; /* Dark gray for readability */ 
+             font-family: 'Inter', sans-serif; 
+             display: flex; 
+             justify-content: center; 
+             align-items: center; 
+             height: 100vh; 
+             margin: 0; 
+         } 
+         
+         .main-wrapper {
+             display: flex;
+             gap: 30px; /* Space between the calculator and the form */
+             align-items: flex-start; /* Align items to the top */
+         }
 
-  <!-- fundo -->
-  <rect class="bg" x="0" y="0" width="820" height="160"/>
+         .form-container { 
+             background: #ffffff; 
+             padding: 30px; 
+             border-radius: 8px; 
+             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */ 
+             width: 400px;
+             min-height: 550px; /* Ensure a minimum height for alignment */
+             text-align: center; 
+             border: 1px solid #ddd; /* Light border */ 
+         } 
+         
+         .sum-container {
+             background: #ffffff;
+             padding: 20px;
+             border-radius: 8px;
+             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+             width: 250px;
+             text-align: center;
+             border: 1px solid #ddd;
+             display: none; /* Controlled by JavaScript for desktop only */
+         }
 
-  <!-- margem / variáveis de layout -->
-  <!-- inner axis starts at x=50, ends at x=750 -->
-  <!-- timeline domain: Jan 2017 (index 0) ... Dec 2020 (index 47) -->
-  <!-- fev2018 index = 13 ; set2019 index = 32 -->
+         .sum-container h3 {
+             margin-top: 0;
+             font-size: 16px;
+             color: #000;
+             margin-bottom: 15px;
+         }
 
-  <!-- eixo -->
-  <line class="axis" x1="50" y1="90" x2="750" y2="90" />
+         .input-row {
+             display: flex;
+             margin-bottom: 10px;
+             gap: 5px;
+         }
 
-  <!-- sombreado do período (posições calculadas) -->
-  <!-- start x = 50 + (13/47)*700 ≈ 244 ; end x = 50 + (32/47)*700 ≈ 527 -->
-  <rect class="period" x="244" y="64" width="283" height="52" rx="8" ry="8"/>
+         .item-price {
+             flex-grow: 1;
+             width: auto !important;
+         }
 
-  <!-- marcador de início: Fev/2018 -->
-  <circle class="marker" cx="244" cy="90" r="4"/>
-  <text class="label" x="244" y="54" text-anchor="middle">Fev 2018</text>
+         .item-quantity {
+             width: 60px !important; 
+             text-align: center;
+         }
 
-  <!-- marcador de fim: Set/2019 -->
-  <circle class="marker" cx="527" cy="90" r="4"/>
-  <text class="label" x="527" y="54" text-anchor="middle">Set 2019</text>
+         .total-display {
+             margin-top: 15px;
+             padding: 10px;
+             background: #f1f1f1;
+             border-radius: 5px;
+             font-weight: bold;
+             font-size: 18px;
+             color: #000;
+         }
+  
+         h2 { 
+             color: #000; 
+             font-weight: 700; 
+             margin-bottom: 20px; 
+             font-size: 20px; 
+         } 
+  
+         label { 
+             display:flex    ; 
+             margin: 10px 0 5px; 
+             font-size: 14px; 
+             align-items: center; 
+             font-weight: 500; 
+             color: #333; 
+         } 
+  
+         input, select { 
+             width: 100%; 
+             padding: 10px; 
+             background: #fff; 
+             border: 1px solid #bbb; 
+             color: #222; 
+             font-size: 16px; 
+             border-radius: 5px; 
+             outline: none; 
+             transition: 0.2s ease-in-out; 
+         } 
+         
+         /* Override button style for calculator '+' button */
+         .sum-container .btn {
+             margin-top: 10px;
+             width: 100%;
+             padding: 8px;
+         }
+  
+         input:focus, select:focus { 
+             border-color: #000; 
+             box-shadow: 0 0 5px rgba(0, 0, 0, 0.2); 
+         } 
+  
+         .btn { 
+             margin-top: 20px; 
+             background: #000; 
+             color: white; 
+             padding: 12px; 
+             border: none; 
+             cursor: pointer; 
+             font-size: 16px; 
+             width: 100%; 
+             border-radius: 5px; 
+             font-weight: bold; 
+             transition: 0.2s ease-in-out; 
+         } 
+  
+         .btn:hover { 
+             background: #333; 
+         } 
+  
+         /* Existing table styles (kept for completeness) */
+         .table-container { 
+             overflow-x: auto; 
+             border-radius: 8px; 
+             padding: 10px; 
+             background: #ffffff; 
+             box-shadow: 0 0 5px rgba(0, 0, 0, 0.1); 
+             border: 1px solid #ddd; 
+         } 
+  
+         /* --- DARK MODE STYLES --- */
+         @media (prefers-color-scheme: dark) {
+             :root {
+                 color-scheme: dark; /* Helps browser handle scrollbars, forms, etc. */
+             }
+             body {
+                 background-color: #121212; /* Very dark background */
+                 color: #e0e0e0; /* Light text */
+             }
+             .form-container, .sum-container {
+                 background: #1e1e1e; /* Slightly lighter dark background for the container */
+                 box-shadow: 0 0 15px rgba(0, 0, 0, 0.5); 
+                 border: 1px solid #333;
+             }
+             h2, .sum-container h3 {
+                 color: #ffffff; /* White title */
+             }
+             label {
+                 color: #cccccc;
+             }
+             input, select {
+                 background: #2b2b2b; /* Darker inputs */
+                 border: 1px solid #444;
+                 color: #e0e0e0;
+             }
+             input:focus, select:focus {
+                 border-color: #888;
+                 box-shadow: 0 0 5px rgba(255, 255, 255, 0.2); 
+             }
+             .btn {
+                 background: #bb86fc; /* Purple/Accent color for dark mode buttons */
+                 color: #121212;
+             }
+             .btn:hover {
+                 background: #9a67ea; 
+             }
+             .total-display {
+                 background: #2b2b2b;
+                 color: #e0e0e0;
+             }
+         }
+  
+     </style> 
+ </head> 
+ <body> 
+    <div class="main-wrapper">
+        
+        <div class="form-container"> 
+            <h2>Adicionar Despesa</h2> 
+            <form id="dataForm" method="post"> 
+                <label for="dia">Data</label> 
+                <input type="date" id="dia" name="dia" value=""> 
+    
+                <div class="input-group"> 
+                    <label for="amount">Valor (R$):</label> 
+                    <input type="text" id="amount" name="amount" inputmode="numeric" placeholder="0,00"> 
+                </div> 
+    
+                <div class="form-group"> 
+                    <label for="categoria">Categoria:</label> 
+                    <select id="categoria" name="categoria" onchange="atualizarSubcategorias()"> 
+                        <option value="">Selecione uma categoria</option> 
+                    </select> 
+    
+                    <label for="subcategoria">Subcategoria:</label> 
+                    <select id="subcategoria" name="subcategoria"> 
+                        <option value="">Selecione uma subcategoria</option> 
+                    </select> 
+                </div> 
+    
+                <div class="form-group"> 
+                    <label for="parcelas">Parcelas:</label> 
+                    <select id="parcelas" name="parcelas"> 
+                        <option value="1">1</option> 
+                        <option value="2">2</option> 
+                        <option value="3">3</option> 
+                        <option value="4">4</option> 
+                        <option value="5">5</option> 
+                        <option value="6">6</option> 
+                        <option value="7">7</option> 
+                        <option value="8">8</option> 
+                        <option value="9">9</option> 
+                        <option value="10">10</option> 
+                        <option value="11">11</option> 
+                        <option value="12">12</option> 
+                    </select> 
+                </div> 
+    
+                <div class="form-group"> 
+                    <label for="tipo">Tipo de gasto:</label> 
+                    <select id="tipo" name="tipo"> 
+                        <option value="Variável">Variável</option> 
+                        <option value="Fixo">Fixo</option> 
+                    </select> 
+                </div> 
+    
+                <label for="comentario">Comentário/Item:</label> 
+                <input id="comentario" type="text" list="itemSuggestions">
+                <datalist id="itemSuggestions"></datalist>
+    
+                <label for="myCheckbox"> 
+                    <input type="checkbox" name="subscribe" value="yes"  id="myCheckbox"> 
+                    Receber e-mail 
+                </label> 
+    
+    
+                <button type="submit" class="btn" id="addic">Adicionar</button> 
+                <p></p> 
+            </form> 
+            <div id="status"></div> 
+        </div>
+    </div> 
 
-  <!-- etiqueta do período sobre o retângulo -->
-  <text class="period-label" x=" (244 + 527) / 2 " y="86" text-anchor="middle" dominant-baseline="middle">
-    Dados coletados
-  </text>
+    <div class="sum-container" id="sumToolBox">
+            <h3>Calculadora de Itens</h3>
+            <div id="inputList">
+                </div>
+            <button type="button" id="addButton" class="btn">+</button>
+            <div class="total-display">
+                Total: <span id="currentSumDisplay">R$ 0,00</span>
+            </div>
+    </div>
+  
+    <script> 
+        let itemMapping = {}; // Global variable for item-to-category mapping
 
-  <!-- ticks e rótulos de anos: Jan 2017, Jan 2018, Jan 2019, Jan 2020, Jan 2021 -->
-  <!-- calcular posições: x = 50 + (monthIndex/47)*700 ; Jan2017 idx 0, Jan2018 idx 12, Jan2019 idx 24, Jan2020 idx 36, Jan2021 idx 48 -> extrapolar para 48 -->
-  <!-- aqui colocamos ticks para 2017..2021 alinhados visualmente -->
-  <!-- Jan 2017 -->
-  <line class="tick" x1="50" y1="84" x2="50" y2="96"/>
-  <text class="year" x="50" y="112" text-anchor="middle">2017</text>
+        async function carregarDados() { 
+            try { 
+                const response = await fetch('./data/categorias.json'); 
+                const data = await response.json(); 
+    
+                const categoriaSelect = document.getElementById("categoria"); 
+                for (const categoria in data.categorias) { 
+                    const option = document.createElement("option"); 
+                    option.value = categoria; 
+                    option.textContent = categoria; 
+                    categoriaSelect.appendChild(option); 
+                } 
+    
+                window.subcategorias = data.categorias;
+                
+                // Load items for auto-categorization
+                await carregarItens();
+            } catch (error) { 
+                console.error("Erro ao carregar o arquivo categorias.json", error); 
+            } 
+        } 
+    
+        function atualizarSubcategorias() { 
+            const categoriaSelecionada = document.getElementById("categoria").value; 
+            const subcategoriaSelect = document.getElementById("subcategoria"); 
+    
+            subcategoriaSelect.innerHTML = '<option value="">Selecione uma subcategoria</option>'; 
+    
+            if (categoriaSelecionada && window.subcategorias && window.subcategorias[categoriaSelecionada]) { 
+                window.subcategorias[categoriaSelecionada].forEach(sub => { 
+                    const option = document.createElement("option"); 
+                    option.value = sub; 
+                    option.textContent = sub; 
+                    subcategoriaSelect.appendChild(option); 
+                }); 
+            }
+        } 
 
-  <!-- Jan 2018 (index 12 -> x ≈ 50 + (12/47)*700 ≈ 229) -->
-  <line class="tick" x1="229" y1="84" x2="229" y2="96"/>
-  <text class="year" x="229" y="112" text-anchor="middle">2018</text>
+        carregarDados();
+    </script> 
+    
+    <script>
+        async function carregarItens() {
+            try {
+                const response = await fetch('./data/itens.json'); 
+                const data = await response.json();
+                
+                itemMapping = data.itens; 
 
-  <!-- Jan 2019 (index 24 -> x ≈ 408) -->
-  <line class="tick" x1="408" y1="84" x2="408" y2="96"/>
-  <text class="year" x="408" y="112" text-anchor="middle">2019</text>
+                const datalist = document.getElementById("itemSuggestions");
+                
+                for (const item in itemMapping) {
+                    const option = document.createElement("option");
+                    option.value = item;
+                    datalist.appendChild(option);
+                }
+            } catch (error) {
+                console.error("Erro ao carregar o arquivo itens.json", error);
+            }
+        }
+        
+        function categorizarAutomaticamente() {
+            const comentarioInput = document.getElementById("comentario");
+            const categoriaSelect = document.getElementById("categoria");
+            const subcategoriaSelect = document.getElementById("subcategoria");
+            
+            const typedItem = comentarioInput.value.trim();
+            
+            if (itemMapping.hasOwnProperty(typedItem)) {
+                const mapping = itemMapping[typedItem];
+                
+                // Auto-fill fields
+                categoriaSelect.value = mapping.categoria;
+                atualizarSubcategorias(); 
+                subcategoriaSelect.value = mapping.subcategoria;
+                
+            } else {
+                // Clear fields if the item is not a known suggestion
+                categoriaSelect.value = "";
+                atualizarSubcategorias(); 
+            }
+        }
 
-  <!-- Jan 2020 (index 36 -> x ≈ 587) -->
-  <line class="tick" x1="587" y1="84" x2="587" y2="96"/>
-  <text class="year" x="587" y="112" text-anchor="middle">2020</text>
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById("comentario").addEventListener("input", categorizarAutomaticamente);
+        });
 
-  <!-- Jan 2021 (visually at end) -->
-  <line class="tick" x1="750" y1="84" x2="750" y2="96"/>
-  <text class="year" x="750" y="112" text-anchor="middle">2021</text>
+    </script>
+  
+    <script> 
+        const amountInput = document.getElementById('amount'); 
+  
+        amountInput.addEventListener('input', function(e) { 
+            // This is the formatting logic for the main field
+            let value = this.value.replace(/[^\d]/g, ''); 
+  
+            while (value.length < 3) { 
+                value = '0' + value; 
+            } 
+  
+            const dollars = value.slice(0, -2); 
+            const cents = value.slice(-2); 
+  
+            // Use pt-BR locale for formatting (dots for thousands, comma for decimals)
+            const formattedDollars = Number(dollars).toLocaleString('pt-BR'); 
+  
+            this.value = formattedDollars + ',' + cents; 
+        }); 
+  
+        // On focus, remove formatting
+        amountInput.addEventListener('focus', function(e) { 
+            // Removes dots (thousands separators) and replaces comma with dot for internal JS calculation
+            const value = this.value.replace(/\./g, '').replace(',', '.'); 
+            this.value = value; 
+        }); 
+  
+        // On blur, reapply formatting 
+        amountInput.addEventListener('blur', function(e) { 
+            if (this.value === '') { 
+                this.value = ''; 
+                return; 
+            } 
+  
+            let value = this.value.replace(/[^\d.]/g, ''); 
+  
+            // Convert to cents
+            const parts = value.split('.');
+            // If the input was "50", parts is ["50"]. We pad the cents part.
+            let centsRaw = (parts[0] || '0') + (parts[1] || '00').padEnd(2, '0').substring(0, 2);
+            let cents = parseInt(centsRaw);
+  
+            // Format back to PT-BR display (comma for decimal, dot for thousands)
+            const total = cents / 100;
+            this.value = total.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }); 
+    </script> 
+  
+    <script> 
+        document.getElementById("dataForm").addEventListener("submit", function(event) { 
+            event.preventDefault(); 
+            document.getElementById("addic").innerText="Enviando..."; 
+            let cbox = document.getElementById("myCheckbox"); 
+            let mail = "no"; 
+            if (cbox.checked) {      
+                mail = "yes";  
+            } 
 
-  <!-- legenda mini -->
-  <rect x="60" y="20" width="14" height="10" class="period" />
-  <text class="label" x="82" y="30" alignment-baseline="middle">Período de coleta</text>
-</svg>
+            // Get the value in a clean numeric format for the backend (e.g., "12.34" or "12,34")
+            // We use the raw value, which should be normalized to PT-BR comma format after blur
+            const finalAmount = document.getElementById("amount").value;
+  
+            let formData = { 
+                data_compra: document.getElementById("dia").value, 
+                // Send the value as displayed (e.g., 1.234,56)
+                valor: finalAmount, 
+                categoria: document.getElementById("categoria").value, 
+                subcategoria: document.getElementById("subcategoria").value, 
+                parcelas: document.getElementById("parcelas").value, 
+                tipo: document.getElementById("tipo").value, 
+                comentario: document.getElementById("comentario").value, 
+                mail: mail, 
+            }; 
+  
+            fetch("https://script.google.com/macros/s/AKfycbyb8xHVHJDHsBFqgWLjrUZSJ7t0TTDYYHWYhszDk7H8lVPlai55VbqGAer2XSgOp5D_hw/exec", { 
+                method: "POST", 
+                mode: "no-cors", 
+                headers: { "Content-Type": "application/json" }, 
+                body: JSON.stringify(formData) 
+            }).then(() => { 
+                document.getElementById("status").innerText = "Dados enviados com sucesso!"; 
+                document.getElementById("dataForm").reset(); 
+                document.getElementById("addic").innerText="Adicionar"; 
+                setTimeout(() => { 
+                    document.getElementById("status").innerText = ""; 
+                }, 1000); 
+                atualizarDia(); 
+            }).catch(error => console.error("Error:", error)); 
+        }); 
+    </script> 
+  
+    <script> 
+        function atualizarDia() { 
+            const today = new Date().toISOString().split('T')[0]; 
+            document.getElementById("dia").value = today; 
+        } 
+        atualizarDia(); 
+    </script> 
+    
+    <script>
+        // --- Desktop Check Functionality ---
+        function isDesktop() {
+            const userAgent = navigator.userAgent;
+            // Check for Windows or macOS (not iOS/Android/other mobile indicators)
+            return (
+                (userAgent.includes("Win") || userAgent.includes("Macintosh")) && 
+                !userAgent.includes("Mobi") && 
+                !userAgent.includes("Android")
+            );
+        }
+
+        // --- Summation Logic Elements ---
+        const inputList = document.getElementById('inputList');
+        const addButton = document.getElementById('addButton');
+        const currentSumDisplay = document.getElementById('currentSumDisplay');
+        const mainAmountInput = document.getElementById('amount'); 
+        const sumToolBox = document.getElementById('sumToolBox');
+        
+        // Function to format a number as BRL currency for display
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('pt-BR', {
+                style: 'currency',
+                currency: 'BRL'
+            }).format(value);
+        }
+        
+        // --- Price Formatting Logic for Calculator Inputs ---
+        function applyCurrencyFormattingCalc(e) {
+            let input = e.target;
+            let value = input.value.replace(/[^\d]/g, ''); 
+
+            while (value.length < 3) {
+                value = '0' + value;
+            }
+
+            const dollars = value.slice(0, -2);
+            const cents = value.slice(-2);
+            const formattedDollars = Number(dollars).toLocaleString('pt-BR'); 
+
+            input.value = formattedDollars + ',' + cents;
+        }
+
+        function normalizeCurrencyOnBlurCalc(e) {
+            let input = e.target;
+            if (input.value === '') {
+                input.value = '0,00';
+                updateSum();
+                return;
+            }
+            
+            let value = input.value.replace(/\./g, '').replace(',', '.'); 
+            const numericValue = parseFloat(value) || 0;
+            
+            input.value = numericValue.toLocaleString('pt-BR', { 
+                minimumFractionDigits: 2, 
+                maximumFractionDigits: 2 
+            });
+            
+            updateSum();
+        }
+        
+        // --- Core Calculation Function ---
+        function updateSum() {
+            let totalCents = 0;
+            const rows = inputList.querySelectorAll('.input-row');
+            
+            rows.forEach(row => {
+                const priceInput = row.querySelector('.item-price');
+                const quantityInput = row.querySelector('.item-quantity');
+                
+                // a) Get Price (normalized from PT-BR format to JS number)
+                let priceValue = priceInput.value.replace(/\./g, '').replace(',', '.'); 
+                const price = parseFloat(priceValue) || 0;
+                
+                // b) Get Quantity (must be integer, default to 1)
+                const quantity = parseInt(quantityInput.value) || 1; 
+                
+                // c) Calculate subtotal (in cents to maintain precision)
+                const subtotal = price * quantity;
+                totalCents += Math.round(subtotal * 100); 
+            });
+            
+            const total = totalCents / 100;
+            
+            // Update the visible total box
+            currentSumDisplay.textContent = formatCurrency(total);
+            
+            // Update the main form's #amount field
+            mainAmountInput.value = total.toFixed(2); 
+            mainAmountInput.dispatchEvent(new Event('blur')); 
+        }
+        
+        // --- New Input Creator ---
+        function createNewInput() {
+            const inputRow = document.createElement('div');
+            inputRow.className = 'input-row';
+            
+            // --- Price Input (Numeric with formatting) ---
+            const priceInput = document.createElement('input');
+            priceInput.type = 'text';
+            priceInput.className = 'item-price';
+            priceInput.inputmode = 'numeric';
+            priceInput.placeholder = '0,00';
+            priceInput.value = '0,00';
+            
+            priceInput.addEventListener('input', applyCurrencyFormattingCalc);
+            priceInput.addEventListener('blur', normalizeCurrencyOnBlurCalc);
+            
+            // --- Quantity Input (Integer only) ---
+            const quantityInput = document.createElement('input');
+            quantityInput.type = 'number';
+            quantityInput.className = 'item-quantity';
+            quantityInput.min = '1';
+            quantityInput.value = '1';
+            
+            quantityInput.addEventListener('input', updateSum);
+            
+            inputRow.appendChild(priceInput);
+            inputRow.appendChild(quantityInput);
+            inputList.appendChild(inputRow);
+            
+            priceInput.focus();
+        }
+
+        // --- Initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            if (isDesktop()) {
+                sumToolBox.style.display = 'flex';
+                sumToolBox.style.flexDirection = 'column';
+                
+                // Clear any existing default content and create the first input
+                inputList.innerHTML = '';
+                createNewInput(); 
+                
+                addButton.addEventListener('click', createNewInput);
+                
+                updateSum();
+            }
+        });
+
+    </script>
+  
+ </body> 
+ </html>

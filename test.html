@@ -76,6 +76,66 @@
              font-weight: bold; 
              transition: 0.2s ease-in-out; 
          } 
+         /* Add to your existing styles */
+        .main-wrapper {
+            display: flex;
+            gap: 30px; /* Space between the calculator and the form */
+            align-items: center;
+        }
+
+        .sum-container {
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            text-align: center;
+            border: 1px solid #ddd;
+            /* Initially hidden until desktop check runs */
+            display: none; 
+        }
+
+        .sum-container h3 {
+            margin-top: 0;
+            font-size: 16px;
+            color: #000;
+        }
+
+        .input-row {
+            display: flex;
+            margin-bottom: 10px;
+        }
+
+        .input-row input {
+            flex-grow: 1;
+            margin-right: 5px;
+            width: auto;
+        }
+
+        .total-display {
+            margin-top: 15px;
+            padding: 10px;
+            background: #f1f1f1;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 18px;
+            color: #000;
+        }
+
+        /* Dark Mode support for the new container */
+        @media (prefers-color-scheme: dark) {
+            .sum-container {
+                background: #1e1e1e;
+                border: 1px solid #333;
+            }
+            .sum-container h3 {
+                color: #ffffff;
+            }
+            .total-display {
+                background: #2b2b2b;
+                color: #e0e0e0;
+            }
+        }
   
          .btn:hover { 
              background: #333; 
@@ -175,276 +235,461 @@
     </style>
 </head>
 <body>
-    <div class="form-container">
-        <h2>Adicionar Despesa</h2>
-        <form id="dataForm" method="post">
-            <label for="dia">Data</label>
-            <input type="date" id="dia" name="dia" value="">
+    <div class="main-wrapper">
 
-            <div class="input-group">
-                <label for="amount">Valor (R$):</label>
-                <input type="text" id="amount" name="amount" inputmode="numeric" placeholder="0.00">
-            </div>
+        <div class="form-container">
+            <h2>Adicionar Despesa</h2>
+            <form id="dataForm" method="post">
+                <label for="dia">Data</label>
+                <input type="date" id="dia" name="dia" value="">
 
-            <label for="comentario">Comentário/Item:</label>
-            <input id="comentario" type="text" list="itemSuggestions">
-             
-            <datalist id="itemSuggestions">
-            </datalist>
+                <div class="input-group">
+                    <label for="amount">Valor (R$):</label>
+                    <input type="text" id="amount" name="amount" inputmode="numeric" placeholder="0.00">
+                </div>
 
-            <div class="form-group">
-                <label for="categoria">Categoria:</label>
-                <select id="categoria" name="categoria" onchange="atualizarSubcategorias()">
-                    <option value="">Selecione uma categoria</option>
-                </select>
+                <label for="comentario">Comentário/Item:</label>
+                <input id="comentario" type="text" list="itemSuggestions">
+                
+                <datalist id="itemSuggestions">
+                </datalist>
 
-                <label for="subcategoria">Subcategoria:</label>
-                <select id="subcategoria" name="subcategoria">
-                    <option value="">Selecione uma subcategoria</option>
-                </select>
-            </div>
+                <div class="form-group">
+                    <label for="categoria">Categoria:</label>
+                    <select id="categoria" name="categoria" onchange="atualizarSubcategorias()">
+                        <option value="">Selecione uma categoria</option>
+                    </select>
 
-            <div class="form-group">
-                <label for="parcelas">Parcelas:</label>
-                <select id="parcelas" name="parcelas">
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="3">3</option>
-                    <option value="4">4</option>
-                    <option value="5">5</option>
-                    <option value="6">6</option>
-                    <option value="7">7</option>
-                    <option value="8">8</option>
-                    <option value="9">9</option>
-                    <option value="10">10</option>
-                    <option value="11">11</option>
-                    <option value="12">12</option>
-                </select>
-            </div>
+                    <label for="subcategoria">Subcategoria:</label>
+                    <select id="subcategoria" name="subcategoria">
+                        <option value="">Selecione uma subcategoria</option>
+                    </select>
+                </div>
 
-            <div class="form-group">
-                <label for="tipo">Tipo de gasto:</label>
-                <select id="tipo" name="tipo">
-                    <option value="Variável">Variável</option>
-                    <option value="Fixo">Fixo</option>
-                </select>
-            </div>
+                <div class="form-group">
+                    <label for="parcelas">Parcelas:</label>
+                    <select id="parcelas" name="parcelas">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                        <option value="10">10</option>
+                        <option value="11">11</option>
+                        <option value="12">12</option>
+                    </select>
+                </div>
 
-            <label for="myCheckbox">
-                <input type="checkbox" name="subscribe" value="yes"  id="myCheckbox">
-                Receber e-mail
-            </label>
+                <div class="form-group">
+                    <label for="tipo">Tipo de gasto:</label>
+                    <select id="tipo" name="tipo">
+                        <option value="Variável">Variável</option>
+                        <option value="Fixo">Fixo</option>
+                    </select>
+                </div>
+
+                <label for="myCheckbox">
+                    <input type="checkbox" name="subscribe" value="yes"  id="myCheckbox">
+                    Receber e-mail
+                </label>
 
 
-            <button type="submit" class="btn" id="addic">Adicionar</button>
-            <p></p>
-        </form>
-        <div id="status"></div>
+                <button type="submit" class="btn" id="addic">Adicionar</button>
+                <p></p>
+            </form>
+            <div id="status"></div>
 
-        <script>
-            async function carregarDados() {
-                try {
-                    const response = await fetch('./data/categorias.json');
-                    const data = await response.json();
+            <script>
+                async function carregarDados() {
+                    try {
+                        const response = await fetch('./data/categorias.json');
+                        const data = await response.json();
+                        
+                        const categoriaSelect = document.getElementById("categoria");
+                        for (const categoria in data.categorias) {
+                            const option = document.createElement("option");
+                            option.value = categoria;
+                            option.textContent = categoria;
+                            categoriaSelect.appendChild(option);
+                        }
+                        
+                        window.subcategorias = data.categorias;
+                    } catch (error) {
+                        console.error("Erro ao carregar o arquivo JSON", error);
+                    }
+                }
+                
+                function atualizarSubcategorias() {
+                    const categoriaSelecionada = document.getElementById("categoria").value;
+                    const subcategoriaSelect = document.getElementById("subcategoria");
                     
+                    subcategoriaSelect.innerHTML = '<option value="">Selecione uma subcategoria</option>';
+                    
+                    if (categoriaSelecionada && window.subcategorias[categoriaSelecionada]) {
+                        window.subcategorias[categoriaSelecionada].forEach(sub => {
+                            const option = document.createElement("option");
+                            option.value = sub;
+                            option.textContent = sub;
+                            subcategoriaSelect.appendChild(option);
+                        });
+                    }
+                }
+                
+                carregarDados();
+            </script>
+
+            <script>
+                // Global variable to store the mapping data from itens.json
+                let itemMapping = {};
+
+                // --- 1. Load Item Data and Populate Datalist ---
+                async function carregarItens() {
+                    try {
+                        // NOTE: Ensure your itens.json is accessible at this path
+                        const response = await fetch('./data/itens.json'); 
+                        const data = await response.json();
+                        
+                        // Store the mapping globally for quick lookup
+                        itemMapping = data.itens; 
+
+                        const datalist = document.getElementById("itemSuggestions");
+                        
+                        for (const item in itemMapping) {
+                            const option = document.createElement("option");
+                            option.value = item;
+                            // You can optionally add a label, but 'value' is what appears in the suggestion box
+                            // option.textContent = item; 
+                            datalist.appendChild(option);
+                        }
+                    } catch (error) {
+                        console.error("Erro ao carregar o arquivo itens.json", error);
+                    }
+                }
+                
+                // --- 2. Categorization Logic ---
+                function categorizarAutomaticamente() {
+                    const comentarioInput = document.getElementById("comentario");
                     const categoriaSelect = document.getElementById("categoria");
-                    for (const categoria in data.categorias) {
-                        const option = document.createElement("option");
-                        option.value = categoria;
-                        option.textContent = categoria;
-                        categoriaSelect.appendChild(option);
+                    const subcategoriaSelect = document.getElementById("subcategoria");
+                    
+                    // Get the exact value currently in the input field
+                    const typedItem = comentarioInput.value.trim();
+                    
+                    // Check if the typed item exists in our loaded map
+                    if (itemMapping.hasOwnProperty(typedItem)) {
+                        const mapping = itemMapping[typedItem];
+                        
+                        // Auto-fill fields
+                        categoriaSelect.value = mapping.categoria;
+                        // The 'atualizarSubcategorias()' function needs to run before setting the subcategory value
+                        atualizarSubcategorias(); 
+                        subcategoriaSelect.value = mapping.subcategoria;
+                        
+                        console.log(`Preenchimento automático: ${mapping.categoria} - ${mapping.subcategoria}`);
+                        
+                    } else {
+                        // If the item is not found, clear the category/subcategory fields
+                        // and require manual selection, as requested.
+                        categoriaSelect.value = "";
+                        atualizarSubcategorias(); // Clears subcategory list
+                        
+                        console.log("Item não encontrado na lista. Seleção manual necessária.");
+                    }
+                }
+
+                // --- 3. Event Listener Setup ---
+                document.addEventListener('DOMContentLoaded', () => {
+                    carregarItens(); // Load the item data when the page loads
+
+                    // Listen for the 'input' event to provide instant feedback and categorization
+                    document.getElementById("comentario").addEventListener("input", categorizarAutomaticamente);
+                });
+
+            </script>
+
+            <script>
+                const amountInput = document.getElementById('amount');
+
+                amountInput.addEventListener('input', function(e) {
+                    // Remove any non-numeric characters
+                    let value = this.value.replace(/[^\d]/g, '');
+                    
+                    // Pad with zeros if necessary
+                    while (value.length < 3) {
+                        value = '0' + value;
                     }
                     
-                    window.subcategorias = data.categorias;
-                } catch (error) {
-                    console.error("Erro ao carregar o arquivo JSON", error);
+                    // Insert decimal point
+                    const dollars = value.slice(0, -2);
+                    const cents = value.slice(-2);
+                    
+                    // Format with commas for thousands
+                    const formattedDollars = Number(dollars).toLocaleString('en-US');
+                    
+                    // Update input value
+                    this.value = formattedDollars + '.' + cents;
+                });
+
+                // On focus, remove formatting
+                amountInput.addEventListener('focus', function(e) {
+                    const value = this.value.replace(/[^\d.]/g, '');
+                    this.value = value;
+                });
+
+                // On blur, reapply formatting
+                amountInput.addEventListener('blur', function(e) {
+                    if (this.value === '') {
+                        this.value = '';
+                        return;
+                    }
+                    
+                    let value = this.value.replace(/[^\d.]/g, '');
+                    
+                    // Convert to cents
+                    const parts = value.split('.');
+                    let cents = parseInt((parts[0] || '0') + (parts[1] || '00').padEnd(2, '0'));
+                    
+                    // Format back to dollars and cents
+                    const dollars = Math.floor(cents / 100).toLocaleString('en-US');
+                    const remainingCents = (cents % 100).toString().padStart(2, '0');
+                    
+                    this.value = dollars + '.' + remainingCents;
+                });
+            </script>
+
+            <script>
+                document.getElementById("dataForm").addEventListener("submit", function(event) {
+                    event.preventDefault();
+                    document.getElementById("addic").innerText="Enviando...";
+                    let cbox = document.getElementById("myCheckbox");
+                    let mail = "no"; // Default value
+                    if (cbox.checked) {     
+                        mail = "yes"; 
+                    }
+
+                    let formData = {
+                        data_compra: document.getElementById("dia").value,
+                        valor: document.getElementById("amount").value,
+                        categoria: document.getElementById("categoria").value,
+                        subcategoria: document.getElementById("subcategoria").value,
+                        parcelas: document.getElementById("parcelas").value,
+                        tipo: document.getElementById("tipo").value,
+                        comentario: document.getElementById("comentario").value,
+                        mail: mail,
+                    };
+
+                    fetch("https://script.google.com/macros/s/AKfycbyb8xHVHJDHsBFqgWLjrUZSJ7t0TTDYYHWYhszDk7H8lVPlai55VbqGAer2XSgOp5D_hw/exec", {
+                        method: "POST",
+                        mode: "no-cors",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(formData)
+                    }).then(() => {
+                        document.getElementById("status").innerText = "Dados enviados com sucesso!";
+                        document.getElementById("dataForm").reset();
+                        document.getElementById("addic").innerText="Adicionar";
+                        setTimeout(() => {
+                            document.getElementById("status").innerText = "";
+                        }, 1000);
+                        atualizarDia();
+                    }).catch(error => console.error("Error:", error));
+                });
+            </script>
+
+            <script>
+                function atualizarDia() {
+                    const today = new Date().toISOString().split('T')[0];
+                    document.getElementById("dia").value = today;
                 }
-            }
-            
-            function atualizarSubcategorias() {
-                const categoriaSelecionada = document.getElementById("categoria").value;
-                const subcategoriaSelect = document.getElementById("subcategoria");
+                atualizarDia();
+            </script>
+
+        </div>
+
+        <div class="sum-container" id="sumToolBox">
+            <h3>Calculadora de Itens</h3>
+            <div id="inputList">
+                </div>
+            <button type="button" id="addButton" class="btn">+</button>
+            <div class="total-display">
+                Total: <span id="currentSumDisplay">R$ 0,00</span>
+            </div>
+
+
+            <script>
+                // --- 1. Desktop Check Functionality ---
+                function isDesktop() {
+                    const userAgent = navigator.userAgent;
+                    // Check for Windows or macOS (not iOS/Android/other mobile indicators)
+                    return (
+                        (userAgent.includes("Win") || userAgent.includes("Macintosh")) && 
+                        !userAgent.includes("Mobi") && 
+                        !userAgent.includes("Android")
+                    );
+                }
+
+                // --- 2. Summation Logic Elements ---
+                const inputList = document.getElementById('inputList');
+                const addButton = document.getElementById('addButton');
+                const currentSumDisplay = document.getElementById('currentSumDisplay');
+                const mainAmountInput = document.getElementById('amount'); 
+                const sumToolBox = document.getElementById('sumToolBox');
                 
-                subcategoriaSelect.innerHTML = '<option value="">Selecione uma subcategoria</option>';
+                // Function to format a number as BRL currency for display
+                function formatCurrency(value) {
+                    return new Intl.NumberFormat('pt-BR', {
+                        style: 'currency',
+                        currency: 'BRL'
+                    }).format(value);
+                }
                 
-                if (categoriaSelecionada && window.subcategorias[categoriaSelecionada]) {
-                    window.subcategorias[categoriaSelecionada].forEach(sub => {
-                        const option = document.createElement("option");
-                        option.value = sub;
-                        option.textContent = sub;
-                        subcategoriaSelect.appendChild(option);
+                // --- 3. Price Formatting Logic (Copied from main #amount input) ---
+                // This function formats the input to two decimal places while typing.
+                function applyCurrencyFormatting(e) {
+                    let input = e.target;
+                    
+                    // Remove any non-numeric characters
+                    let value = input.value.replace(/[^\d]/g, ''); 
+
+                    // Pad with zeros if necessary (ensuring at least 3 digits for XX.XX)
+                    while (value.length < 3) {
+                        value = '0' + value;
+                    }
+
+                    // Insert decimal point
+                    const dollars = value.slice(0, -2);
+                    const cents = value.slice(-2);
+
+                    // Format with separators (e.g., 1.000.000)
+                    // Note: For Portuguese display, we use 'pt-BR' formatting rules (dot for thousands, comma for decimals)
+                    const formattedDollars = Number(dollars).toLocaleString('pt-BR'); 
+
+                    // Update input value with the final formatted string
+                    input.value = formattedDollars + ',' + cents;
+                }
+
+                // This function normalizes the input to a raw numeric string (e.g., "123.45") on blur
+                function normalizeCurrencyOnBlur(e) {
+                    let input = e.target;
+                    if (input.value === '') {
+                        input.value = '';
+                        updateSum();
+                        return;
+                    }
+                    
+                    // Remove thousands separators (dots) and replace comma with dot for JS calculation
+                    let value = input.value.replace(/\./g, '').replace(',', '.'); 
+                    
+                    const numericValue = parseFloat(value) || 0;
+                    
+                    // Reapply the standard PT-BR display format (which includes two decimals)
+                    // This relies on the browser's locale settings but ensures two decimals are visible
+                    input.value = numericValue.toLocaleString('pt-BR', { 
+                        minimumFractionDigits: 2, 
+                        maximumFractionDigits: 2 
                     });
+                    
+                    updateSum();
                 }
-            }
-            
-            carregarDados();
-        </script>
-
-        <script>
-            // Global variable to store the mapping data from itens.json
-            let itemMapping = {};
-
-            // --- 1. Load Item Data and Populate Datalist ---
-            async function carregarItens() {
-                try {
-                    // NOTE: Ensure your itens.json is accessible at this path
-                    const response = await fetch('./data/itens.json'); 
-                    const data = await response.json();
+                
+                // --- 4. Core Calculation Function ---
+                function updateSum() {
+                    let totalCents = 0;
                     
-                    // Store the mapping globally for quick lookup
-                    itemMapping = data.itens; 
-
-                    const datalist = document.getElementById("itemSuggestions");
+                    // Find all input rows
+                    const rows = inputList.querySelectorAll('.input-row');
                     
-                    for (const item in itemMapping) {
-                        const option = document.createElement("option");
-                        option.value = item;
-                        // You can optionally add a label, but 'value' is what appears in the suggestion box
-                        // option.textContent = item; 
-                        datalist.appendChild(option);
+                    rows.forEach(row => {
+                        const priceInput = row.querySelector('.item-price');
+                        const quantityInput = row.querySelector('.item-quantity');
+                        
+                        // a) Get Price (normalized from PT-BR format to JS number)
+                        let priceValue = priceInput.value.replace(/\./g, '').replace(',', '.'); 
+                        const price = parseFloat(priceValue) || 0;
+                        
+                        // b) Get Quantity (must be integer)
+                        const quantity = parseInt(quantityInput.value) || 1; 
+                        
+                        // c) Calculate subtotal (in cents to maintain precision)
+                        const subtotal = price * quantity;
+                        totalCents += Math.round(subtotal * 100); 
+                    });
+                    
+                    const total = totalCents / 100;
+                    
+                    // Update the visible total box
+                    currentSumDisplay.textContent = formatCurrency(total);
+                    
+                    // Update the main form's #amount field
+                    // Set the raw number first and then dispatch the 'blur' event
+                    // to use the main form's specific formatting logic for the final submission value.
+                    mainAmountInput.value = total.toFixed(2); 
+                    mainAmountInput.dispatchEvent(new Event('blur')); 
+                }
+                
+                // --- 5. New Input Creator ---
+                function createNewInput() {
+                    const inputRow = document.createElement('div');
+                    inputRow.className = 'input-row';
+                    
+                    // --- Price Input (Numeric with formatting) ---
+                    const priceInput = document.createElement('input');
+                    priceInput.type = 'text';
+                    priceInput.className = 'item-price';
+                    priceInput.inputmode = 'numeric';
+                    priceInput.placeholder = '0,00';
+                    priceInput.value = '0,00'; // Default value
+                    
+                    // Attach the new currency formatting listeners
+                    priceInput.addEventListener('input', applyCurrencyFormatting);
+                    priceInput.addEventListener('blur', normalizeCurrencyOnBlur);
+                    
+                    // --- Quantity Input (Integer only) ---
+                    const quantityInput = document.createElement('input');
+                    quantityInput.type = 'number';
+                    quantityInput.className = 'item-quantity';
+                    quantityInput.min = '1';
+                    quantityInput.value = '1'; // Default quantity is 1
+                    quantityInput.style.width = '60px'; // Make it smaller
+                    quantityInput.style.textAlign = 'center';
+
+                    // Key listener: Recalculate sum when quantity changes
+                    quantityInput.addEventListener('input', updateSum);
+                    
+                    inputRow.appendChild(priceInput);
+                    inputRow.appendChild(quantityInput);
+                    inputList.appendChild(inputRow);
+                    
+                    // Focus on the new price input field
+                    priceInput.focus();
+                }
+
+                // --- 6. Initialization ---
+                document.addEventListener('DOMContentLoaded', () => {
+                    // Only initialize the sum tool if the browser is detected as desktop
+                    if (isDesktop()) {
+                        sumToolBox.style.display = 'flex'; // Use flex for vertical centering
+                        sumToolBox.style.flexDirection = 'column';
+                        
+                        // Set up initial input field
+                        createNewInput(); 
+                        
+                        // Set up button listener
+                        addButton.addEventListener('click', () => {
+                            createNewInput();
+                            // No need to call updateSum here, as the initial value is 0.00 * 1
+                        });
+                        
+                        // Run initial sum calculation
+                        updateSum();
                     }
-                } catch (error) {
-                    console.error("Erro ao carregar o arquivo itens.json", error);
-                }
-            }
-            
-            // --- 2. Categorization Logic ---
-            function categorizarAutomaticamente() {
-                const comentarioInput = document.getElementById("comentario");
-                const categoriaSelect = document.getElementById("categoria");
-                const subcategoriaSelect = document.getElementById("subcategoria");
-                
-                // Get the exact value currently in the input field
-                const typedItem = comentarioInput.value.trim();
-                
-                // Check if the typed item exists in our loaded map
-                if (itemMapping.hasOwnProperty(typedItem)) {
-                    const mapping = itemMapping[typedItem];
-                    
-                    // Auto-fill fields
-                    categoriaSelect.value = mapping.categoria;
-                    // The 'atualizarSubcategorias()' function needs to run before setting the subcategory value
-                    atualizarSubcategorias(); 
-                    subcategoriaSelect.value = mapping.subcategoria;
-                    
-                    console.log(`Preenchimento automático: ${mapping.categoria} - ${mapping.subcategoria}`);
-                    
-                } else {
-                    // If the item is not found, clear the category/subcategory fields
-                    // and require manual selection, as requested.
-                    categoriaSelect.value = "";
-                    atualizarSubcategorias(); // Clears subcategory list
-                    
-                    console.log("Item não encontrado na lista. Seleção manual necessária.");
-                }
-            }
+                });
 
-            // --- 3. Event Listener Setup ---
-            document.addEventListener('DOMContentLoaded', () => {
-                carregarItens(); // Load the item data when the page loads
-
-                // Listen for the 'input' event to provide instant feedback and categorization
-                document.getElementById("comentario").addEventListener("input", categorizarAutomaticamente);
-            });
-
-        </script>
-
-        <script>
-            const amountInput = document.getElementById('amount');
-
-            amountInput.addEventListener('input', function(e) {
-                // Remove any non-numeric characters
-                let value = this.value.replace(/[^\d]/g, '');
-                
-                // Pad with zeros if necessary
-                while (value.length < 3) {
-                    value = '0' + value;
-                }
-                
-                // Insert decimal point
-                const dollars = value.slice(0, -2);
-                const cents = value.slice(-2);
-                
-                // Format with commas for thousands
-                const formattedDollars = Number(dollars).toLocaleString('en-US');
-                
-                // Update input value
-                this.value = formattedDollars + '.' + cents;
-            });
-
-            // On focus, remove formatting
-            amountInput.addEventListener('focus', function(e) {
-                const value = this.value.replace(/[^\d.]/g, '');
-                this.value = value;
-            });
-
-            // On blur, reapply formatting
-            amountInput.addEventListener('blur', function(e) {
-                if (this.value === '') {
-                    this.value = '';
-                    return;
-                }
-                
-                let value = this.value.replace(/[^\d.]/g, '');
-                
-                // Convert to cents
-                const parts = value.split('.');
-                let cents = parseInt((parts[0] || '0') + (parts[1] || '00').padEnd(2, '0'));
-                
-                // Format back to dollars and cents
-                const dollars = Math.floor(cents / 100).toLocaleString('en-US');
-                const remainingCents = (cents % 100).toString().padStart(2, '0');
-                
-                this.value = dollars + '.' + remainingCents;
-            });
-        </script>
-
-        <script>
-            document.getElementById("dataForm").addEventListener("submit", function(event) {
-                event.preventDefault();
-                document.getElementById("addic").innerText="Enviando...";
-                let cbox = document.getElementById("myCheckbox");
-                let mail = "no"; // Default value
-                if (cbox.checked) {     
-                    mail = "yes"; 
-                }
-
-                let formData = {
-                    data_compra: document.getElementById("dia").value,
-                    valor: document.getElementById("amount").value,
-                    categoria: document.getElementById("categoria").value,
-                    subcategoria: document.getElementById("subcategoria").value,
-                    parcelas: document.getElementById("parcelas").value,
-                    tipo: document.getElementById("tipo").value,
-                    comentario: document.getElementById("comentario").value,
-                    mail: mail,
-                };
-
-                fetch("https://script.google.com/macros/s/AKfycbyb8xHVHJDHsBFqgWLjrUZSJ7t0TTDYYHWYhszDk7H8lVPlai55VbqGAer2XSgOp5D_hw/exec", {
-                    method: "POST",
-                    mode: "no-cors",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(formData)
-                }).then(() => {
-                    document.getElementById("status").innerText = "Dados enviados com sucesso!";
-                    document.getElementById("dataForm").reset();
-                    document.getElementById("addic").innerText="Adicionar";
-                    setTimeout(() => {
-                        document.getElementById("status").innerText = "";
-                    }, 1000);
-                    atualizarDia();
-                }).catch(error => console.error("Error:", error));
-            });
-        </script>
-
-        <script>
-            function atualizarDia() {
-                const today = new Date().toISOString().split('T')[0];
-                document.getElementById("dia").value = today;
-            }
-            atualizarDia();
-        </script>
-
+            </script>
+        </div>
     </div>
 
 </body>
