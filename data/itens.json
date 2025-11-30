@@ -8,17 +8,313 @@
       "categoria": "Alimentação",
       "subcategoria": "Cafés"
     },
-    "Combustível": {
-      "categoria": "Transporte",
-      "subcategoria": "Gasolina/Etanol"
+    "quitandas": {
+      "categoria": "Alimentação",
+      "subcategoria": "Quitandas"
     },
-    "Aluguel": {
+    "carne": {
+      "categoria": "Alimentação",
+      "subcategoria": "Carnes"
+    },
+    "queijo": {
+      "categoria": "Alimentação",
+      "subcategoria": "Queijos"
+    },
+    "ultraprocessados": {
+      "categoria": "Alimentação",
+      "subcategoria": "Ultraprocessados"
+    },
+    "ovos": {
+      "categoria": "Alimentação",
+      "subcategoria": "Ovos"
+    },
+    "restaurante": {
+      "categoria": "Alimentação",
+      "subcategoria": "Restaurantes"
+    },
+    "batista": {
+      "categoria": "Alimentação",
+      "subcategoria": "Restaurantes"
+    },
+    "na graça": {
+      "categoria": "Alimentação",
+      "subcategoria": "Restaurantes"
+    },
+    "agua": {
+      "categoria": "Alimentação",
+      "subcategoria": "Água"
+    },
+    "manteiga": {
+      "categoria": "Alimentação",
+      "subcategoria": "Manteiga"
+    },
+    "azeite": {
+      "categoria": "Alimentação",
+      "subcategoria": "Azeite"
+    },
+    "iogurte": {
+      "categoria": "Alimentação",
+      "subcategoria": "Iogurte"
+    },
+    "pasta de amendoim": {
+      "categoria": "Alimentação",
+      "subcategoria": "Pasta de amendoim"
+    },
+    "frutas": {
+      "categoria": "Alimentação",
+      "subcategoria": "Feira e produtos naturais"
+    },
+    "verduras": {
+      "categoria": "Alimentação",
+      "subcategoria": "Feira e produtos naturais"
+    },
+    "uva": {
+      "categoria": "Alimentação",
+      "subcategoria": "Feira e produtos naturais"
+    },
+    "goiaba": {
+      "categoria": "Alimentação",
+      "subcategoria": "Feira e produtos naturais"
+    },
+    "banana": {
+      "categoria": "Alimentação",
+      "subcategoria": "Feira e produtos naturais"
+    },
+    "mamão": {
+      "categoria": "Alimentação",
+      "subcategoria": "Feira e produtos naturais"
+    },
+    "limão": {
+      "categoria": "Alimentação",
+      "subcategoria": "Feira e produtos naturais"
+    },
+    "abacaxi": {
+      "categoria": "Alimentação",
+      "subcategoria": "Feira e produtos naturais"
+    },
+    "tomate": {
+      "categoria": "Alimentação",
+      "subcategoria": "Feira e produtos naturais"
+    },
+    "gasolina": {
+      "categoria": "Transporte",
+      "subcategoria": "Combustível"
+    },
+    "pedágio": {
+      "categoria": "Transporte",
+      "subcategoria": "Pedágios"
+    },
+    "troca de óleo": {
+      "categoria": "Transporte",
+      "subcategoria": "Manutenção e revisão"
+    },
+    "aluguel": {
       "categoria": "Moradia",
       "subcategoria": "Aluguel"
     },
-    "Mensalidade Academia": {
+    "condomínio": {
+      "categoria": "Moradia",
+      "subcategoria": "Condomínio"
+    },
+    "cemig": {
+      "categoria": "Moradia",
+      "subcategoria": "Cemig"
+    },
+    "gas": {
+      "categoria": "Moradia",
+      "subcategoria": "Gás"
+    },
+    "faxina": {
+      "categoria": "Moradia",
+      "subcategoria": "Faxina"
+    },
+    "produtos de limpeza": {
+      "categoria": "Moradia",
+      "subcategoria": "Produtos de limpeza"
+    },
+    "veja": {
+      "categoria": "Moradia",
+      "subcategoria": "Produtos de limpeza"
+    },
+    "comfort": {
+      "categoria": "Moradia",
+      "subcategoria": "Produtos de limpeza"
+    },
+    "amaciante": {
+      "categoria": "Moradia",
+      "subcategoria": "Produtos de limpeza"
+    },
+    "sabão líquido": {
+      "categoria": "Moradia",
+      "subcategoria": "Produtos de limpeza"
+    },
+    "detergente": {
+      "categoria": "Moradia",
+      "subcategoria": "Produtos de limpeza"
+    },
+    "desinfetante": {
+      "categoria": "Moradia",
+      "subcategoria": "Produtos de limpeza"
+    },
+    "alcool": {
+      "categoria": "Moradia",
+      "subcategoria": "Produtos de limpeza"
+    },
+    "pilates": {
       "categoria": "Saúde",
-      "subcategoria": "Esportes"
+      "subcategoria": "Academia/Pilates"
+    },
+    "consulta": {
+      "categoria": "Saúde",
+      "subcategoria": "Consultas médicas"
+    },
+    "exames": {
+      "categoria": "Saúde",
+      "subcategoria": "Exames médicos"
+    },
+    "plano de saúde": {
+      "categoria": "Saúde",
+      "subcategoria": "Plano de saúde"
+    },
+    "suplementos": {
+      "categoria": "Saúde",
+      "subcategoria": "Suplementos"
+    },
+    "omega 3": {
+      "categoria": "Saúde",
+      "subcategoria": "Suplementos"
+    },
+    "ferro": {
+      "categoria": "Saúde",
+      "subcategoria": "Suplementos"
+    },
+    "vitamina D": {
+      "categoria": "Saúde",
+      "subcategoria": "Suplementos"
+    },
+    "dha": {
+      "categoria": "Saúde",
+      "subcategoria": "Suplementos"
+    },
+    "bar/restaurante": {
+      "categoria": "Lazer e Entretenimento",
+      "subcategoria": "Bares/Restaurantes"
+    },
+    "oito bicas": {
+      "categoria": "Lazer e Entretenimento",
+      "subcategoria": "Bares/Restaurantes"
+    },
+    "ovelhas": {
+      "categoria": "Lazer e Entretenimento",
+      "subcategoria": "Bares/Restaurantes"
+    },
+    "mini burguer": {
+      "categoria": "Lazer e Entretenimento",
+      "subcategoria": "Bares/Restaurantes"
+    },
+    "cerveja": {
+      "categoria": "Lazer e Entretenimento",
+      "subcategoria": "Bebidas alcoólicas"
+    },
+    "heineken": {
+      "categoria": "Lazer e Entretenimento",
+      "subcategoria": "Bebidas alcoólicas"
+    },
+    "pizza": {
+      "categoria": "Lazer e Entretenimento",
+      "subcategoria": "Delivery"
+    },
+    "hambúrguer": {
+      "categoria": "Lazer e Entretenimento",
+      "subcategoria": "Delivery"
+    },
+    "sorvete": {
+      "categoria": "Lazer e Entretenimento",
+      "subcategoria": "Delivery"
+    },
+    "milk shake": {
+      "categoria": "Lazer e Entretenimento",
+      "subcategoria": "Delivery"
+    },
+    "camisa": {
+      "categoria": "Vestuário e Cuidados Pessoais",
+      "subcategoria": "Roupas e calçados"
+    },
+    "calça": {
+      "categoria": "Vestuário e Cuidados Pessoais",
+      "subcategoria": "Roupas e calçados"
+    },
+    "sapato": {
+      "categoria": "Vestuário e Cuidados Pessoais",
+      "subcategoria": "Roupas e calçados"
+    },
+    "roupas": {
+      "categoria": "Vestuário e Cuidados Pessoais",
+      "subcategoria": "Roupas e calçados"
+    },
+    "meias": {
+      "categoria": "Vestuário e Cuidados Pessoais",
+      "subcategoria": "Roupas e calçados"
+    },
+    "corte de cabelo": {
+      "categoria": "Vestuário e Cuidados Pessoais",
+      "subcategoria": "Salão de beleza/barbearia"
+    },
+    "guará": {
+      "categoria": "Vestuário e Cuidados Pessoais",
+      "subcategoria": "Salão de beleza/barbearia"
+    },
+    "sabonete": {
+      "categoria": "Vestuário e Cuidados Pessoais",
+      "subcategoria": "Produtos de higiene e cosméticos"
+    },
+    "shampoo": {
+      "categoria": "Vestuário e Cuidados Pessoais",
+      "subcategoria": "Produtos de higiene e cosméticos"
+    },
+    "desodorante": {
+      "categoria": "Vestuário e Cuidados Pessoais",
+      "subcategoria": "Produtos de higiene e cosméticos"
+    },
+    "condicionador": {
+      "categoria": "Vestuário e Cuidados Pessoais",
+      "subcategoria": "Produtos de higiene e cosméticos"
+    },
+    "creme": {
+      "categoria": "Vestuário e Cuidados Pessoais",
+      "subcategoria": "Produtos de higiene e cosméticos"
+    },
+    "creme dental": {
+      "categoria": "Vestuário e Cuidados Pessoais",
+      "subcategoria": "Produtos de higiene e cosméticos"
+    },
+    "escova de dente": {
+      "categoria": "Vestuário e Cuidados Pessoais",
+      "subcategoria": "Produtos de higiene e cosméticos"
+    },
+    "protetor solar": {
+      "categoria": "Vestuário e Cuidados Pessoais",
+      "subcategoria": "Produtos de higiene e cosméticos"
+    },
+    "gilete": {
+      "categoria": "Vestuário e Cuidados Pessoais",
+      "subcategoria": "Produtos de higiene e cosméticos"
+    },
+    "presente": {
+      "categoria": "Família e Presentes",
+      "subcategoria": "Presentes"
+    },
+    "festa": {
+      "categoria": "Família e Presentes",
+      "subcategoria": "Comemorações"
+    },
+    "fotos": {
+      "categoria": "Família e Presentes",
+      "subcategoria": "Fotos"
+    },
+    "medicamentos": {
+      "categoria": "Saúde",
+      "subcategoria": "Medicamentos"
     }
   }
 }
