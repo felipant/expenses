@@ -131,15 +131,15 @@
             <input type="date" id="dia" name="dia" value="">
 
             <div class="input-group">
-                 <label for="amount">Valor (R$):</label>
-                 <div style="display: flex; align-items: center; gap: 10px;">
-                     <input type="text" id="amount" name="amount" inputmode="numeric" placeholder="0.00" style="flex-grow: 1;">
-                     <button type="button" id="micButton" class="btn" style="width: 50px; padding: 10px; margin: 0; background: #333;">
-                         🎙️
-                     </button>
-                 </div>
-                 <div id="speechOutput" style="font-size: 14px; color: #000; margin-top: 5px; text-align: left;"></div>
-             </div>
+                <label for="amount">Valor (R$):</label>
+                <input type="text" id="amount" name="amount" inputmode="numeric" placeholder="0.00">
+            </div>
+
+            <label for="comentario">Comentário/Item:</label>
+            <input id="comentario" type="text" list="itemSuggestions">
+             
+            <datalist id="itemSuggestions">
+            </datalist>
 
             <div class="form-group">
                 <label for="categoria">Categoria:</label>
@@ -178,9 +178,6 @@
                     <option value="Fixo">Fixo</option>
                 </select>
             </div>
-
-            <label for="comentario">Comentário:</label>
-            <input id="comentario" type="text"></input>
 
             <label for="myCheckbox">
                 <input type="checkbox" name="subscribe" value="yes"  id="myCheckbox">
@@ -233,45 +230,72 @@
         </script>
 
         <script>
-            // Global variable to hold recognized text for categorization
-            let recognizedText = ''; 
-            
-            // Check for browser support
-            if (!('webkitSpeechRecognition' in window)) {
-                document.getElementById('speechOutput').textContent = "Seu navegador não suporta a API de Reconhecimento de Fala.";
-            } else {
-                const recognition = new webkitSpeechRecognition();
-                recognition.lang = 'pt-BR'; // Set language to Portuguese (Brazil)
-                recognition.continuous = false;
-                recognition.interimResults = false;
+            // Global variable to store the mapping data from itens.json
+            let itemMapping = {};
 
-                const micButton = document.getElementById('micButton');
-                const amountInput = document.getElementById('amount');
-                const speechOutput = document.getElementById('speechOutput');
+            // --- 1. Load Item Data and Populate Datalist ---
+            async function carregarItens() {
+                try {
+                    // NOTE: Ensure your itens.json is accessible at this path
+                    const response = await fetch('./data/itens.json'); 
+                    const data = await response.json();
+                    
+                    // Store the mapping globally for quick lookup
+                    itemMapping = data.itens; 
 
-                micButton.addEventListener('click', () => {
-                    recognition.start();
-                    micButton.style.background = '#e74c3c'; // Red while listening
-                    speechOutput.textContent = 'Ouvindo... Diga o valor e o item. Ex: "Cinquenta e dois e trinta, padaria"';
-                });
-
-                recognition.onresult = (event) => {
-                    const transcript = event.results[0][0].transcript;
-                    recognizedText = transcript;
-                    speechOutput.textContent = `Você disse: "${transcript}"`;
-                    processAudioInput(transcript);
-                };
-
-                recognition.onerror = (event) => {
-                    console.error('Erro de reconhecimento de fala:', event.error);
-                    speechOutput.textContent = `Erro de reconhecimento: ${event.error}`;
-                    micButton.style.background = '#333';
-                };
-
-                recognition.onend = () => {
-                    micButton.style.background = '#333'; // Back to black
-                };
+                    const datalist = document.getElementById("itemSuggestions");
+                    
+                    for (const item in itemMapping) {
+                        const option = document.createElement("option");
+                        option.value = item;
+                        // You can optionally add a label, but 'value' is what appears in the suggestion box
+                        // option.textContent = item; 
+                        datalist.appendChild(option);
+                    }
+                } catch (error) {
+                    console.error("Erro ao carregar o arquivo itens.json", error);
+                }
             }
+            
+            // --- 2. Categorization Logic ---
+            function categorizarAutomaticamente() {
+                const comentarioInput = document.getElementById("comentario");
+                const categoriaSelect = document.getElementById("categoria");
+                const subcategoriaSelect = document.getElementById("subcategoria");
+                
+                // Get the exact value currently in the input field
+                const typedItem = comentarioInput.value.trim();
+                
+                // Check if the typed item exists in our loaded map
+                if (itemMapping.hasOwnProperty(typedItem)) {
+                    const mapping = itemMapping[typedItem];
+                    
+                    // Auto-fill fields
+                    categoriaSelect.value = mapping.categoria;
+                    // The 'atualizarSubcategorias()' function needs to run before setting the subcategory value
+                    atualizarSubcategorias(); 
+                    subcategoriaSelect.value = mapping.subcategoria;
+                    
+                    console.log(`Preenchimento automático: ${mapping.categoria} - ${mapping.subcategoria}`);
+                    
+                } else {
+                    // If the item is not found, clear the category/subcategory fields
+                    // and require manual selection, as requested.
+                    categoriaSelect.value = "";
+                    atualizarSubcategorias(); // Clears subcategory list
+                    
+                    console.log("Item não encontrado na lista. Seleção manual necessária.");
+                }
+            }
+
+            // --- 3. Event Listener Setup ---
+            document.addEventListener('DOMContentLoaded', () => {
+                carregarItens(); // Load the item data when the page loads
+
+                // Listen for the 'input' event to provide instant feedback and categorization
+                document.getElementById("comentario").addEventListener("input", categorizarAutomaticamente);
+            });
+
         </script>
 
         <script>
@@ -360,100 +384,6 @@
                     atualizarDia();
                 }).catch(error => console.error("Error:", error));
             });
-        </script>
-
-        <script>
-            // Define rules for categorization based on keywords found in the spoken text.
-            const CATEGORY_RULES = {
-                "Alimentação": ["supermercado", "padaria", "acougue", "feira", "mercado"],
-                "Transporte": ["gasolina", "uber", "onibus", "metrô", "combustível", "estacionamento"],
-                "Moradia": ["aluguel", "água", "luz", "internet", "iptu", "condomínio"],
-                "Lazer": ["cinema", "restaurante", "bar", "viagem", "jogo", "clube"],
-                // Add more categories and keywords based on your 'categorias.json'
-            };
-
-            /**
-             * Converts Portuguese spoken numbers (like "vinte e cinco e quarenta") 
-             * to a numeric string (like "25.40").
-             * This is a highly simplified version; a robust solution requires a more complex library.
-             */
-            function parsePortuguesePrice(text) {
-                // 1. Clean the text and replace common currency words
-                let cleanText = text.toLowerCase()
-                    .replace(/reais|reais|r\$|e|centavos|centavo|vírgula/g, '')
-                    .trim();
-
-                // 2. Simple pattern matching for price (assumes the price is the first number or structure)
-                // Look for numbers separated by common delimiters like "e" (already removed) or space
-                
-                // Example: "cinquenta dois trinta" -> 52.30
-                // We look for any digit-like sequence and hope the last two digits are cents.
-                
-                let parts = cleanText.split(/\s+/).filter(p => !isNaN(parseFloat(p)));
-                
-                if (parts.length === 0) return null;
-
-                // Join all numbers found
-                let numericValue = parts.join('');
-
-                // If there's no decimal (or separator), assume the last two digits are cents (R$ 52,30)
-                if (numericValue.length >= 3) {
-                    let dollars = numericValue.slice(0, -2);
-                    let cents = numericValue.slice(-2);
-                    return dollars + '.' + cents;
-                } else {
-                    // Handle cases like "cinco" -> R$ 5,00
-                    return numericValue + '.00';
-                }
-            }
-
-
-            function processAudioInput(transcript) {
-                const amountInput = document.getElementById('amount');
-                const categoriaSelect = document.getElementById('categoria');
-                const subcategoriaSelect = document.getElementById('subcategoria');
-                const lowerTranscript = transcript.toLowerCase();
-                
-                // 1. Extract Price
-                const priceNumeric = parsePortuguesePrice(lowerTranscript);
-                if (priceNumeric) {
-                    // Apply the existing formatting logic from the blur event listener
-                    // (temporarily set the unformatted value, then trigger blur for proper display)
-                    amountInput.value = priceNumeric; 
-                    amountInput.dispatchEvent(new Event('blur')); 
-                }
-                
-                // 2. Categorization Logic
-                let matchedCategory = null;
-
-                for (const category in CATEGORY_RULES) {
-                    if (CATEGORY_RULES[category].some(keyword => lowerTranscript.includes(keyword))) {
-                        matchedCategory = category;
-                        break;
-                    }
-                }
-                
-                if (matchedCategory) {
-                    // Set the Category
-                    categoriaSelect.value = matchedCategory;
-                    
-                    // Trigger the update for subcategories (using the existing function)
-                    atualizarSubcategorias(); 
-                    
-                    // 3. Simple Subcategory Guessing (Optional/Advanced)
-                    // If a category is set, you could try to guess the subcategory
-                    // based on the keyword (e.g., if 'padaria' matched 'Alimentação',
-                    // maybe the subcategory is 'Lanches'). This requires a more complex 
-                    // mapping but is left as an exercise for specific needs.
-                    
-                    // For now, we only select the main category and update subcategories.
-                    
-                    document.getElementById('speechOutput').textContent += `\nCategoria preenchida: ${matchedCategory}`;
-
-                } else {
-                    document.getElementById('speechOutput').textContent += `\nNão foi possível categorizar automaticamente.`;
-                }
-            }
         </script>
 
         <script>

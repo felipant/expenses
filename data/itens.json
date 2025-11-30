@@ -1,0 +1,24 @@
+{
+  "itens": {
+    "café": {
+      "categoria": "Alimentação",
+      "subcategoria": "Cafés"
+    },
+    "filtro de café": {
+      "categoria": "Alimentação",
+      "subcategoria": "Cafés"
+    },
+    "Combustível": {
+      "categoria": "Transporte",
+      "subcategoria": "Gasolina/Etanol"
+    },
+    "Aluguel": {
+      "categoria": "Moradia",
+      "subcategoria": "Aluguel"
+    },
+    "Mensalidade Academia": {
+      "categoria": "Saúde",
+      "subcategoria": "Esportes"
+    }
+  }
+}
