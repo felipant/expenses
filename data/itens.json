@@ -176,6 +176,10 @@
       "categoria": "Saúde",
       "subcategoria": "Plano de saúde"
     },
+    "unimed": {
+      "categoria": "Saúde",
+      "subcategoria": "Plano de saúde"
+    },
     "suplementos": {
       "categoria": "Saúde",
       "subcategoria": "Suplementos"

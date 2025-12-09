@@ -10,8 +10,8 @@
   
          /* --- LIGHT MODE (Default) --- */
          body { 
-             background-color: #f8f8f8; /* Soft white background */ 
-             color: #222; /* Dark gray for readability */ 
+             background-color: #f8f8f8; 
+             color: #222; 
              font-family: 'Inter', sans-serif; 
              display: flex; 
              justify-content: center; 
@@ -24,10 +24,10 @@
              background: #ffffff; 
              padding: 30px; 
              border-radius: 8px; 
-             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */ 
+             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); 
              width: 400px; 
              text-align: center; 
-             border: 1px solid #ddd; /* Light border */ 
+             border: 1px solid #ddd; 
          } 
   
          h2 { 
@@ -38,7 +38,7 @@
          } 
   
          label { 
-             display:flex    ; 
+             display:flex; 
              margin: 10px 0 5px; 
              font-size: 14px; 
              align-items: center; 
@@ -76,10 +76,34 @@
              font-weight: bold; 
              transition: 0.2s ease-in-out; 
          } 
-         /* Add to your existing styles */
-        .main-wrapper {
+
+         .btn:hover { 
+             background: #333; 
+         } 
+
+         /* --- NOVOS ESTILOS PARA O RESET --- */
+         .btn-row {
+             display: flex;
+             gap: 10px; /* Espaço entre os botões */
+             margin-top: 20px;
+         }
+
+         .btn-row .btn {
+             margin-top: 0; /* Remove margem superior pois o pai já controla */
+         }
+
+         .btn-red {
+             background-color: #d32f2f; /* Vermelho */
+         }
+
+         .btn-red:hover {
+             background-color: #b71c1c; /* Vermelho mais escuro */
+         }
+         /* ---------------------------------- */
+  
+         .main-wrapper {
             display: flex;
-            gap: 30px; /* Space between the calculator and the form */
+            gap: 30px; 
             align-items: center;
         }
 
@@ -91,7 +115,6 @@
             width: 300px;
             text-align: center;
             border: 1px solid #ddd;
-            /* Initially hidden until desktop check runs */
             display: none; 
         }
 
@@ -122,115 +145,50 @@
             color: #000;
         }
 
-        /* Dark Mode support for the new container */
+        input[type="checkbox"] { 
+             width: 20px; 
+             height: 20px; 
+         } 
+
+        /* Dark Mode support */
         @media (prefers-color-scheme: dark) {
-            .sum-container {
-                background: #1e1e1e;
-                border: 1px solid #333;
+            :root { color-scheme: dark; }
+            body {
+                 background-color: #121212; 
+                 color: #e0e0e0; 
             }
-            .sum-container h3 {
+            .form-container, .sum-container {
+                 background: #1e1e1e; 
+                 box-shadow: 0 0 15px rgba(0, 0, 0, 0.5); 
+                 border: 1px solid #333;
+            }
+            .sum-container h3, h2 {
                 color: #ffffff;
             }
             .total-display {
                 background: #2b2b2b;
                 color: #e0e0e0;
             }
-        }
-  
-         .btn:hover { 
-             background: #333; 
-         } 
-  
-         .table-container { 
-             overflow-x: auto; /* Enables scrolling for large tables */ 
-             border-radius: 8px; 
-             padding: 10px; 
-             background: #ffffff; 
-             box-shadow: 0 0 5px rgba(0, 0, 0, 0.1); 
-             border: 1px solid #ddd; 
-         } 
-  
-         th, td { 
-             padding: 12px; 
-             border: 1px solid #ddd; 
-             text-align: center; 
-         } 
-  
-         th { 
-             background: #f1f1f1; 
-             font-weight: bold; 
-             color: #000; 
-         } 
-  
-         tr:nth-child(even) { 
-             background: #f9f9f9; 
-         } 
-  
-         tr:hover { 
-             background: #f1f1f1; 
-         } 
-  
-         input[type="checkbox"] { 
-             width: 20px; 
-             height: 20px; 
-         } 
-  
-         /* --- DARK MODE STYLES --- */
-         @media (prefers-color-scheme: dark) {
-             :root {
-                 color-scheme: dark; /* Helps browser handle scrollbars, forms, etc. */
-             }
-             body {
-                 background-color: #121212; /* Very dark background */
-                 color: #e0e0e0; /* Light text */
-             }
-             .form-container {
-                 background: #1e1e1e; /* Slightly lighter dark background for the container */
-                 box-shadow: 0 0 15px rgba(0, 0, 0, 0.5); 
-                 border: 1px solid #333;
-             }
-             h2 {
-                 color: #ffffff; /* White title */
-             }
-             label {
-                 color: #cccccc;
-             }
-             input, select {
-                 background: #2b2b2b; /* Darker inputs */
+            label { color: #cccccc; }
+            input, select {
+                 background: #2b2b2b; 
                  border: 1px solid #444;
                  color: #e0e0e0;
-             }
-             input:focus, select:focus {
+            }
+            input:focus, select:focus {
                  border-color: #888;
                  box-shadow: 0 0 5px rgba(255, 255, 255, 0.2); 
-             }
-             .btn {
-                 background: #bb86fc; /* Purple/Accent color for dark mode buttons */
+            }
+            .btn {
+                 background: #bb86fc; 
                  color: #121212;
-             }
-             .btn:hover {
-                 background: #9a67ea; 
-             }
-             
-             /* Styles for the (currently unused) table elements */
-             .table-container { 
-                 background: #1e1e1e; 
-                 border: 1px solid #333; 
-             }
-             th { 
-                 background: #333; 
-                 color: #e0e0e0; 
-             } 
-             td {
-                 border: 1px solid #333;
-             }
-             tr:nth-child(even) { 
-                 background: #252525; 
-             } 
-             tr:hover { 
-                 background: #353535; 
-             } 
-         }
+            }
+            .btn:hover { background: #9a67ea; }
+            
+            /* Ajuste do botão vermelho no modo escuro */
+            .btn-red { background-color: #cf6679; color: #000; }
+            .btn-red:hover { background-color: #b00020; color: #fff; }
+        }
   
     </style>
 </head>
@@ -297,7 +255,6 @@
                     Receber e-mail
                 </label>
 
-
                 <button type="submit" class="btn" id="addic">Adicionar</button>
                 <p></p>
             </form>
@@ -343,17 +300,12 @@
             </script>
 
             <script>
-                // Global variable to store the mapping data from itens.json
                 let itemMapping = {};
 
-                // --- 1. Load Item Data and Populate Datalist ---
                 async function carregarItens() {
                     try {
-                        // NOTE: Ensure your itens.json is accessible at this path
                         const response = await fetch('./data/itens.json'); 
                         const data = await response.json();
-                        
-                        // Store the mapping globally for quick lookup
                         itemMapping = data.itens; 
 
                         const datalist = document.getElementById("itemSuggestions");
@@ -361,8 +313,6 @@
                         for (const item in itemMapping) {
                             const option = document.createElement("option");
                             option.value = item;
-                            // You can optionally add a label, but 'value' is what appears in the suggestion box
-                            // option.textContent = item; 
                             datalist.appendChild(option);
                         }
                     } catch (error) {
@@ -370,93 +320,59 @@
                     }
                 }
                 
-                // --- 2. Categorization Logic ---
                 function categorizarAutomaticamente() {
                     const comentarioInput = document.getElementById("comentario");
                     const categoriaSelect = document.getElementById("categoria");
                     const subcategoriaSelect = document.getElementById("subcategoria");
                     
-                    // Get the exact value currently in the input field
                     const typedItem = comentarioInput.value.trim();
                     
-                    // Check if the typed item exists in our loaded map
                     if (itemMapping.hasOwnProperty(typedItem)) {
                         const mapping = itemMapping[typedItem];
-                        
-                        // Auto-fill fields
                         categoriaSelect.value = mapping.categoria;
-                        // The 'atualizarSubcategorias()' function needs to run before setting the subcategory value
                         atualizarSubcategorias(); 
                         subcategoriaSelect.value = mapping.subcategoria;
-                        
-                        console.log(`Preenchimento automático: ${mapping.categoria} - ${mapping.subcategoria}`);
-                        
                     } else {
-                        // If the item is not found, clear the category/subcategory fields
-                        // and require manual selection, as requested.
                         categoriaSelect.value = "";
-                        atualizarSubcategorias(); // Clears subcategory list
-                        
-                        console.log("Item não encontrado na lista. Seleção manual necessária.");
+                        atualizarSubcategorias(); 
                     }
                 }
 
-                // --- 3. Event Listener Setup ---
                 document.addEventListener('DOMContentLoaded', () => {
-                    carregarItens(); // Load the item data when the page loads
-
-                    // Listen for the 'input' event to provide instant feedback and categorization
+                    carregarItens(); 
                     document.getElementById("comentario").addEventListener("input", categorizarAutomaticamente);
                 });
-
             </script>
 
             <script>
                 const amountInput = document.getElementById('amount');
 
                 amountInput.addEventListener('input', function(e) {
-                    // Remove any non-numeric characters
                     let value = this.value.replace(/[^\d]/g, '');
-                    
-                    // Pad with zeros if necessary
                     while (value.length < 3) {
                         value = '0' + value;
                     }
-                    
-                    // Insert decimal point
                     const dollars = value.slice(0, -2);
                     const cents = value.slice(-2);
-                    
-                    // Format with commas for thousands
                     const formattedDollars = Number(dollars).toLocaleString('en-US');
-                    
-                    // Update input value
                     this.value = formattedDollars + '.' + cents;
                 });
 
-                // On focus, remove formatting
                 amountInput.addEventListener('focus', function(e) {
                     const value = this.value.replace(/[^\d.]/g, '');
                     this.value = value;
                 });
 
-                // On blur, reapply formatting
                 amountInput.addEventListener('blur', function(e) {
                     if (this.value === '') {
                         this.value = '';
                         return;
                     }
-                    
                     let value = this.value.replace(/[^\d.]/g, '');
-                    
-                    // Convert to cents
                     const parts = value.split('.');
                     let cents = parseInt((parts[0] || '0') + (parts[1] || '00').padEnd(2, '0'));
-                    
-                    // Format back to dollars and cents
                     const dollars = Math.floor(cents / 100).toLocaleString('en-US');
                     const remainingCents = (cents % 100).toString().padStart(2, '0');
-                    
                     this.value = dollars + '.' + remainingCents;
                 });
             </script>
@@ -466,7 +382,7 @@
                     event.preventDefault();
                     document.getElementById("addic").innerText="Enviando...";
                     let cbox = document.getElementById("myCheckbox");
-                    let mail = "no"; // Default value
+                    let mail = "no"; 
                     if (cbox.checked) {     
                         mail = "yes"; 
                     }
@@ -490,7 +406,12 @@
                     }).then(() => {
                         document.getElementById("status").innerText = "Dados enviados com sucesso!";
                         document.getElementById("dataForm").reset();
-                        document.getElementById("sumToolBox").reset();
+                        
+                        // CORREÇÃO: Reseta a calculadora usando a nova função global
+                        if (typeof window.resetCalculator === 'function') {
+                            window.resetCalculator();
+                        }
+                        
                         document.getElementById("addic").innerText="Adicionar";
                         setTimeout(() => {
                             document.getElementById("status").innerText = "";
@@ -498,9 +419,7 @@
                         atualizarDia();
                     }).catch(error => console.error("Error:", error));
                 });
-            </script>
 
-            <script>
                 function atualizarDia() {
                     const today = new Date().toISOString().split('T')[0];
                     document.getElementById("dia").value = today;
@@ -513,18 +432,21 @@
         <div class="sum-container" id="sumToolBox">
             <h3>Calculadora de Itens</h3>
             <div id="inputList">
-                </div>
-            <button type="button" id="addButton" class="btn">+</button>
+            </div>
+            
+            <div class="btn-row">
+                <button type="button" id="addButton" class="btn" style="flex: 1;">+</button>
+                <button type="button" id="resetButton" class="btn btn-red" style="flex: 1;">Limpar</button>
+            </div>
+
             <div class="total-display">
                 Total: <span id="currentSumDisplay">R$ 0,00</span>
             </div>
 
 
             <script>
-                // --- 1. Desktop Check Functionality ---
                 function isDesktop() {
                     const userAgent = navigator.userAgent;
-                    // Check for Windows or macOS (not iOS/Android/other mobile indicators)
                     return (
                         (userAgent.includes("Win") || userAgent.includes("Macintosh")) && 
                         !userAgent.includes("Mobi") && 
@@ -532,14 +454,12 @@
                     );
                 }
 
-                // --- 2. Summation Logic Elements ---
                 const inputList = document.getElementById('inputList');
                 const addButton = document.getElementById('addButton');
                 const currentSumDisplay = document.getElementById('currentSumDisplay');
                 const mainAmountInput = document.getElementById('amount'); 
                 const sumToolBox = document.getElementById('sumToolBox');
                 
-                // Function to format a number as BRL currency for display
                 function formatCurrency(value) {
                     return new Intl.NumberFormat('pt-BR', {
                         style: 'currency',
@@ -547,32 +467,16 @@
                     }).format(value);
                 }
                 
-                // --- 3. Price Formatting Logic (Copied from main #amount input) ---
-                // This function formats the input to two decimal places while typing.
                 function applyCurrencyFormatting(e) {
                     let input = e.target;
-                    
-                    // Remove any non-numeric characters
                     let value = input.value.replace(/[^\d]/g, ''); 
-
-                    // Pad with zeros if necessary (ensuring at least 3 digits for XX.XX)
-                    while (value.length < 3) {
-                        value = '0' + value;
-                    }
-
-                    // Insert decimal point
+                    while (value.length < 3) { value = '0' + value; }
                     const dollars = value.slice(0, -2);
                     const cents = value.slice(-2);
-
-                    // Format with separators (e.g., 1.000.000)
-                    // Note: For Portuguese display, we use 'pt-BR' formatting rules (dot for thousands, comma for decimals)
                     const formattedDollars = Number(dollars).toLocaleString('pt-BR'); 
-
-                    // Update input value with the final formatted string
                     input.value = formattedDollars + ',' + cents;
                 }
 
-                // This function normalizes the input to a raw numeric string (e.g., "123.45") on blur
                 function normalizeCurrencyOnBlur(e) {
                     let input = e.target;
                     if (input.value === '') {
@@ -580,119 +484,95 @@
                         updateSum();
                         return;
                     }
-                    
-                    // Remove thousands separators (dots) and replace comma with dot for JS calculation
                     let value = input.value.replace(/\./g, '').replace(',', '.'); 
-                    
                     const numericValue = parseFloat(value) || 0;
-                    
-                    // Reapply the standard PT-BR display format (which includes two decimals)
-                    // This relies on the browser's locale settings but ensures two decimals are visible
                     input.value = numericValue.toLocaleString('pt-BR', { 
                         minimumFractionDigits: 2, 
                         maximumFractionDigits: 2 
                     });
-                    
                     updateSum();
                 }
                 
-                // --- 4. Core Calculation Function ---
                 function updateSum() {
                     let totalCents = 0;
-                    
-                    // Find all input rows
                     const rows = inputList.querySelectorAll('.input-row');
                     
                     rows.forEach(row => {
                         const priceInput = row.querySelector('.item-price');
                         const quantityInput = row.querySelector('.item-quantity');
                         
-                        // a) Get Price (normalized from PT-BR format to JS number)
                         let priceValue = priceInput.value.replace(/\./g, '').replace(',', '.'); 
                         const price = parseFloat(priceValue) || 0;
-                        
-                        // b) Get Quantity (must be integer)
                         const quantity = parseInt(quantityInput.value) || 1; 
-                        
-                        // c) Calculate subtotal (in cents to maintain precision)
                         const subtotal = price * quantity;
                         totalCents += Math.round(subtotal * 100); 
                     });
                     
                     const total = totalCents / 100;
-                    
-                    // Update the visible total box
                     currentSumDisplay.textContent = formatCurrency(total);
-                    
-                    // Update the main form's #amount field
-                    // Set the raw number first and then dispatch the 'blur' event
-                    // to use the main form's specific formatting logic for the final submission value.
                     mainAmountInput.value = total.toFixed(2); 
                     mainAmountInput.dispatchEvent(new Event('blur')); 
                 }
                 
-                // --- 5. New Input Creator ---
                 function createNewInput() {
                     const inputRow = document.createElement('div');
                     inputRow.className = 'input-row';
                     
-                    // --- Price Input (Numeric with formatting) ---
                     const priceInput = document.createElement('input');
                     priceInput.type = 'text';
                     priceInput.className = 'item-price';
                     priceInput.inputmode = 'numeric';
                     priceInput.placeholder = '0,00';
-                    priceInput.value = '0,00'; // Default value
-                    
-                    // Attach the new currency formatting listeners
+                    priceInput.value = '0,00'; 
                     priceInput.addEventListener('input', applyCurrencyFormatting);
                     priceInput.addEventListener('blur', normalizeCurrencyOnBlur);
                     
-                    // --- Quantity Input (Integer only) ---
                     const quantityInput = document.createElement('input');
                     quantityInput.type = 'number';
                     quantityInput.className = 'item-quantity';
                     quantityInput.min = '1';
-                    quantityInput.value = '1'; // Default quantity is 1
-                    quantityInput.style.width = '60px'; // Make it smaller
+                    quantityInput.value = '1'; 
+                    quantityInput.style.width = '60px'; 
                     quantityInput.style.textAlign = 'center';
-
-                    // Key listener: Recalculate sum when quantity changes
                     quantityInput.addEventListener('input', updateSum);
                     
                     inputRow.appendChild(priceInput);
                     inputRow.appendChild(quantityInput);
                     inputList.appendChild(inputRow);
                     
-                    // Focus on the new price input field
                     priceInput.focus();
                 }
 
-                // --- 6. Initialization ---
                 document.addEventListener('DOMContentLoaded', () => {
-                    // Only initialize the sum tool if the browser is detected as desktop
                     if (isDesktop()) {
-                        sumToolBox.style.display = 'flex'; // Use flex for vertical centering
+                        sumToolBox.style.display = 'flex'; 
                         sumToolBox.style.flexDirection = 'column';
                         
-                        // Set up initial input field
                         createNewInput(); 
                         
-                        // Set up button listener
                         addButton.addEventListener('click', () => {
                             createNewInput();
-                            // No need to call updateSum here, as the initial value is 0.00 * 1
                         });
+
+                        // --- LÓGICA DO RESET ---
+                        const resetButton = document.getElementById('resetButton');
+
+                        // Função Global para limpar (para usar aqui e no envio do form)
+                        window.resetCalculator = function() {
+                            inputList.innerHTML = ''; // Limpa as linhas
+                            createNewInput(); // Adiciona uma nova linha vazia
+                            updateSum(); // Zera o total
+                        };
+
+                        resetButton.addEventListener('click', window.resetCalculator);
+                        // ------------------------
                         
-                        // Run initial sum calculation
                         updateSum();
                     }
                 });
-
             </script>
         </div>
     </div>
 
 </body>
 </html>
-
