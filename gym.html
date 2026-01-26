@@ -2,429 +2,244 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gym Workout Manager</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>IronTrack | Gym Progress</title>
     <style>
         :root {
-            --primary: #3498db;
-            --secondary: #2c3e50;
-            --bg: #f4f7f6;
-            --card-bg: #ffffff;
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --accent: #bb86fc;
+            --text-primary: #e0e0e0;
+            --text-secondary: #a0a0a0;
+            --danger: #cf6679;
+            --success: #03dac6;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
             margin: 0;
-            padding: 20px;
-            background-color: var(--bg);
-            color: var(--secondary);
-        }
-
-        h1 { text-align: center; }
-
-        /* Tabs Styling */
-        .tab-container {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 20px;
-            background: var(--card-bg);
             padding: 10px;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            flex-wrap: wrap;
-        }
-
-        .tab-button {
-            padding: 10px 20px;
-            border: none;
-            background: none;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: 600;
-            color: #7f8c8d;
-            border-bottom: 3px solid transparent;
-            transition: all 0.3s;
-        }
-
-        .tab-button:hover { color: var(--primary); }
-        .tab-button.active {
-            color: var(--primary);
-            border-bottom: 3px solid var(--primary);
-        }
-
-        /* Content Styling */
-        .tab-content { display: none; animation: fadeIn 0.5s; }
-        .tab-content.active { display: block; }
-
-        .card {
-            background: var(--card-bg);
-            padding: 20px;
-            margin-bottom: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
-
-        .input-group {
-            display: flex;
-            gap: 10px;
-            align-items: flex-end;
-            margin-bottom: 15px;
-            flex-wrap: wrap;
-        }
-
-        .input-wrapper {
             display: flex;
             flex-direction: column;
+            align-items: center;
         }
 
-        label { font-size: 12px; margin-bottom: 5px; color: #7f8c8d; }
+        h2 { color: var(--accent); margin-bottom: 10px; }
 
-        input, select {
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+        /* Tabs Styling */
+        .tabs-container {
+            display: flex;
+            overflow-x: auto;
+            width: 100%;
+            gap: 10px;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            scrollbar-width: none; /* Hide scrollbar Firefox */
         }
+        .tabs-container::-webkit-scrollbar { display: none; }
 
-        button.action-btn {
-            padding: 9px 15px;
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
+        .tab-btn {
+            background: var(--card-bg);
+            color: var(--text-secondary);
+            border: 1px solid #333;
+            padding: 10px 20px;
+            border-radius: 20px;
+            white-space: nowrap;
             font-weight: bold;
         }
 
-        button.action-btn:hover { background-color: #2980b9; }
-
-        button.delete-btn {
-            background-color: #e74c3c;
-            margin-left: auto;
-            font-size: 12px;
-            padding: 5px 10px;
+        .tab-btn.active {
+            background: var(--accent);
+            color: #000;
+            border-color: var(--accent);
         }
 
-        .chart-container {
-            position: relative;
-            height: 300px;
+        /* Exercise Section */
+        .exercise-card {
+            background: var(--card-bg);
             width: 100%;
+            max-width: 400px;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
         }
 
-        .section-header {
+        .exercise-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid #333;
             padding-bottom: 10px;
+            margin-bottom: 10px;
+        }
+
+        .delete-btn { background: none; border: none; color: var(--danger); font-weight: bold; cursor: pointer; }
+
+        /* Inputs */
+        .input-group {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr auto;
+            gap: 5px;
             margin-bottom: 15px;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(5px); }
-            to { opacity: 1; transform: translateY(0); }
+        input {
+            background: #2c2c2c;
+            border: 1px solid #444;
+            color: white;
+            padding: 8px;
+            border-radius: 4px;
+            font-size: 0.9rem;
         }
+
+        .add-log-btn {
+            background: var(--success);
+            border: none;
+            border-radius: 4px;
+            color: #000;
+            font-weight: bold;
+            padding: 0 10px;
+        }
+
+        /* Table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        th { text-align: left; color: var(--text-secondary); padding-bottom: 5px; }
+        td { padding: 5px 0; border-top: 1px solid #333; }
+
+        .add-exercise-section {
+            width: 100%;
+            max-width: 400px;
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        #new-ex-name { flex-grow: 1; }
+        .create-btn { background: var(--accent); border: none; border-radius: 4px; padding: 10px; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <h1>🏋️ Gym Tracker</h1>
+    <h2>IronTrack</h2>
 
-    <div class="tab-container">
-        <button class="tab-button active" onclick="switchTab('overall')">Overall</button>
-        <button class="tab-button" onclick="switchTab('arms')">Arms & Shoulders</button>
-        <button class="tab-button" onclick="switchTab('back')">Back & Chest</button>
-        <button class="tab-button" onclick="switchTab('legs')">Legs</button>
+    <div class="tabs-container" id="tabs">
+        <button class="tab-btn active" onclick="switchTab('Legs')">Legs</button>
+        <button class="tab-btn" onclick="switchTab('Biceps')">Biceps</button>
+        <button class="tab-btn" onclick="switchTab('Triceps')">Triceps</button>
+        <button class="tab-btn" onclick="switchTab('Chest')">Chest</button>
+        <button class="tab-btn" onclick="switchTab('Back')">Back</button>
+        <button class="tab-btn" onclick="switchTab('Shoulders')">Shoulders</button>
     </div>
 
-    <div id="overall" class="tab-content active">
-        
-        <div class="card">
-            <div class="section-header">
-                <h2>Body Weight</h2>
-                <select id="weightFilter" onchange="renderOverallCharts()">
-                    <option value="7">Last 7 Days</option>
-                    <option value="30" selected>Last 30 Days</option>
-                    <option value="90">Last 3 Months</option>
-                    <option value="all">All Time</option>
-                </select>
-            </div>
-            <div class="input-group">
-                <div class="input-wrapper">
-                    <label>Date</label>
-                    <input type="date" id="weightDate">
-                </div>
-                <div class="input-wrapper">
-                    <label>Weight (kg/lbs)</label>
-                    <input type="number" id="weightValue" placeholder="e.g. 75">
-                </div>
-                <button class="action-btn" onclick="addGlobalData('bodyWeight')">Add Entry</button>
-            </div>
-            <div class="chart-container">
-                <canvas id="weightChart"></canvas>
-            </div>
+    <div id="exercise-list" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
         </div>
 
-        <div class="card">
-            <h2>Calories Burned</h2>
-            <div class="input-group">
-                <div class="input-wrapper">
-                    <label>Date</label>
-                    <input type="date" id="calDate">
-                </div>
-                <div class="input-wrapper">
-                    <label>Calories</label>
-                    <input type="number" id="calValue" placeholder="e.g. 500">
-                </div>
-                <button class="action-btn" onclick="addGlobalData('calories')">Add Entry</button>
-            </div>
-            <div class="chart-container">
-                <canvas id="calChart"></canvas>
-            </div>
-        </div>
-    </div>
-
-    <div id="arms" class="tab-content">
-        <div class="card">
-            <h3>Add New Exercise</h3>
-            <div class="input-group">
-                <input type="text" id="newArmsExercise" placeholder="Exercise Name (e.g. Bicep Curls)">
-                <button class="action-btn" onclick="createNewExercise('arms', 'newArmsExercise')">Create Exercise</button>
-            </div>
-        </div>
-        <div id="armsContainer"></div>
-    </div>
-
-    <div id="back" class="tab-content">
-        <div class="card">
-            <h3>Add New Exercise</h3>
-            <div class="input-group">
-                <input type="text" id="newBackExercise" placeholder="Exercise Name (e.g. Bench Press)">
-                <button class="action-btn" onclick="createNewExercise('back', 'newBackExercise')">Create Exercise</button>
-            </div>
-        </div>
-        <div id="backContainer"></div>
-    </div>
-
-    <div id="legs" class="tab-content">
-        <div class="card">
-            <h3>Add New Exercise</h3>
-            <div class="input-group">
-                <input type="text" id="newLegsExercise" placeholder="Exercise Name (e.g. Squats)">
-                <button class="action-btn" onclick="createNewExercise('legs', 'newLegsExercise')">Create Exercise</button>
-            </div>
-        </div>
-        <div id="legsContainer"></div>
+    <div class="add-exercise-section">
+        <input type="text" id="new-ex-name" placeholder="New Exercise Name...">
+        <button class="create-btn" onclick="addExercise()">Add</button>
     </div>
 
     <script>
-        // --- DATA MANAGEMENT ---
-        
-        // Initial Data Structure
-        const defaultData = {
-            bodyWeight: [],
-            calories: [],
-            arms: {},
-            back: {},
-            legs: {}
+        let currentTab = 'Legs';
+        let data = JSON.parse(localStorage.getItem('gymData')) || {
+            Legs: [], Biceps: [], Triceps: [], Chest: [], Back: [], Shoulders: []
         };
 
-        let gymData = JSON.parse(localStorage.getItem('gymData')) || defaultData;
-        let activeCharts = {}; // Store chart instances to destroy them before redrawing
-
-        function saveData() {
-            localStorage.setItem('gymData', JSON.stringify(gymData));
-        }
-
-        // Set default dates to today
-        document.querySelectorAll('input[type="date"]').forEach(input => {
-            input.valueAsDate = new Date();
-        });
-
-        // --- TAB LOGIC ---
-
-        function switchTab(tabId) {
-            // Hide all contents
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            // Deactivate all buttons
-            document.querySelectorAll('.tab-button').forEach(el => el.classList.remove('active'));
-            
-            // Show selected
-            document.getElementById(tabId).classList.add('active');
-            // Activate button (finding by onclick attribute for simplicity)
-            const btns = document.querySelectorAll('.tab-button');
-            btns.forEach(btn => {
-                if(btn.getAttribute('onclick').includes(tabId)) btn.classList.add('active');
+        function switchTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.innerText === tab);
             });
-
-            // Trigger Render
-            if (tabId === 'overall') {
-                renderOverallCharts();
-            } else {
-                renderCategory(tabId);
-            }
+            render();
         }
 
-        // --- CHART HELPER ---
-
-        function renderChart(canvasId, label, dataPoints, color, filterDays = 'all') {
-            const ctx = document.getElementById(canvasId).getContext('2d');
-
-            // Sort data by date
-            let sortedData = [...dataPoints].sort((a, b) => new Date(a.date) - new Date(b.date));
-
-            // Apply Date Filter
-            if (filterDays !== 'all') {
-                const cutoff = new Date();
-                cutoff.setDate(cutoff.getDate() - parseInt(filterDays));
-                sortedData = sortedData.filter(d => new Date(d.date) >= cutoff);
-            }
-
-            const labels = sortedData.map(d => d.date);
-            const values = sortedData.map(d => d.value);
-
-            // Destroy existing chart if it exists
-            if (activeCharts[canvasId]) {
-                activeCharts[canvasId].destroy();
-            }
-
-            activeCharts[canvasId] = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: label,
-                        data: values,
-                        borderColor: color,
-                        backgroundColor: color + '33', // Add transparency
-                        tension: 0.3,
-                        fill: true
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        x: { grid: { display: false } },
-                        y: { beginAtZero: false }
-                    }
-                }
+        function addExercise() {
+            const nameInput = document.getElementById('new-ex-name');
+            if (!nameInput.value) return;
+            
+            data[currentTab].push({
+                id: Date.now(),
+                name: nameInput.value,
+                logs: []
             });
+            
+            nameInput.value = '';
+            saveAndRender();
         }
 
-        // --- OVERALL TAB FUNCTIONS ---
-
-        function addGlobalData(type) {
-            const dateId = type === 'bodyWeight' ? 'weightDate' : 'calDate';
-            const valueId = type === 'bodyWeight' ? 'weightValue' : 'calValue';
-            
-            const date = document.getElementById(dateId).value;
-            const value = document.getElementById(valueId).value;
-
-            if (!date || !value) return alert("Please fill in both fields");
-
-            gymData[type].push({ date, value });
-            saveData();
-            
-            // Clear input
-            document.getElementById(valueId).value = '';
-            
-            renderOverallCharts();
+        function deleteExercise(id) {
+            data[currentTab] = data[currentTab].filter(ex => ex.id !== id);
+            saveAndRender();
         }
 
-        function renderOverallCharts() {
-            const filter = document.getElementById('weightFilter').value;
-            renderChart('weightChart', 'Body Weight', gymData.bodyWeight, '#3498db', filter);
-            renderChart('calChart', 'Calories Burned', gymData.calories, '#e67e22', filter); // Calorie filter follows same logic or 'all'
-        }
+        function addLog(exId) {
+            const date = document.getElementById(`date-${exId}`).value;
+            const weight = document.getElementById(`weight-${exId}`).value;
+            const reps = document.getElementById(`reps-${exId}`).value;
 
-        // --- EXERCISE TABS FUNCTIONS ---
+            if (!date || !weight || !reps) return;
 
-        function createNewExercise(category, inputId) {
-            const name = document.getElementById(inputId).value.trim();
-            if (!name) return alert("Enter a name");
+            const exercise = data[currentTab].find(ex => ex.id === exId);
+            exercise.logs.unshift({ date, weight, reps }); // Add to top
             
-            if (gymData[category][name]) return alert("Exercise already exists");
+            // Clear inputs
+            document.getElementById(`weight-${exId}`).value = '';
+            document.getElementById(`reps-${exId}`).value = '';
 
-            gymData[category][name] = []; // Initialize array for data
-            saveData();
-            document.getElementById(inputId).value = '';
-            renderCategory(category);
+            saveAndRender();
         }
 
-        function addExerciseData(category, exerciseName, dateId, valId) {
-            const date = document.getElementById(dateId).value;
-            const value = document.getElementById(valId).value;
-
-            if (!date || !value) return alert("Please fill in both fields");
-
-            gymData[category][exerciseName].push({ date, value });
-            saveData();
-            
-            // Re-render only this chart? For simplicity, re-render category
-            renderCategory(category);
+        function saveAndRender() {
+            localStorage.setItem('gymData', JSON.stringify(data));
+            render();
         }
 
-        function deleteExercise(category, exerciseName) {
-            if(confirm(`Delete ${exerciseName} and all its history?`)) {
-                delete gymData[category][exerciseName];
-                saveData();
-                renderCategory(category);
-            }
-        }
+        function render() {
+            const container = document.getElementById('exercise-list');
+            container.innerHTML = '';
 
-        function renderCategory(category) {
-            const container = document.getElementById(category + 'Container');
-            container.innerHTML = ''; // Clear current
+            data[currentTab].forEach(ex => {
+                const card = document.createElement('div');
+                card.className = 'exercise-card';
+                
+                let rows = ex.logs.slice(0, 5).map(log => `
+                    <tr>
+                        <td>${log.date}</td>
+                        <td>${log.weight}kg</td>
+                        <td>${log.reps}</td>
+                    </tr>
+                `).join('');
 
-            const exercises = gymData[category];
-            
-            if (Object.keys(exercises).length === 0) {
-                container.innerHTML = '<p style="text-align:center; color:#999;">No exercises added yet.</p>';
-                return;
-            }
-
-            Object.keys(exercises).forEach((name, index) => {
-                // Unique IDs for DOM elements
-                const safeName = name.replace(/\s+/g, ''); 
-                const canvasId = `chart_${category}_${safeName}_${index}`;
-                const dateId = `date_${category}_${safeName}_${index}`;
-                const valId = `val_${category}_${safeName}_${index}`;
-
-                const html = `
-                    <div class="card">
-                        <div class="section-header">
-                            <h3>${name}</h3>
-                            <button class="action-btn delete-btn" onclick="deleteExercise('${category}', '${name}')">Delete</button>
-                        </div>
-                        <div class="chart-container">
-                            <canvas id="${canvasId}"></canvas>
-                        </div>
-                        <div class="input-group" style="margin-top: 20px;">
-                            <div class="input-wrapper">
-                                <label>Date</label>
-                                <input type="date" id="${dateId}">
-                            </div>
-                            <div class="input-wrapper">
-                                <label>Weight Used</label>
-                                <input type="number" id="${valId}" placeholder="Weight">
-                            </div>
-                            <button class="action-btn" onclick="addExerciseData('${category}', '${name}', '${dateId}', '${valId}')">Add Log</button>
-                        </div>
+                card.innerHTML = `
+                    <div class="exercise-header">
+                        <strong>${ex.name}</strong>
+                        <button class="delete-btn" onclick="deleteExercise(${ex.id})">Delete</button>
                     </div>
+                    <div class="input-group">
+                        <input type="date" id="date-${ex.id}" value="${new Date().toISOString().split('T')[0]}">
+                        <input type="number" id="weight-${ex.id}" placeholder="kg">
+                        <input type="number" id="reps-${ex.id}" placeholder="reps">
+                        <button class="add-log-btn" onclick="addLog(${ex.id})">+</button>
+                    </div>
+                    <table>
+                        <thead><tr><th>Date</th><th>Weight</th><th>Reps</th></tr></thead>
+                        <tbody>${rows || '<tr><td colspan="3">No logs yet</td></tr>'}</tbody>
+                    </table>
                 `;
-                container.insertAdjacentHTML('beforeend', html);
-
-                // Set default date for the new input
-                document.getElementById(dateId).valueAsDate = new Date();
-
-                // Render Chart
-                renderChart(canvasId, `Weight: ${name}`, exercises[name], '#2ecc71', 'all');
+                container.appendChild(card);
             });
         }
 
-        // Initialize
-        renderOverallCharts();
+        // Initial render
+        render();
     </script>
 </body>
 </html>
