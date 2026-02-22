@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Iron Tracker</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    /* Custom scrollbar for webkit */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #374151; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #4B5563; }
+    
+    /* Smooth modal transitions */
+    .modal-enter { animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    .modal-overlay-enter { animation: fadeIn 0.2s ease-out forwards; }
+    
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+  </style>
+</head>
+<body class="bg-gray-950 text-gray-100 font-sans pb-24 selection:bg-blue-500/30 min-h-screen">
+
+  <!-- Header -->
+  <header class="bg-gray-900 border-b border-gray-800 pt-12 pb-4 px-4 sticky top-0 z-10 shadow-sm">
+    <div class="flex items-center gap-2 mb-1">
+      <i data-lucide="dumbbell" class="text-blue-500 w-6 h-6"></i>
+      <h1 class="text-xl font-bold tracking-tight text-white">Iron Tracker</h1>
+    </div>
+    <p id="header-tab-name" class="text-sm text-gray-400 font-medium">Chest Workouts</p>
+  </header>
+
+  <!-- Main Content -->
+  <main class="p-4 space-y-6">
+    
+    <!-- Add Exercise Form -->
+    <form id="add-exercise-form" class="flex gap-2">
+      <input
+        type="text"
+        id="new-exercise-input"
+        placeholder="Add new exercise..."
+        class="flex-1 bg-gray-900 border border-gray-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder:text-gray-500"
+      />
+      <button 
+        type="submit"
+        id="add-exercise-btn"
+        disabled
+        class="bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:bg-blue-600 text-white rounded-xl px-4 py-3 flex items-center justify-center transition-colors active:scale-95"
+      >
+        <i data-lucide="plus" class="w-5 h-5"></i>
+      </button>
+    </form>
+
+    <!-- Exercises Container -->
+    <div id="exercises-container" class="space-y-4">
+      <!-- Exercises will be injected here via JS -->
+    </div>
+  </main>
+
+  <!-- Always Visible Bottom Tab Selector -->
+  <nav class="fixed bottom-0 left-0 right-0 bg-gray-900/95 backdrop-blur-md border-t border-gray-800 pb-safe pt-2 px-2 z-40">
+    <div id="tab-nav" class="flex justify-between items-center max-w-md mx-auto mb-2">
+      <!-- Tabs injected via JS -->
+    </div>
+  </nav>
+
+  <!-- Add Workout Modal Overlay -->
+  <div id="workout-modal" class="hidden fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-0 sm:p-4">
+    <div class="w-full max-w-md bg-gray-900 rounded-t-3xl sm:rounded-3xl border border-gray-800 shadow-2xl overflow-hidden modal-enter">
+      
+      <div class="flex items-center justify-between p-5 border-b border-gray-800">
+        <div>
+          <h2 class="text-lg font-bold text-white">Log Workout</h2>
+          <p id="modal-exercise-name" class="text-xs text-blue-400 font-medium mt-0.5">Exercise Name</p>
+        </div>
+        <button onclick="closeModal()" class="p-2 bg-gray-800 text-gray-400 hover:text-white rounded-full transition-colors">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="workout-form" class="p-5 space-y-4">
+        <!-- Date Input -->
+        <div class="space-y-1.5">
+          <label class="text-xs font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-1">
+            <i data-lucide="calendar" class="w-3 h-3"></i> Date
+          </label>
+          <input
+            type="date"
+            id="workout-date"
+            required
+            class="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <!-- Weight Input -->
+          <div class="space-y-1.5 col-span-2">
+            <label class="text-xs font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-1">
+              <i data-lucide="dumbbell" class="w-3 h-3"></i> Weight
+            </label>
+            <input
+              type="number"
+              id="workout-weight"
+              required
+              min="0"
+              step="0.5"
+              placeholder="e.g. 135"
+              class="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          <!-- Sets Input -->
+          <div class="space-y-1.5">
+            <label class="text-xs font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-1">
+              <i data-lucide="hash" class="w-3 h-3"></i> Sets
+            </label>
+            <input
+              type="number"
+              id="workout-sets"
+              required
+              min="1"
+              placeholder="Sets"
+              class="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          <!-- Reps Input -->
+          <div class="space-y-1.5">
+            <label class="text-xs font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-1">
+              <i data-lucide="arrow-up-right" class="w-3 h-3"></i> Reps
+            </label>
+            <input
+              type="number"
+              id="workout-reps"
+              required
+              min="1"
+              placeholder="Reps"
+              class="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+        </div>
+
+        <div class="pt-4 pb-4 sm:pb-0">
+          <button
+            type="submit"
+            class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl py-3.5 flex items-center justify-center gap-2 transition-colors active:scale-[0.98]"
+          >
+            <i data-lucide="save" class="w-5 h-5"></i>
+            Save Workout
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Application Logic -->
+  <script>
+    // Constants & State
+    const TABS = ['Chest', 'Back', 'Legs', 'Shoulders', 'Arms'];
+    
+    // Load from local storage or default
+    let gymData = JSON.parse(localStorage.getItem('gymTrackerData')) || {
+      Chest: [], Back: [], Legs: [], Shoulders: [], Arms: []
+    };
+    
+    let activeTab = TABS[0];
+    let activeExerciseForModal = null;
+
+    // Elements
+    const elements = {
+      headerTabName: document.getElementById('header-tab-name'),
+      newExerciseInput: document.getElementById('new-exercise-input'),
+      addExerciseBtn: document.getElementById('add-exercise-btn'),
+      addExerciseForm: document.getElementById('add-exercise-form'),
+      exercisesContainer: document.getElementById('exercises-container'),
+      tabNav: document.getElementById('tab-nav'),
+      
+      // Modal
+      workoutModal: document.getElementById('workout-modal'),
+      modalExerciseName: document.getElementById('modal-exercise-name'),
+      workoutForm: document.getElementById('workout-form'),
+      workoutDate: document.getElementById('workout-date'),
+      workoutWeight: document.getElementById('workout-weight'),
+      workoutSets: document.getElementById('workout-sets'),
+      workoutReps: document.getElementById('workout-reps')
+    };
+
+    // Initialize App
+    function init() {
+      setupEventListeners();
+      renderApp();
+    }
+
+    // Save state helper
+    function saveData() {
+      localStorage.setItem('gymTrackerData', JSON.stringify(gymData));
+    }
+
+    // Render functions
+    function renderApp() {
+      // Update header and input placeholder
+      elements.headerTabName.textContent = `${activeTab}`;
+      elements.newExerciseInput.placeholder = `Add new ${activeTab.toLowerCase()} exercise...`;
+      
+      renderTabs();
+      renderExercises();
+      
+      // Re-initialize icons for newly added DOM elements
+      lucide.createIcons();
+    }
+
+    function renderTabs() {
+      elements.tabNav.innerHTML = TABS.map(tab => {
+        const isActive = activeTab === tab;
+        return `
+          <button
+            onclick="switchTab('${tab}')"
+            class="flex-1 flex flex-col items-center justify-center py-2 px-1 rounded-xl transition-all ${isActive ? 'text-blue-500' : 'text-gray-500 hover:text-gray-300'}"
+          >
+            <span class="text-[11px] font-bold uppercase tracking-wider mt-1 ${isActive ? 'scale-105' : ''}">
+              ${tab}
+            </span>
+            ${isActive ? '<span class="w-1 h-1 bg-blue-500 rounded-full mt-1.5 animate-pulse"></span>' : '<span class="w-1 h-1 mt-1.5"></span>'}
+          </button>
+        `;
+      }).join('');
+    }
+
+    function renderExercises() {
+      const currentExercises = gymData[activeTab] || [];
+      
+      if (currentExercises.length === 0) {
+        elements.exercisesContainer.innerHTML = `
+          <div class="text-center py-12 px-4 border border-dashed border-gray-800 rounded-2xl bg-gray-900/30">
+            <i data-lucide="dumbbell" class="w-12 h-12 text-gray-700 mx-auto mb-3"></i>
+            <p class="text-gray-400 text-sm">No exercises added yet.</p>
+            <p class="text-gray-500 text-xs mt-1">Add your first ${activeTab.toLowerCase()} exercise above.</p>
+          </div>
+        `;
+        return;
+      }
+
+      elements.exercisesContainer.innerHTML = currentExercises.map(exercise => {
+        const topWorkouts = exercise.workouts.slice(0, 5);
+        
+        let tableHTML = '';
+        if (topWorkouts.length > 0) {
+          const rows = topWorkouts.map(w => `
+            <tr class="hover:bg-gray-800/30 transition-colors">
+              <td class="px-4 py-3 whitespace-nowrap text-gray-300 font-medium">${formatDisplayDate(w.date)}</td>
+              <td class="px-4 py-3 text-white font-semibold">${w.weight} <span class="text-gray-500 text-xs font-normal">kg</span></td>
+              <td class="px-4 py-3 text-gray-300">${w.sets}</td>
+              <td class="px-4 py-3 text-gray-300">${w.reps}</td>
+            </tr>
+          `).join('');
+
+          tableHTML = `
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm text-left">
+                <thead class="text-xs text-gray-400 uppercase bg-gray-900/50">
+                  <tr>
+                    <th class="px-4 py-3 font-medium">Date</th>
+                    <th class="px-4 py-3 font-medium">Weight</th>
+                    <th class="px-4 py-3 font-medium">Sets</th>
+                    <th class="px-4 py-3 font-medium">Reps</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-800/60">
+                  ${rows}
+                </tbody>
+              </table>
+            </div>
+          `;
+        } else {
+          tableHTML = `<div class="p-6 text-center text-sm text-gray-500">No workouts recorded yet.</div>`;
+        }
+
+        return `
+          <div class="bg-gray-900 rounded-2xl border border-gray-800 overflow-hidden shadow-sm">
+            <!-- Exercise Header -->
+            <div class="flex items-center justify-between p-4 border-b border-gray-800/60 bg-gray-800/20">
+              <h3 class="font-semibold text-lg text-white truncate pr-4">${escapeHTML(exercise.name)}</h3>
+              <button 
+                onclick="deleteExercise('${exercise.id}')"
+                class="p-2 text-gray-500 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-colors"
+              >
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
+              </button>
+            </div>
+
+            <!-- Data Table -->
+            <div class="p-0">
+              ${tableHTML}
+            </div>
+
+            <!-- Add Workout Button -->
+            <div class="p-4 bg-gray-900/50 border-t border-gray-800/60">
+              <button
+                onclick="openModal('${exercise.id}')"
+                class="w-full py-2.5 px-4 bg-gray-800 hover:bg-gray-700 text-blue-400 text-sm font-semibold rounded-xl flex items-center justify-center gap-2 transition-colors active:scale-[0.98]"
+              >
+                <i data-lucide="plus" class="w-4 h-4"></i>
+                Log Workout
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Actions
+    function switchTab(tab) {
+      activeTab = tab;
+      elements.newExerciseInput.value = '';
+      checkAddInput();
+      renderApp();
+    }
+
+    function addExercise(e) {
+      e.preventDefault();
+      const name = elements.newExerciseInput.value.trim();
+      if (!name) return;
+
+      const newExercise = {
+        id: Date.now().toString(),
+        name: name,
+        workouts: []
+      };
+
+      if (!gymData[activeTab]) gymData[activeTab] = [];
+      gymData[activeTab].push(newExercise);
+      
+      elements.newExerciseInput.value = '';
+      checkAddInput();
+      
+      saveData();
+      renderApp();
+    }
+
+    function deleteExercise(exerciseId) {
+      if (confirm('Are you sure you want to delete this exercise and all its data?')) {
+        gymData[activeTab] = gymData[activeTab].filter(ex => ex.id !== exerciseId);
+        saveData();
+        renderApp();
+      }
+    }
+
+    // Modal Functions
+    function openModal(exerciseId) {
+      activeExerciseForModal = gymData[activeTab].find(ex => ex.id === exerciseId);
+      if (!activeExerciseForModal) return;
+
+      elements.modalExerciseName.textContent = activeExerciseForModal.name;
+      
+      // Reset form & set today's date
+      elements.workoutForm.reset();
+      elements.workoutDate.value = new Date().toISOString().split('T')[0];
+      
+      elements.workoutModal.classList.remove('hidden');
+      elements.workoutModal.classList.add('modal-overlay-enter');
+    }
+
+    function closeModal() {
+      elements.workoutModal.classList.add('hidden');
+      elements.workoutModal.classList.remove('modal-overlay-enter');
+      activeExerciseForModal = null;
+    }
+
+    function saveWorkout(e) {
+      e.preventDefault();
+      if (!activeExerciseForModal) return;
+
+      const date = elements.workoutDate.value;
+      const weight = elements.workoutWeight.value;
+      const sets = elements.workoutSets.value;
+      const reps = elements.workoutReps.value;
+
+      if (!date || !weight || !sets || !reps) return;
+
+      const newWorkout = {
+        id: Date.now().toString(),
+        date: date,
+        weight: Number(weight),
+        sets: Number(sets),
+        reps: Number(reps),
+        timestamp: new Date(date).getTime()
+      };
+
+      // Add and sort by date descending
+      activeExerciseForModal.workouts.push(newWorkout);
+      activeExerciseForModal.workouts.sort((a, b) => b.timestamp - a.timestamp);
+
+      saveData();
+      closeModal();
+      renderApp();
+    }
+
+    // Helpers
+    function checkAddInput() {
+      elements.addExerciseBtn.disabled = !elements.newExerciseInput.value.trim();
+    }
+
+    function formatDisplayDate(dateString) {
+      const parts = dateString.split('-');
+      if (parts.length === 3) {
+        return `${parts[1]}/${parts[2]}`; // MM/DD
+      }
+      return dateString;
+    }
+
+    function escapeHTML(str) {
+      return str.replace(/[&<>'"]/g, 
+        tag => ({
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            "'": '&#39;',
+            '"': '&quot;'
+          }[tag] || tag)
+      );
+    }
+
+    function setupEventListeners() {
+      elements.newExerciseInput.addEventListener('input', checkAddInput);
+      elements.addExerciseForm.addEventListener('submit', addExercise);
+      elements.workoutForm.addEventListener('submit', saveWorkout);
+      
+      // Close modal on outside click
+      elements.workoutModal.addEventListener('click', (e) => {
+        if (e.target === elements.workoutModal) closeModal();
+      });
+    }
+
+    // Run the app
+    init();
+  </script>
+</body>
+</html>
