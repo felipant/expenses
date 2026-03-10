@@ -11,21 +11,6 @@
             background-color: #0f172a;
             color: #f8fafc;
             font-family: 'Inter', sans-serif;
-            overflow: hidden;
-            touch-action: pan-y;
-        }
-        .slider-container {
-            display: flex;
-            transition: transform 0.3s ease-out;
-            height: 80vh;
-        }
-        .card {
-            min-width: 100%;
-            padding: 20px;
-            box-sizing: border-box;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
         }
         .inner-card {
             background: #1e293b;
@@ -46,61 +31,45 @@
             text-transform: uppercase;
             margin-bottom: 12px;
         }
-        .indicator {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #475569;
-            margin: 0 4px;
-            transition: all 0.3s;
-        }
-        .indicator.active {
-            background: #38bdf8;
-            width: 20px;
-            border-radius: 4px;
-        }
         .workout-item {
             background: #334155;
             border-radius: 12px;
             padding: 16px;
             margin-bottom: 12px;
         }
+        /* Ajuste para o ícone do calendário ficar visível no modo escuro */
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
 
-    <div class="h-screen flex flex-col">
+    <div class="min-h-screen flex flex-col">
         <!-- Header -->
         <div class="p-6 text-center">
-            <h1 class="text-xl font-bold text-sky-400">Rumo aos 10km</h1>
-            <p id="current-date-display" class="text-slate-400 text-sm">Carregando plano...</p>
+            <h1 class="text-xl font-bold text-sky-400 mb-4">Running</h1>
+            <!-- Date Picker -->
+            <input type="date" id="date-picker" class="bg-slate-800 text-sky-400 border border-slate-600 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-sky-500 w-full max-w-xs cursor-pointer">
         </div>
 
-        <!-- Slider -->
-        <div id="slider" class="slider-container">
-            <!-- Cards will be injected here -->
+        <!-- Single Card Container -->
+        <div id="card-container" class="flex-1 px-6 pb-6 flex flex-col justify-center">
+            <!-- Card will be injected here -->
         </div>
 
         <!-- Navigation Info -->
         <div class="p-6 flex flex-col items-center">
-            <div id="indicators" class="flex mb-4"></div>
-            <p class="text-slate-500 text-xs italic">Deslize para o lado para ver o próximo dia</p>
-            <button onclick="goToToday()" class="mt-4 px-6 py-2 bg-sky-600 hover:bg-sky-500 rounded-full text-sm font-semibold transition">
+            <button onclick="goToToday()" class="px-6 py-2 bg-sky-600 hover:bg-sky-500 rounded-full text-sm font-semibold transition">
                 Ir para Hoje
             </button>
         </div>
     </div>
 
     <script>
-        // Atualizado para 2026 para que a função goToToday() funcione corretamente agora
         const startDate = new Date(2026, 2, 16); // 16 de Março de 2026
         const endDate = new Date(2026, 6, 11);  // 11 de Julho de 2026
-        
-        let currentIndex = 0;
-        let startX = 0;
-        let currentTranslate = 0;
-        let prevTranslate = 0;
-        let isDragging = false;
         
         const workouts = [];
 
@@ -110,6 +79,12 @@
                 const dayOfWeek = curr.getDay(); // 0: Dom, 1: Seg, ...
                 const dateStr = curr.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
                 
+                // Formatar para YYYY-MM-DD para comparar com o input type="date"
+                const yyyy = curr.getFullYear();
+                const mm = String(curr.getMonth() + 1).padStart(2, '0');
+                const dd = String(curr.getDate()).padStart(2, '0');
+                const ymd = `${yyyy}-${mm}-${dd}`;
+
                 let phase = "";
                 let phaseColor = "";
                 
@@ -199,6 +174,7 @@
                 }
 
                 workouts.push({
+                    ymd,
                     date: dateStr,
                     rawDate: new Date(curr),
                     phase,
@@ -231,42 +207,46 @@
             return "";
         }
 
-        function renderCards() {
-            const slider = document.getElementById('slider');
-            const indicators = document.getElementById('indicators');
-            
-            workouts.forEach((workout, index) => {
-                const card = document.createElement('div');
-                card.className = 'card';
-                
-                let activitiesHtml = workout.activities.map(act => `
-                    <div class="workout-item">
-                        <div class="flex items-center gap-3 mb-2">
-                            <span class="text-sky-400">${getIcon(act.type)}</span>
-                            <h3 class="font-bold text-lg">${act.title}</h3>
-                        </div>
-                        <p class="text-slate-300 text-sm leading-relaxed">${act.desc}</p>
-                    </div>
-                `).join('');
+        function renderCardForDate(ymd) {
+            const container = document.getElementById('card-container');
+            const workout = workouts.find(w => w.ymd === ymd);
 
-                card.innerHTML = `
-                    <div class="inner-card">
-                        <span class="phase-badge ${workout.phaseColor}">${workout.phase}</span>
-                        <h2 class="text-2xl font-bold mb-6 capitalize">${workout.date}</h2>
-                        <div class="flex-1 overflow-y-auto pr-2">
-                            ${activitiesHtml}
-                        </div>
+            if (!workout) {
+                // Caso a data selecionada esteja fora do planejamento
+                const [year, month, day] = ymd.split('-');
+                const formattedDate = `${day}/${month}/${year}`;
+                
+                container.innerHTML = `
+                    <div class="inner-card w-full max-w-md mx-auto items-center justify-center text-center">
+                        <i data-lucide="calendar-x" class="w-12 h-12 text-slate-500 mb-4"></i>
+                        <h2 class="text-xl font-bold text-slate-300 mb-2">Sem treino em ${formattedDate}</h2>
+                        <p class="text-slate-500 text-sm">O plano oficial vai de 16/03/2026 a 11/07/2026.</p>
                     </div>
                 `;
-                slider.appendChild(card);
+                lucide.createIcons();
+                return;
+            }
 
-                if (index % 10 === 0) {
-                   const ind = document.createElement('div');
-                   ind.className = 'indicator';
-                   ind.id = `ind-${index}`;
-                   indicators.appendChild(ind);
-                }
-            });
+            let activitiesHtml = workout.activities.map(act => `
+                <div class="workout-item">
+                    <div class="flex items-center gap-3 mb-2">
+                        <span class="text-sky-400">${getIcon(act.type)}</span>
+                        <h3 class="font-bold text-lg">${act.title}</h3>
+                    </div>
+                    <p class="text-slate-300 text-sm leading-relaxed">${act.desc}</p>
+                </div>
+            `).join('');
+
+            container.innerHTML = `
+                <div class="inner-card w-full max-w-md mx-auto">
+                    <span class="phase-badge ${workout.phaseColor}">${workout.phase}</span>
+                    <h2 class="text-2xl font-bold mb-6 capitalize">${workout.date}</h2>
+                    <div class="flex-1 overflow-y-auto pr-2">
+                        ${activitiesHtml}
+                    </div>
+                </div>
+            `;
+            lucide.createIcons();
         }
 
         function getIcon(type) {
@@ -274,88 +254,35 @@
             if (type === 'bike') return '<i data-lucide="bike"></i>';
             if (type === 'gym') return '<i data-lucide="dumbbell"></i>';
             if (type === 'rest') return '<i data-lucide="moon"></i>';
-            return '<i data-lucide="circle"></i>';
+            return '<i data-lucide="calendar-x"></i>';
         }
-
-        const slider = document.getElementById('slider');
         
-        slider.addEventListener('touchstart', touchStart);
-        slider.addEventListener('touchmove', touchMove);
-        slider.addEventListener('touchend', touchEnd);
-
-        function touchStart(event) {
-            startX = event.touches[0].clientX;
-            isDragging = true;
-        }
-
-        function touchMove(event) {
-            if (!isDragging) return;
-            const currentX = event.touches[0].clientX;
-            const diff = currentX - startX;
-            currentTranslate = prevTranslate + diff;
-            setSliderPosition();
-        }
-
-        function touchEnd() {
-            isDragging = false;
-            const movedBy = currentTranslate - prevTranslate;
-
-            if (movedBy < -100 && currentIndex < workouts.length - 1) {
-                currentIndex++;
-            } else if (movedBy > 100 && currentIndex > 0) {
-                currentIndex--;
-            }
-
-            setPositionByIndex();
-        }
-
-        function setSliderPosition() {
-            slider.style.transform = `translateX(${currentTranslate}px)`;
-        }
-
-        function setPositionByIndex() {
-            currentTranslate = currentIndex * -window.innerWidth;
-            prevTranslate = currentTranslate;
-            setSliderPosition();
-            updateHeader();
-        }
-
-        function updateHeader() {
-            const workout = workouts[currentIndex];
-            if (workout) {
-                document.getElementById('current-date-display').innerText = workout.date;
-            }
-        }
+        // Listener que reage à mudança de data no campo
+        document.getElementById('date-picker').addEventListener('change', (e) => {
+            renderCardForDate(e.target.value);
+        });
 
         function goToToday() {
             const today = new Date();
-            today.setHours(0,0,0,0);
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dd = String(today.getDate()).padStart(2, '0');
+            const ymd = `${yyyy}-${mm}-${dd}`;
             
-            const index = workouts.findIndex(w => {
-                const d = new Date(w.rawDate);
-                d.setHours(0,0,0,0);
-                return d.getTime() === today.getTime();
-            });
-
-            if (index !== -1) {
-                currentIndex = index;
-            } else if (today < startDate) {
-                currentIndex = 0;
-            } else {
-                currentIndex = workouts.length - 1;
-            }
-            setPositionByIndex();
+            const picker = document.getElementById('date-picker');
+            picker.value = ymd;
+            renderCardForDate(ymd);
         }
 
         window.onload = () => {
             generatePlan();
-            renderCards();
-            lucide.createIcons();
-            goToToday();
             
-            window.addEventListener('resize', () => {
-                setPositionByIndex();
-            });
+            // Sugere os limites do calendário
+            const picker = document.getElementById('date-picker');
+            picker.min = workouts[0].ymd;
+            picker.max = workouts[workouts.length - 1].ymd;
+
+            goToToday();
         };
     </script>
 </body>
