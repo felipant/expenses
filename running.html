@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plano de Treino 10km</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            background-color: #0f172a;
+            color: #f8fafc;
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+            touch-action: pan-y;
+        }
+        .slider-container {
+            display: flex;
+            transition: transform 0.3s ease-out;
+            height: 80vh;
+        }
+        .card {
+            min-width: 100%;
+            padding: 20px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .inner-card {
+            background: #1e293b;
+            border-radius: 24px;
+            padding: 24px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+            border: 1px solid #334155;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        .phase-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 99px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+        .indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #475569;
+            margin: 0 4px;
+            transition: all 0.3s;
+        }
+        .indicator.active {
+            background: #38bdf8;
+            width: 20px;
+            border-radius: 4px;
+        }
+        .workout-item {
+            background: #334155;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="h-screen flex flex-col">
+        <!-- Header -->
+        <div class="p-6 text-center">
+            <h1 class="text-xl font-bold text-sky-400">Rumo aos 10km</h1>
+            <p id="current-date-display" class="text-slate-400 text-sm">Carregando plano...</p>
+        </div>
+
+        <!-- Slider -->
+        <div id="slider" class="slider-container">
+            <!-- Cards will be injected here -->
+        </div>
+
+        <!-- Navigation Info -->
+        <div class="p-6 flex flex-col items-center">
+            <div id="indicators" class="flex mb-4"></div>
+            <p class="text-slate-500 text-xs italic">Deslize para o lado para ver o próximo dia</p>
+            <button onclick="goToToday()" class="mt-4 px-6 py-2 bg-sky-600 hover:bg-sky-500 rounded-full text-sm font-semibold transition">
+                Ir para Hoje
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Atualizado para 2026 para que a função goToToday() funcione corretamente agora
+        const startDate = new Date(2026, 2, 16); // 16 de Março de 2026
+        const endDate = new Date(2026, 6, 11);  // 11 de Julho de 2026
+        
+        let currentIndex = 0;
+        let startX = 0;
+        let currentTranslate = 0;
+        let prevTranslate = 0;
+        let isDragging = false;
+        
+        const workouts = [];
+
+        function generatePlan() {
+            let curr = new Date(startDate);
+            while (curr <= endDate) {
+                const dayOfWeek = curr.getDay(); // 0: Dom, 1: Seg, ...
+                const dateStr = curr.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
+                
+                let phase = "";
+                let phaseColor = "";
+                
+                // Determinar Fase (Datas ajustadas para 2026)
+                if (curr < new Date(2026, 3, 20)) {
+                    phase = "Fase 1: Adaptação";
+                    phaseColor = "bg-emerald-500/20 text-emerald-400";
+                } else if (curr < new Date(2026, 5, 1)) {
+                    phase = "Fase 2: Velocidade";
+                    phaseColor = "bg-amber-500/20 text-amber-400";
+                } else if (curr < new Date(2026, 5, 29)) {
+                    phase = "Fase 3: Pico";
+                    phaseColor = "bg-rose-500/20 text-rose-400";
+                } else {
+                    phase = "Fase 4: Polimento";
+                    phaseColor = "bg-sky-500/20 text-sky-400";
+                }
+
+                let activities = [];
+
+                // Lógica de Treino por dia da semana
+                switch(dayOfWeek) {
+                    case 1: // Segunda
+                        activities.push({ 
+                            type: 'run', 
+                            title: 'Corrida (Velocidade)', 
+                            desc: getRunningWorkout(1, phase) 
+                        });
+                        activities.push({ 
+                            type: 'gym', 
+                            title: 'Musculação', 
+                            desc: 'Foco: Peito e Costas' 
+                        });
+                        break;
+                    case 2: // Terça
+                        activities.push({ 
+                            type: 'bike', 
+                            title: 'Bicicleta', 
+                            desc: 'Recuperação Ativa / Cadência leve (45-60 min)' 
+                        });
+                        break;
+                    case 3: // Quarta
+                        activities.push({ 
+                            type: 'bike', 
+                            title: 'Bicicleta', 
+                            desc: 'Resistência aeróbica (60-80 min)' 
+                        });
+                        activities.push({ 
+                            type: 'gym', 
+                            title: 'Musculação', 
+                            desc: 'Foco: Pernas, Lombar e Abdômen' 
+                        });
+                        break;
+                    case 4: // Quinta
+                        activities.push({ 
+                            type: 'bike', 
+                            title: 'Bicicleta', 
+                            desc: 'Simulação de Esforço / Subidas (Intervalos de força)' 
+                        });
+                        break;
+                    case 5: // Sexta
+                        activities.push({ 
+                            type: 'run', 
+                            title: 'Corrida (Tempo Run)', 
+                            desc: getRunningWorkout(5, phase) 
+                        });
+                        activities.push({ 
+                            type: 'gym', 
+                            title: 'Musculação', 
+                            desc: 'Foco: Braços e Ombros' 
+                        });
+                        break;
+                    case 6: // Sábado
+                        activities.push({ 
+                            type: 'run', 
+                            title: 'Corrida (Longo)', 
+                            desc: getRunningWorkout(6, phase) 
+                        });
+                        break;
+                    case 0: // Domingo
+                        activities.push({ 
+                            type: 'rest', 
+                            title: 'Descanso Total', 
+                            desc: 'Recuperação muscular e mental. Hidrate-se bem.' 
+                        });
+                        break;
+                }
+
+                workouts.push({
+                    date: dateStr,
+                    rawDate: new Date(curr),
+                    phase,
+                    phaseColor,
+                    activities
+                });
+
+                curr.setDate(curr.getDate() + 1);
+            }
+        }
+
+        function getRunningWorkout(day, phase) {
+            if (phase.includes("Fase 1")) {
+                if (day === 1) return "2km aquec. + 8x 400m (5:00 min/km) - rec. 90s";
+                if (day === 5) return "6km ritmo constante (5:40 min/km)";
+                if (day === 6) return "8km a 9km ritmo confortável (6:00 min/km)";
+            } else if (phase.includes("Fase 2")) {
+                if (day === 1) return "2km aquec. + 5x 1000m (4:50-5:00 min/km) - rec. 2min";
+                if (day === 5) return "2km aquec. + 4km Tempo Run (5:15 min/km) + 1km arref.";
+                if (day === 6) return "10km-12km Progressivo (6:10 -> 5:30)";
+            } else if (phase.includes("Fase 3")) {
+                if (day === 1) return "2km aquec. + 10x 400m (4:30-4:40 min/km) - rec. 60s";
+                if (day === 5) return "8km alternando: 1km prova (5:05) / 1km leve (5:50)";
+                if (day === 6) return "14km ritmo constante (5:50 min/km)";
+            } else {
+                if (day === 1) return "4km leve + 4 tiros 200m rápidos";
+                if (day === 5) return "3km trote muito leve (soltura)";
+                if (day === 6) return "DIA DA PROVA (11/07) - Boa sorte!";
+            }
+            return "";
+        }
+
+        function renderCards() {
+            const slider = document.getElementById('slider');
+            const indicators = document.getElementById('indicators');
+            
+            workouts.forEach((workout, index) => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                
+                let activitiesHtml = workout.activities.map(act => `
+                    <div class="workout-item">
+                        <div class="flex items-center gap-3 mb-2">
+                            <span class="text-sky-400">${getIcon(act.type)}</span>
+                            <h3 class="font-bold text-lg">${act.title}</h3>
+                        </div>
+                        <p class="text-slate-300 text-sm leading-relaxed">${act.desc}</p>
+                    </div>
+                `).join('');
+
+                card.innerHTML = `
+                    <div class="inner-card">
+                        <span class="phase-badge ${workout.phaseColor}">${workout.phase}</span>
+                        <h2 class="text-2xl font-bold mb-6 capitalize">${workout.date}</h2>
+                        <div class="flex-1 overflow-y-auto pr-2">
+                            ${activitiesHtml}
+                        </div>
+                    </div>
+                `;
+                slider.appendChild(card);
+
+                if (index % 10 === 0) {
+                   const ind = document.createElement('div');
+                   ind.className = 'indicator';
+                   ind.id = `ind-${index}`;
+                   indicators.appendChild(ind);
+                }
+            });
+        }
+
+        function getIcon(type) {
+            if (type === 'run') return '<i data-lucide="zap"></i>';
+            if (type === 'bike') return '<i data-lucide="bike"></i>';
+            if (type === 'gym') return '<i data-lucide="dumbbell"></i>';
+            if (type === 'rest') return '<i data-lucide="moon"></i>';
+            return '<i data-lucide="circle"></i>';
+        }
+
+        const slider = document.getElementById('slider');
+        
+        slider.addEventListener('touchstart', touchStart);
+        slider.addEventListener('touchmove', touchMove);
+        slider.addEventListener('touchend', touchEnd);
+
+        function touchStart(event) {
+            startX = event.touches[0].clientX;
+            isDragging = true;
+        }
+
+        function touchMove(event) {
+            if (!isDragging) return;
+            const currentX = event.touches[0].clientX;
+            const diff = currentX - startX;
+            currentTranslate = prevTranslate + diff;
+            setSliderPosition();
+        }
+
+        function touchEnd() {
+            isDragging = false;
+            const movedBy = currentTranslate - prevTranslate;
+
+            if (movedBy < -100 && currentIndex < workouts.length - 1) {
+                currentIndex++;
+            } else if (movedBy > 100 && currentIndex > 0) {
+                currentIndex--;
+            }
+
+            setPositionByIndex();
+        }
+
+        function setSliderPosition() {
+            slider.style.transform = `translateX(${currentTranslate}px)`;
+        }
+
+        function setPositionByIndex() {
+            currentTranslate = currentIndex * -window.innerWidth;
+            prevTranslate = currentTranslate;
+            setSliderPosition();
+            updateHeader();
+        }
+
+        function updateHeader() {
+            const workout = workouts[currentIndex];
+            if (workout) {
+                document.getElementById('current-date-display').innerText = workout.date;
+            }
+        }
+
+        function goToToday() {
+            const today = new Date();
+            today.setHours(0,0,0,0);
+            
+            const index = workouts.findIndex(w => {
+                const d = new Date(w.rawDate);
+                d.setHours(0,0,0,0);
+                return d.getTime() === today.getTime();
+            });
+
+            if (index !== -1) {
+                currentIndex = index;
+            } else if (today < startDate) {
+                currentIndex = 0;
+            } else {
+                currentIndex = workouts.length - 1;
+            }
+            setPositionByIndex();
+        }
+
+        window.onload = () => {
+            generatePlan();
+            renderCards();
+            lucide.createIcons();
+            goToToday();
+            
+            window.addEventListener('resize', () => {
+                setPositionByIndex();
+            });
+        };
+    </script>
+</body>
+</html>
