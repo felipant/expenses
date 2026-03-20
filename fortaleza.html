@@ -1,38 +1,280 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="820" height="160" viewBox="0 0 820 160" role="img" aria-label="Linha do tempo: Agosto de 2017 a Julho de 2019">
-  <style>
-    .bg { fill: #f1f4ee; }
-    .axis { stroke: #333; stroke-width: 2; }
-    .tick { stroke: #666; stroke-width: 1; }
-    .label { font-family: "Segoe UI", Roboto, Arial, sans-serif; font-size: 12px; fill: #222; }
-    .period { fill: #2b8cbe; fill-opacity: 0.18; stroke: #1f6f9a; stroke-opacity: 0.9; rx:6; ry:6; }
-    .period-label { font-weight: 700; font-size: 13px; fill: #0b3b52; }
-    .marker { fill: #1f6f9a; }
-    .year { font-weight: 600; font-size: 12px; }
-  </style>
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulário de Avaliação Psiquiátrica Avançado</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; max-width: 1000px; margin: 20px auto; padding: 0 -20px; background-color: #f0f2f5; color: #333; }
+        h1 { color: #1a3a5a; text-align: center; border-bottom: 3px solid #3498db; padding-bottom: 10px; }
+        h2 { color: #2980b9; font-size: 1.1em; margin-top: 0; border-left: 4px solid #3498db; padding-left: 10px; }
+        section { background: white; padding: 20px; border-radius: 8px; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .sub-section { border: 1px solid #e1e8ed; padding: 15px; border-radius: 6px; margin-top: 10px; background-color: #fafafa; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-bottom: 10px; }
+        .checkbox-group { display: flex; align-items: center; gap: 8px; font-size: 0.85em; }
+        .input-inline { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+        textarea { width: 100%; height: 60px; margin-top: 10px; border: 1px solid #ccc; border-radius: 4px; padding: 8px; box-sizing: border-box; resize: vertical; }
+        input[type="text"], input[type="number"] { padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        .btn-container { display: flex; gap: 10px; margin-top: 20px; position: sticky; bottom: 20px; }
+        button { flex: 1; padding: 18px; border: none; border-radius: 5px; cursor: pointer; font-size: 1.1em; font-weight: bold; transition: 0.3s; }
+        #btn-gerar { background-color: #27ae60; color: white; }
+        #btn-gerar:hover { background-color: #219150; }
+        #btn-copiar { background-color: #3498db; color: white; display: none; }
+        #btn-copiar.sucesso { background-color: #f39c12; }
+        #output { margin-top: 20px; white-space: pre-wrap; background: #2c3e50; color: #ecf0f1; padding: 20px; border-radius: 5px; display: none; font-family: monospace; border: 2px solid #34495e; }
+        .label-bold { font-weight: bold; font-size: 0.9em; display: block; margin-bottom: 5px; margin-top: 10px; }
+    </style>
+</head>
+<body>
 
-  <rect class="bg" x="0" y="0" width="820" height="160"/>
+    <h1>Registro de Exame Psíquico (CNV)</h1>
 
-  <line class="axis" x1="50" y1="90" x2="750" y2="90" />
+    <section>
+        <h2>1. Ambiente da Comunicação</h2>
+        <div class="grid">
+            <div class="input-inline">
+                <label>Nº Alunos:</label>
+                <input type="number" id="num_alunos" min="0" value="0" style="width: 60px;">
+            </div>
+            <div class="input-inline">
+                <label>Nº Acompanhantes:</label>
+                <input type="number" id="num_acomp" min="0" value="0" style="width: 60px;">
+            </div>
+        </div>
+        <div class="grid">
+            <div class="checkbox-group"><input type="checkbox" data-label="Ambiente Silencioso"> Silencioso</div>
+            <div class="checkbox-group"><input type="checkbox" data-label="Ambiente Barulhento"> Barulhento</div>
+            <div class="checkbox-group"><input type="checkbox" data-label="Ambiente Iluminado"> Iluminado</div>
+            <div class="checkbox-group"><input type="checkbox" data-label="Ambiente Escuro"> Escuro</div>
+        </div>
+        <textarea placeholder="Local da avaliação e influências do ambiente..."></textarea>
+    </section>
 
-  <rect class="period" x="186" y="64" width="447" height="52" rx="8" ry="8"/>
+    <section>
+        <h2>2. Aparência Física</h2>
+        <div class="grid">
+            <div><label class="label-bold">Altura:</label><input type="text" id="alt_val" placeholder="Ex: 1,75m"></div>
+            <div><label class="label-bold">Peso:</label><input type="text" id="peso_val" placeholder="Ex: 70kg"></div>
+            <div><label class="label-bold">Tonalidade da Pele:</label><input type="text" id="pele_val"></div>
+        </div>
+        <div class="sub-section">
+            <label class="label-bold">Pertences e Acessórios:</label>
+            <textarea placeholder="Bolsas, mochilas, maletas, pastas executivas, canetas em mãos..."></textarea>
+            <label class="label-bold">Odores Emitidos:</label>
+            <input type="text" id="odores" style="width: 100%;" placeholder="Hálito, perfume, higiene, odores corporais...">
+        </div>
+        <div class="grid" style="margin-top: 10px;">
+            <div class="checkbox-group"><input type="checkbox" data-label="Higiene bucal adequada"> Higiene bucal ok</div>
+            <div class="checkbox-group"><input type="checkbox" data-label="Dentes descuidados/estragados"> Dentes descuidados</div>
+            <div class="checkbox-group"><input type="checkbox" data-label="Higiene geral preservada"> Higiene preservada</div>
+        </div>
+        <textarea placeholder="Cabelos, roupas, maquiagem e cuidados globais..."></textarea>
+    </section>
 
-  <circle class="marker" cx="186" cy="90" r="4"/>
-  <text class="label" x="186" y="54" text-anchor="middle">Ago 2017</text>
+    <section>
+        <h2>3. Proxêmica</h2>
+        <div class="grid">
+            <div class="checkbox-group"><input type="checkbox" data-label="Distância adequada"> Distância adequada</div>
+            <div class="checkbox-group"><input type="checkbox" data-label="Invasivo"> Invasivo</div>
+            <div class="checkbox-group"><input type="checkbox" data-label="Distante/Retraído"> Distante/Retraído</div>
+        </div>
+        <textarea placeholder="Ocupação do espaço e posicionamento na sala..."></textarea>
+    </section>
 
-  <circle class="marker" cx="633" cy="90" r="4"/>
-  <text class="label" x="633" y="54" text-anchor="middle">Jul 2019</text>
+    <section>
+        <h2>4. Movimentos do Corpo</h2>
+        
+        <div class="sub-section">
+            <strong>4.1 Gestos ilustradores (fala):</strong>
+            <div class="checkbox-group"><input type="checkbox" data-label="Gestos acompanham a fala"> Gestos acompanham a fala</div>
+            <textarea placeholder="Notas sobre gestos que acompanham a linguagem verbal..."></textarea>
+        </div>
 
+        <div class="sub-section">
+            <strong>4.2 Gestos adaptativos:</strong>
+            <div class="grid">
+                <div class="checkbox-group"><input type="checkbox" data-label="Autotoque"> Autotoque</div>
+                <div class="checkbox-group"><input type="checkbox" data-label="Manuseio de objetos"> Manuseio de objetos</div>
+                <div class="checkbox-group"><input type="checkbox" data-label="Passando a mão nos cabelos"> Passando a mão nos cabelos</div>
+            </div>
+            <textarea placeholder="Sinais de tensão ou ansiedade..."></textarea>
+        </div>
 
-  <line class="tick" x1="50" y1="84" x2="50" y2="96"/>
-  <text class="year" x="50" y="112" text-anchor="middle">2017</text>
+        <div class="sub-section">
+            <strong>4.3 Postura:</strong>
+            <div class="grid">
+                <div class="checkbox-group"><input type="checkbox" data-label="Postura tensa/rígida"> Tensa/Rígida</div>
+                <div class="checkbox-group"><input type="checkbox" data-label="Postura curvada/triste"> Curvada/Triste</div>
+                <div class="checkbox-group"><input type="checkbox" data-label="Corpo inclinado para frente"> Inclinado p/ frente</div>
+                <div class="checkbox-group"><input type="checkbox" data-label="Postura relaxada"> Relaxada</div>
+            </div>
+            <textarea placeholder="Nível de atenção ou envolvimento..."></textarea>
+        </div>
 
-  <line class="tick" x1="283" y1="84" x2="283" y2="96"/>
-  <text class="year" x="283" y="112" text-anchor="middle">2018</text>
+        <div class="sub-section">
+            <strong>4.4 Comportamento tátil e Aperto de Mão:</strong>
+            <label class="label-bold">Qualidade do Aperto de Mão:</label>
+            <div class="grid">
+                <div class="checkbox-group"><input type="checkbox" data-label="Aperto firme"> Firme</div>
+                <div class="checkbox-group"><input type="checkbox" data-label="Aperto forte"> Forte</div>
+                <div class="checkbox-group"><input type="checkbox" data-label="Aperto delicado"> Delicado</div>
+                <div class="checkbox-group"><input type="checkbox" data-label="Aperto muito fraco"> Muito fraco</div>
+                <div class="checkbox-group"><input type="checkbox" data-label="Aperto largado"> "Largado"</div>
+                <div class="checkbox-group"><input type="checkbox" data-label="Aperto em demasia"> Apertado em demasia</div>
+            </div>
+            <label class="label-bold">Outras Interações:</label>
+            <div class="grid">
+                <div class="checkbox-group"><input type="checkbox" data-label="Abraço"> Abraço</div>
+                <div class="checkbox-group"><input type="checkbox" data-label="Tapinhas nas costas/cabeça"> Tapinhas (costas/cab.)</div>
+                <div class="checkbox-group"><input type="checkbox" data-label="Alisa o outro com a mão"> Alisa com a mão</div>
+            </div>
+            <input type="text" id="erotizacao" placeholder="Grau de erotização observado no contato..." style="width: 100%; margin-top: 10px;">
+            <textarea placeholder="Frequência e intensidade do toque..."></textarea>
+        </div>
 
-  <line class="tick" x1="517" y1="84" x2="517" y2="96"/>
-  <text class="year" x="517" y="112" text-anchor="middle">2019</text>
+        <div class="sub-section">
+            <strong>4.5 Expressões Faciais e Reações:</strong>
+            <div class="grid">
+                <div class="checkbox-group"><input type="checkbox" data-label="Rubor facial"> Rubor</div>
+                <div class="checkbox-group"><input type="checkbox" data-label="Palidez facial"> Palidez</div>
+                <div class="checkbox-group"><input type="checkbox" data-label="Suor facial"> Suor facial</div>
+            </div>
+            <label class="label-bold">Padrões Faciais Observados:</label>
+            <div class="grid">
+                <div class="checkbox-group"><input type="checkbox" data-label="Cantos da boca elevados (Sorriso)"> Elevação cantos da boca</div>
+                <div class="checkbox-group"><input type="checkbox" data-label="Sobrancelhas franzidas/unidas"> Sobrancelhas franzidas</div>
+                <div class="checkbox-group"><input type="checkbox" data-label="Cantos da boca para baixo/Olhar fundo"> Cantos boca p/ baixo</div>
+                <div class="checkbox-group"><input type="checkbox" data-label="Olhos arregalados/Pálpebras elevadas"> Olhos arregalados</div>
+                <div class="checkbox-group"><input type="checkbox" data-label="Nariz franzido"> Nariz franzido</div>
+                <div class="checkbox-group"><input type="checkbox" data-label="Lábio superior elevado"> Lábio superior elevado</div>
+                <div class="checkbox-group"><input type="checkbox" data-label="Boca aberta/Manto caído"> Boca aberta/relaxada</div>
+            </div>
+            <textarea placeholder="Descrição detalhada das expressões e microexpressões..."></textarea>
+        </div>
 
-  <line class="tick" x1="750" y1="84" x2="750" y2="96"/>
-  <text class="year" x="750" y="112" text-anchor="middle">2020</text>
+        <div class="sub-section">
+            <strong>4.6 Comportamento ocular:</strong>
+            <div class="grid">
+                <div class="checkbox-group"><input type="checkbox" data-label="Olhar fixo"> Olhar fixo</div>
+                <div class="checkbox-group"><input type="checkbox" data-label="Evita contato visual"> Evita contato</div>
+            </div>
+            <textarea placeholder="Direção, tempo e modo de fixação do olhar..."></textarea>
+        </div>
+    </section>
 
-</svg>
+    <section>
+        <h2>5. Histórico Cultural</h2>
+        <textarea placeholder="Contexto cultural e influência na CNV..."></textarea>
+    </section>
+
+    <section id="paralinguagem">
+        <h2>6. Paralinguagem</h2>
+        
+        <label class="label-bold">Fluidez e Ritmo:</label>
+        <div class="grid">
+            <div class="checkbox-group"><input type="checkbox" data-label="Latência de resposta aumentada"> Latência aumentada</div>
+            <div class="checkbox-group"><input type="checkbox" data-label="Silêncios prolongados"> Silêncios prolongados</div>
+            <div class="checkbox-group"><input type="checkbox" data-label="Pausas entre palavras"> Pausas entre palavras</div>
+            <div class="checkbox-group"><input type="checkbox" data-label="Dificuldade de articulação"> Má articulação</div>
+        </div>
+
+        <label class="label-bold">Prosódia (Qualidades Vocais):</label>
+        <div class="grid">
+            <div class="checkbox-group"><input type="checkbox" data-label="Voz com intensidade forte"> Intensidade Forte</div>
+            <div class="checkbox-group"><input type="checkbox" data-label="Voz com intensidade fraca"> Intensidade Fraca</div>
+            <div class="checkbox-group"><input type="checkbox" data-label="Frequência Aguda"> Frequência Aguda</div>
+            <div class="checkbox-group"><input type="checkbox" data-label="Frequência Grave"> Frequência Grave</div>
+            <div class="checkbox-group"><input type="checkbox" data-label="Voz monótona (sem entonação)"> Voz monótona</div>
+        </div>
+
+        <label class="label-bold">Sons Intrusos e Vocalizações:</label>
+        <div class="grid">
+            <div class="checkbox-group"><input type="checkbox" data-label="Sons intrusos (humm, ahá, etc)"> Sons intrusos (humm/ahá)</div>
+            <div class="checkbox-group"><input type="checkbox" data-label="Risos inapropriados ou nervosos"> Risos</div>
+            <div class="checkbox-group"><input type="checkbox" data-label="Bocejos frequentes"> Bocejos</div>
+            <div class="checkbox-group"><input type="checkbox" data-label="Gemidos ou suspiros"> Gemidos/Suspiros</div>
+            <div class="checkbox-group"><input type="checkbox" data-label="Arrotos ou ruídos gástricos"> Arrotos/Ruídos</div>
+        </div>
+
+        <textarea placeholder="Descreva a entonação, as variações sonoras e como a paralinguagem se contrapõe ou acentua o discurso verbal..."></textarea>
+    </section>
+
+    <div class="btn-container">
+        <button id="btn-gerar" onclick="gerarPrompt()">Gerar Prompt para LLM</button>
+        <button id="btn-copiar" onclick="copiarTexto()">Copiar Texto</button>
+    </div>
+
+    <div id="output"></div>
+
+    <script>
+        function gerarPrompt() {
+            let prompt = "Aja como um médico psiquiatra experiente. Com base nos dados estruturados de Comunicação Não-Verbal (CNV) coletados, elabore um relatório semiológico detalhado para o prontuário:\n\n";
+            
+            // Dados de ambiente
+            prompt += "--- 1. AMBIENTE DA COMUNICAÇÃO ---\n";
+            prompt += `Nº de Alunos: ${document.getElementById('num_alunos').value || 0}\n`;
+            prompt += `Nº de Acompanhantes: ${document.getElementById('num_acomp').value || 0}\n`;
+
+            const secoes = document.querySelectorAll('section');
+            secoes.forEach((sec, index) => {
+                const tituloElement = sec.querySelector('h2');
+                if(!tituloElement) return;
+                
+                const titulo = tituloElement.innerText;
+                if(index > 0) prompt += `\n--- ${titulo.toUpperCase()} ---\n`;
+                
+                // Coleta Checkboxes
+                sec.querySelectorAll('input[type="checkbox"]:checked').forEach(c => {
+                    prompt += `• ${c.getAttribute('data-label')}\n`;
+                });
+
+                // Inputs específicos (Aparência)
+                if(index === 1) { 
+                    const fields = { "Altura": "alt_val", "Peso": "peso_val", "Pele": "pele_val", "Odores": "odores" };
+                    for(let key in fields) {
+                        let val = document.getElementById(fields[key]).value;
+                        if(val) prompt += `${key}: ${val}\n`;
+                    }
+                }
+                
+                // Erotização (Movimentos)
+                if(index === 3) {
+                    const erot = document.getElementById('erotizacao').value;
+                    if(erot) prompt += `Grau de erotização: ${erot}\n`;
+                }
+
+                // Textareas
+                sec.querySelectorAll('textarea').forEach(t => {
+                    if(t.value) {
+                        const context = t.placeholder || "Notas";
+                        prompt += `[${context}]: ${t.value}\n`;
+                    }
+                });
+            });
+
+            const outputDiv = document.getElementById('output');
+            outputDiv.innerText = prompt;
+            outputDiv.style.display = 'block';
+            document.getElementById('btn-copiar').style.display = 'block';
+            window.scrollTo(0, document.body.scrollHeight);
+        }
+
+        async function copiarTexto() {
+            const texto = document.getElementById('output').innerText;
+            const btn = document.getElementById('btn-copiar');
+            try {
+                await navigator.clipboard.writeText(texto);
+                btn.innerText = "Copiado!";
+                btn.classList.add('sucesso');
+                setTimeout(() => {
+                    btn.innerText = "Copiar Texto";
+                    btn.classList.remove('sucesso');
+                }, 2000);
+            } catch (err) {
+                alert('Erro ao copiar.');
+            }
+        }
+    </script>
+
+</body>
+</html>
