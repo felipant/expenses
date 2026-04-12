@@ -1,0 +1,424 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+.header{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1.25rem;margin-bottom:1rem}
+.header-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1rem;padding-bottom:.75rem;border-bottom:0.5px solid var(--color-border-tertiary);gap:1rem;flex-wrap:wrap}
+.upload-btn{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:500;padding:6px 12px;border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);color:var(--color-text-primary);cursor:pointer}
+.upload-btn:hover{background:var(--color-background-secondary)}
+.upload-status{font-size:12px;padding:5px 10px;border-radius:var(--border-radius-md);display:none}
+.upload-status.ok{background:var(--color-background-success);color:var(--color-text-success);display:block}
+.upload-status.err{background:var(--color-background-danger);color:var(--color-text-danger);display:block}
+.section-label{font-size:12px;color:var(--color-text-secondary);font-weight:500;margin-bottom:.6rem}
+.grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.75rem}
+.grid-4{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:.75rem}
+.sep{border-top:0.5px solid var(--color-border-tertiary);margin:.85rem 0}
+.ctrl{display:flex;flex-direction:column;gap:5px}
+.ctrl label{font-size:12px;color:var(--color-text-secondary);font-weight:500}
+.ctrl .val{font-size:12px;font-weight:500;color:var(--color-text-primary)}
+.weight-row{display:flex;align-items:center;gap:8px}
+.weight-row label{font-size:12px;color:var(--color-text-secondary);min-width:110px}
+.weight-row input[type=range]{flex:1}
+.weight-row .wval{font-size:12px;font-weight:500;color:var(--color-text-primary);min-width:28px;text-align:right}
+.fuel-row{display:flex;align-items:center;gap:8px}
+.fuel-row label{font-size:12px;color:var(--color-text-secondary);min-width:130px}
+.fuel-row input[type=number]{width:90px;font-size:13px;padding:4px 8px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:var(--color-background-primary);color:var(--color-text-primary)}
+.fuel-row input[type=number]:focus{outline:none;border-color:var(--color-border-primary)}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:1rem}
+.stat-card{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:.75rem 1rem}
+.stat-label{font-size:12px;color:var(--color-text-secondary);margin-bottom:4px}
+.stat-value{font-size:18px;font-weight:500;color:var(--color-text-primary)}
+.search-row{display:flex;gap:8px;margin-bottom:1rem;align-items:center}
+.search-row input[type=text]{flex:1;font-size:13px;padding:7px 10px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:var(--color-background-primary);color:var(--color-text-primary)}
+.search-row input[type=text]:focus{outline:none;border-color:var(--color-border-primary)}
+.search-hint{font-size:12px;color:var(--color-text-tertiary);white-space:nowrap}
+.table-wrap{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:auto}
+table{width:100%;border-collapse:collapse;font-size:12px;min-width:900px}
+thead th{background:var(--color-background-secondary);font-weight:500;font-size:11px;color:var(--color-text-secondary);padding:8px 7px;text-align:left;border-bottom:0.5px solid var(--color-border-tertiary);white-space:nowrap;position:sticky;top:0;z-index:1}
+tbody tr{border-bottom:0.5px solid var(--color-border-tertiary)}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:var(--color-background-secondary)}
+tbody tr.highlight{background:var(--color-background-info)}
+tbody td{padding:7px 7px;color:var(--color-text-primary);white-space:nowrap}
+.rank-badge{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;font-size:10px;font-weight:500;background:var(--color-background-secondary);color:var(--color-text-secondary)}
+.rank-badge.top3{background:#E1F5EE;color:#0F6E56}
+.rank-badge.search{background:#E6F1FB;color:#185FA5}
+.idx-bar{display:flex;align-items:center;gap:4px}
+.bar-bg{width:48px;height:4px;background:var(--color-background-secondary);border-radius:4px;overflow:hidden;flex-shrink:0}
+.bar-fill{height:100%;background:#1D9E75;border-radius:4px}
+.idx-val{font-size:11px;font-weight:500;min-width:26px;text-align:right;color:var(--color-text-primary)}
+.tag{display:inline-block;font-size:10px;padding:1px 5px;border-radius:var(--border-radius-md);background:var(--color-background-info);color:var(--color-text-info);white-space:nowrap}
+.tag-reg{background:var(--color-background-secondary);color:var(--color-text-secondary)}
+.maps-link{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:3px;text-decoration:none;flex-shrink:0}
+.maps-link:hover{background:var(--color-background-secondary)}
+.no-data{padding:2rem;text-align:center;color:var(--color-text-secondary);font-size:14px}
+.fuel-cost{font-size:11.5px;color:var(--color-text-secondary)}
+.weight-warn{font-size:12px;margin-top:6px}
+</style>
+
+<div style="padding:1rem 0">
+<div class="header">
+  <div class="header-top">
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <span style="font-size:15px;font-weight:500;color:var(--color-text-primary)">Potencial de mercado — queijo artesanal (~R$ 80/kg)</span>
+      <label class="upload-btn" for="csv-input">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 10V3M5 6l3-3 3 3"/><path d="M3 11v1.5A1.5 1.5 0 004.5 14h7A1.5 1.5 0 0013 12.5V11"/></svg>
+        Carregar CSV
+      </label>
+      <input type="file" id="csv-input" accept=".csv" style="display:none">
+      <div class="upload-status" id="upload-status"></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div class="fuel-row"><label>Preço da gasolina (R$/L)</label><input type="number" id="gas-price" value="6.40" min="1" max="20" step="0.10"></div>
+      <div class="fuel-row"><label>Eficiência do veículo (km/L)</label><input type="number" id="gas-km" value="13" min="1" max="50" step="0.5"></div>
+    </div>
+  </div>
+
+  <div class="section-label">Pesos do índice (ajuste para somar 100)</div>
+  <div class="grid-2">
+    <div class="weight-row"><label>PIB per capita</label><input type="range" id="w-pibpc" min="0" max="100" step="5" value="35"><span class="wval" id="wv-pibpc">35</span></div>
+    <div class="weight-row"><label>População</label><input type="range" id="w-pop" min="0" max="100" step="5" value="30"><span class="wval" id="wv-pop">30</span></div>
+    <div class="weight-row"><label>Distância (inverso)</label><input type="range" id="w-dist" min="0" max="100" step="5" value="25"><span class="wval" id="wv-dist">25</span></div>
+    <div class="weight-row"><label>PIB total</label><input type="range" id="w-pib" min="0" max="100" step="5" value="10"><span class="wval" id="wv-pib">10</span></div>
+  </div>
+  <div class="weight-warn" id="weight-warning"></div>
+
+  <div class="sep"></div>
+  <div class="section-label">Filtros</div>
+  <div class="grid-4">
+    <div class="ctrl">
+      <label>Estado</label>
+      <select id="f-estado"><option value="">Todos</option></select>
+    </div>
+    <div class="ctrl">
+      <label>Região do estado</label>
+      <select id="f-regiao"><option value="">Todas</option></select>
+    </div>
+    <div class="ctrl">
+      <label>População mínima</label>
+      <input type="range" id="f-pop-min" min="0" max="2000000" step="20000" value="0">
+      <span class="val" id="fv-pop-min">Sem mínimo</span>
+    </div>
+    <div class="ctrl">
+      <label>População máxima</label>
+      <input type="range" id="f-pop-max" min="20000" max="2000000" step="20000" value="2000000">
+      <span class="val" id="fv-pop-max">Sem limite</span>
+    </div>
+    <div class="ctrl">
+      <label>PIB per capita mínimo</label>
+      <input type="range" id="f-pibpc-min" min="0" max="150000" step="10000" value="0">
+      <span class="val" id="fv-pibpc-min">Sem mínimo</span>
+    </div>
+    <div class="ctrl">
+      <label>Distância mínima (km)</label>
+      <input type="range" id="f-dist-min" min="0" max="2960" step="40" value="0">
+      <span class="val" id="fv-dist-min">Sem mínimo</span>
+    </div>
+    <div class="ctrl">
+      <label>Distância máxima (km)</label>
+      <input type="range" id="f-dist-max" min="40" max="3000" step="40" value="3000">
+      <span class="val" id="fv-dist-max">Sem limite</span>
+    </div>
+  </div>
+</div>
+
+<div class="stats-row">
+  <div class="stat-card"><div class="stat-label">Cidades filtradas</div><div class="stat-value" id="st-count">—</div></div>
+  <div class="stat-card"><div class="stat-label">Maior índice</div><div class="stat-value" id="st-maxidx">—</div></div>
+  <div class="stat-card"><div class="stat-label">PIB per cap. médio</div><div class="stat-value" id="st-avgpibpc">—</div></div>
+  <div class="stat-card"><div class="stat-label">Distância média</div><div class="stat-value" id="st-avgdist">—</div></div>
+</div>
+
+<div class="search-row">
+  <input type="text" id="search-input" placeholder="Pesquisar cidade fora do top 40...">
+  <span class="search-hint" id="search-hint"></span>
+</div>
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th style="width:30px">#</th>
+        <th style="width:18px"></th>
+        <th style="width:120px">Cidade</th>
+        <th style="width:36px">UF</th>
+        <th style="width:110px">Região do estado</th>
+        <th style="width:92px">Índice</th>
+        <th style="width:72px">Distância</th>
+        <th style="width:88px">PIB per cap.</th>
+        <th style="width:88px">População</th>
+        <th style="width:82px">PIB (mil R$)</th>
+        <th style="width:95px">Combustível (i+v)</th>
+      </tr>
+    </thead>
+    <tbody id="table-body">
+      <tr><td colspan="11" class="no-data">Carregue um CSV ou aguarde os dados de demonstração.</td></tr>
+    </tbody>
+  </table>
+</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<script>
+let ALL=[];
+
+const fmt=(n,d=0)=>(n==null||isNaN(n))?'—':Number(n).toLocaleString('pt-BR',{minimumFractionDigits:d,maximumFractionDigits:d});
+const fmtR=n=>(n==null||isNaN(n)||n===0)?'—':'R$ '+fmt(n,2);
+const fmtKm=n=>(n==null||isNaN(n)||n===0)?'—':fmt(n,1)+' km';
+
+function mapsUrl(cidade,estado){
+  const dest=encodeURIComponent(cidade+', '+estado+', Brasil');
+  const orig=encodeURIComponent('Itapecerica, MG, Brasil');
+  return `https://www.google.com/maps/dir/${orig}/${dest}`;
+}
+
+function mapsIcon(){
+  return `<svg width="15" height="15" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="#EA4335"/><circle cx="12" cy="9" r="2.5" fill="white"/></svg>`;
+}
+
+function calcFuel(distKm){
+  const price=parseFloat(document.getElementById('gas-price').value)||6.40;
+  const eff=parseFloat(document.getElementById('gas-km').value)||13;
+  if(!distKm||distKm<=0) return null;
+  return (distKm*2/eff)*price;
+}
+
+function normalize(arr,key,invert=false){
+  const vals=arr.map(r=>r[key]).filter(v=>v!=null&&!isNaN(v)&&v>0);
+  if(!vals.length) return arr.map(r=>({...r,[key+'_n']:0}));
+  const mn=Math.min(...vals),mx=Math.max(...vals),range=mx-mn||1;
+  return arr.map(r=>{
+    const v=r[key];
+    if(v==null||isNaN(v)||v<=0) return {...r,[key+'_n']:0};
+    const n=(v-mn)/range;
+    return {...r,[key+'_n']:invert?1-n:n};
+  });
+}
+
+function getWeights(){
+  return{pibpc:+document.getElementById('w-pibpc').value,pop:+document.getElementById('w-pop').value,dist:+document.getElementById('w-dist').value,pib:+document.getElementById('w-pib').value};
+}
+
+function getFiltered(){
+  const estado=document.getElementById('f-estado').value;
+  const regiao=document.getElementById('f-regiao').value;
+  const popMin=+document.getElementById('f-pop-min').value;
+  const popMax=+document.getElementById('f-pop-max').value;
+  const pibpcMin=+document.getElementById('f-pibpc-min').value;
+  const distMin=+document.getElementById('f-dist-min').value;
+  const distMax=+document.getElementById('f-dist-max').value;
+  return ALL.filter(r=>{
+    if(estado&&r.Estado!==estado) return false;
+    if(regiao&&r.Regiao!==regiao) return false;
+    if(r.Populacao!=null&&r.Populacao<popMin) return false;
+    if(popMax<+document.getElementById('f-pop-max').max&&r.Populacao!=null&&r.Populacao>popMax) return false;
+    if(r.PibPc!=null&&r.PibPc<pibpcMin) return false;
+    if(distMin>0&&r.Distancia!=null&&r.Distancia<distMin) return false;
+    if(distMax<+document.getElementById('f-dist-max').max&&r.Distancia!=null&&r.Distancia>distMax) return false;
+    return true;
+  });
+}
+
+function computeRanked(data){
+  const w=getWeights();
+  const wn={pibpc:w.pibpc/100,pop:w.pop/100,dist:w.dist/100,pib:w.pib/100};
+  let d=[...data];
+  d=normalize(d,'PibPc');d=normalize(d,'Populacao');d=normalize(d,'Distancia',true);d=normalize(d,'Pib');
+  return d.map(r=>({...r,_idx:(r.PibPc_n||0)*wn.pibpc+(r.Populacao_n||0)*wn.pop+(r.Distancia_n||0)*wn.dist+(r.Pib_n||0)*wn.pib})).sort((a,b)=>b._idx-a._idx);
+}
+
+function renderRow(r,rank,isSearch=false){
+  const badge=isSearch?'rank-badge search':rank<=3?'rank-badge top3':'rank-badge';
+  const rankLabel=isSearch?'–':rank;
+  const bw=Math.round(Math.min((r._idx||0)*100,100));
+  const fuel=calcFuel(r.Distancia);
+  const regLabel=r.Regiao?`<span class="tag tag-reg">${r.Regiao}</span>`:'<span style="color:var(--color-text-tertiary);font-size:11px">—</span>';
+  return `<tr${isSearch?' class="highlight"':''}>
+    <td><span class="${badge}">${rankLabel}</span></td>
+    <td><a class="maps-link" href="${mapsUrl(r.Cidade,r.Estado)}" target="_blank" title="Rota no Google Maps">${mapsIcon()}</a></td>
+    <td style="max-width:120px;overflow:hidden;text-overflow:ellipsis" title="${r.Cidade}">${r.Cidade}</td>
+    <td><span class="tag">${r.Estado||'—'}</span></td>
+    <td>${regLabel}</td>
+    <td><div class="idx-bar"><div class="bar-bg"><div class="bar-fill" style="width:${bw}%"></div></div><span class="idx-val">${((r._idx||0)*100).toFixed(1)}</span></div></td>
+    <td>${fmtKm(r.Distancia)}</td>
+    <td>${fmtR(r.PibPc)}</td>
+    <td>${r.Populacao>0?fmt(r.Populacao,0):'—'}</td>
+    <td>${r.Pib>0?fmt(r.Pib,0):'—'}</td>
+    <td><span class="fuel-cost">${fuel?fmtR(fuel):'—'}</span></td>
+  </tr>`;
+}
+
+function render(){
+  const w=getWeights();
+  const total=w.pibpc+w.pop+w.dist+w.pib;
+  document.getElementById('weight-warning').innerHTML=Math.abs(total-100)>1?`<span style="color:var(--color-text-warning)">Pesos somam ${total} — ajuste para 100.</span>`:'';
+  if(!ALL.length) return;
+
+  const filtered=getFiltered();
+  const ranked=computeRanked(filtered);
+  const top40=ranked.slice(0,40);
+
+  document.getElementById('st-count').textContent=fmt(filtered.length);
+  document.getElementById('st-maxidx').textContent=top40.length?(top40[0]._idx*100).toFixed(1):'—';
+  const vp=filtered.filter(r=>r.PibPc>0);
+  document.getElementById('st-avgpibpc').textContent=vp.length?fmtR(vp.reduce((s,r)=>s+r.PibPc,0)/vp.length):'—';
+  const vd=filtered.filter(r=>r.Distancia>0);
+  document.getElementById('st-avgdist').textContent=vd.length?fmt(vd.reduce((s,r)=>s+r.Distancia,0)/vd.length,0)+' km':'—';
+
+  const query=(document.getElementById('search-input').value||'').toLowerCase().trim();
+  let searchRow='';
+  const hint=document.getElementById('search-hint');
+
+  if(query.length>=2){
+    const inTop=top40.some(r=>r.Cidade.toLowerCase().includes(query));
+    if(inTop){hint.textContent='Cidade encontrada no top 40.';searchRow='';}
+    else{
+      const match=ranked.find(r=>r.Cidade.toLowerCase().includes(query));
+      if(match){const pos=ranked.indexOf(match)+1;hint.textContent=`Posição: ${pos}º de ${filtered.length} filtradas`;searchRow=renderRow(match,pos,true);}
+      else{
+        const matchAll=ALL.find(r=>r.Cidade.toLowerCase().includes(query));
+        if(matchAll){hint.textContent='Cidade fora dos filtros atuais';searchRow=renderRow({...matchAll,_idx:0},0,true);}
+        else{hint.textContent='Nenhuma cidade encontrada.';}
+      }
+    }
+  } else {hint.textContent='';}
+
+  const tbody=document.getElementById('table-body');
+  if(!top40.length&&!searchRow){tbody.innerHTML='<tr><td colspan="11" class="no-data">Nenhuma cidade com os filtros aplicados.</td></tr>';return;}
+  tbody.innerHTML=searchRow+top40.map((r,i)=>renderRow(r,i+1,false)).join('');
+}
+
+function normalizeRow(r){
+  const pick=(...ks)=>{for(const k of ks)if(r[k]!=null&&r[k]!=='')return +r[k]||0;return 0;};
+  const str=(...ks)=>{for(const k of ks)if(r[k]!=null&&r[k]!=='')return String(r[k]).trim();return '';};
+  return{
+    Cidade:    str('Cidade','cidade'),
+    Estado:    str('Estado','UF','estado','uf'),
+    Regiao:    str('Região do Estado','Regiao do Estado','Região do estado','regiao_do_estado','Regiao','regiao','região'),
+    Populacao: pick('População','Populacao','populacao'),
+    Pib:       pick('PIB','pib','PIB Total (mil R$)'),
+    PibPc:     pick('PIB per capta','PIB per capita','pib_per_capta'),
+    Distancia: pick('Distância de Itapecerica (km)','Distancia','distancia','distance_km'),
+  };
+}
+
+function populateSelectsFromData(){
+  const estados=[...new Set(ALL.map(r=>r.Estado).filter(Boolean))].sort();
+  document.getElementById('f-estado').innerHTML='<option value="">Todos</option>'+estados.map(e=>`<option>${e}</option>`).join('');
+  const regioes=[...new Set(ALL.map(r=>r.Regiao).filter(Boolean))].sort();
+  document.getElementById('f-regiao').innerHTML='<option value="">Todas</option>'+regioes.map(e=>`<option>${e}</option>`).join('');
+}
+
+function loadCSV(text){
+  const parsed=Papa.parse(text,{header:true,skipEmptyLines:true,dynamicTyping:true});
+  if(!parsed.data.length) return 0;
+  ALL=parsed.data.map(normalizeRow).filter(r=>r.Cidade);
+  populateSelectsFromData();
+  const maxPop=Math.max(...ALL.map(r=>r.Populacao).filter(v=>v>0),2000000);
+  const maxDist=Math.max(...ALL.map(r=>r.Distancia).filter(v=>v>0),3000);
+  const maxPibpc=Math.max(...ALL.map(r=>r.PibPc).filter(v=>v>0),150000);
+  const roundPop=Math.ceil(maxPop/20000)*20000;
+  const roundDist=Math.ceil(maxDist/40)*40;
+  ['f-pop-min','f-pop-max'].forEach(id=>{const el=document.getElementById(id);el.max=roundPop;});
+  document.getElementById('f-pop-min').value=0;document.getElementById('f-pop-max').value=roundPop;
+  ['f-dist-min','f-dist-max'].forEach(id=>{const el=document.getElementById(id);el.max=roundDist;});
+  document.getElementById('f-dist-min').value=0;document.getElementById('f-dist-max').value=roundDist;
+  document.getElementById('f-pibpc-min').max=Math.ceil(maxPibpc/10000)*10000;
+  document.getElementById('fv-pop-max').textContent='Sem limite';
+  document.getElementById('fv-pop-min').textContent='Sem mínimo';
+  document.getElementById('fv-dist-max').textContent='Sem limite';
+  document.getElementById('fv-dist-min').textContent='Sem mínimo';
+  document.getElementById('fv-pibpc-min').textContent='Sem mínimo';
+  render();
+  return ALL.length;
+}
+
+document.getElementById('csv-input').addEventListener('change',function(){
+  const file=this.files[0];const status=document.getElementById('upload-status');
+  if(!file) return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const count=loadCSV(e.target.result);
+      if(!count){status.className='upload-status err';status.textContent='CSV inválido ou vazio.';}
+      else{status.className='upload-status ok';status.textContent=count+' cidades carregadas de "'+file.name+'"';try{window.storage.set('queijo_csv',e.target.result);}catch(_){}}
+    }catch(err){status.className='upload-status err';status.textContent='Erro: '+err.message;}
+  };
+  reader.readAsText(file,'UTF-8');this.value='';
+});
+
+['w-pibpc','w-pop','w-dist','w-pib'].forEach(id=>{
+  const el=document.getElementById(id),lbl=document.getElementById('wv-'+id.slice(2));
+  el.addEventListener('input',()=>{lbl.textContent=el.value;render();});
+});
+
+document.getElementById('f-estado').addEventListener('change',render);
+document.getElementById('f-regiao').addEventListener('change',render);
+document.getElementById('gas-price').addEventListener('input',render);
+document.getElementById('gas-km').addEventListener('input',render);
+document.getElementById('search-input').addEventListener('input',render);
+
+[
+  ['f-pop-min','fv-pop-min',v=>v==0?'Sem mínimo':fmt(v,0)+' hab'],
+  ['f-pop-max','fv-pop-max',v=>+v>=+document.getElementById('f-pop-max').max?'Sem limite':fmt(v,0)+' hab'],
+  ['f-pibpc-min','fv-pibpc-min',v=>v==0?'Sem mínimo':'R$ '+fmt(v,0)],
+  ['f-dist-min','fv-dist-min',v=>v==0?'Sem mínimo':fmt(v,0)+' km'],
+  ['f-dist-max','fv-dist-max',v=>+v>=+document.getElementById('f-dist-max').max?'Sem limite':fmt(v,0)+' km'],
+].forEach(([id,lblId,fmtFn])=>{
+  const el=document.getElementById(id),lbl=document.getElementById(lblId);
+  el.addEventListener('input',()=>{lbl.textContent=fmtFn(+el.value);render();});
+});
+
+try{
+  window.storage.get('queijo_csv').then(res=>{
+    if(res&&res.value){const count=loadCSV(res.value);if(count){const s=document.getElementById('upload-status');s.className='upload-status ok';s.textContent=count+' cidades restauradas do cache.';}}
+    else{loadSample();}
+  }).catch(()=>loadSample());
+}catch(_){loadSample();}
+
+function loadSample(){
+  ALL=[
+    {Cidade:'São Paulo',Estado:'SP',Regiao:'Metropolitana',Populacao:12396372,Pib:747582000,PibPc:60318,Distancia:395},
+    {Cidade:'Belo Horizonte',Estado:'MG',Regiao:'Metropolitana',Populacao:2521564,Pib:113950000,PibPc:45189,Distancia:195},
+    {Cidade:'Rio de Janeiro',Estado:'RJ',Regiao:'Metropolitana',Populacao:6775561,Pib:359578000,PibPc:53067,Distancia:550},
+    {Cidade:'Campinas',Estado:'SP',Regiao:'Campinas',Populacao:1223237,Pib:68000000,PibPc:55590,Distancia:440},
+    {Cidade:'Vitória',Estado:'ES',Regiao:'Metropolitana',Populacao:365855,Pib:31200000,PibPc:85280,Distancia:480},
+    {Cidade:'Goiânia',Estado:'GO',Regiao:'Metropolitana',Populacao:1536097,Pib:82000000,PibPc:53380,Distancia:590},
+    {Cidade:'Uberlândia',Estado:'MG',Regiao:'Triângulo Mineiro',Populacao:699097,Pib:42500000,PibPc:60797,Distancia:330},
+    {Cidade:'Contagem',Estado:'MG',Regiao:'Metropolitana',Populacao:663048,Pib:38700000,PibPc:58372,Distancia:200},
+    {Cidade:'Betim',Estado:'MG',Regiao:'Metropolitana',Populacao:436284,Pib:51000000,PibPc:116898,Distancia:195},
+    {Cidade:'Juiz de Fora',Estado:'MG',Regiao:'Zona da Mata',Populacao:573285,Pib:22000000,PibPc:38382,Distancia:340},
+    {Cidade:'Osasco',Estado:'SP',Regiao:'Metropolitana',Populacao:699944,Pib:76310000,PibPc:109025,Distancia:420},
+    {Cidade:'Niterói',Estado:'RJ',Regiao:'Metropolitana',Populacao:516981,Pib:40000000,PibPc:77379,Distancia:575},
+    {Cidade:'Guarulhos',Estado:'SP',Regiao:'Metropolitana',Populacao:1392121,Pib:65850000,PibPc:47301,Distancia:425},
+    {Cidade:'Divinópolis',Estado:'MG',Regiao:'Centro-Oeste',Populacao:237638,Pib:8200000,PibPc:34509,Distancia:70},
+    {Cidade:'Itaúna',Estado:'MG',Regiao:'Centro-Oeste',Populacao:101470,Pib:4800000,PibPc:47304,Distancia:65},
+    {Cidade:'Formiga',Estado:'MG',Regiao:'Centro-Oeste',Populacao:67036,Pib:2100000,PibPc:31328,Distancia:50},
+    {Cidade:'Varginha',Estado:'MG',Regiao:'Sul de Minas',Populacao:132485,Pib:5800000,PibPc:43780,Distancia:165},
+    {Cidade:'Lavras',Estado:'MG',Regiao:'Sul de Minas',Populacao:101948,Pib:4100000,PibPc:40219,Distancia:120},
+    {Cidade:'Passos',Estado:'MG',Regiao:'Sul de Minas',Populacao:112688,Pib:4200000,PibPc:37275,Distancia:120},
+    {Cidade:'Poços de Caldas',Estado:'MG',Regiao:'Sul de Minas',Populacao:168985,Pib:8100000,PibPc:47936,Distancia:215},
+    {Cidade:'Sete Lagoas',Estado:'MG',Regiao:'Central',Populacao:239812,Pib:11000000,PibPc:45869,Distancia:250},
+    {Cidade:'Ipatinga',Estado:'MG',Regiao:'Vale do Aço',Populacao:248498,Pib:12000000,PibPc:48290,Distancia:310},
+    {Cidade:'Uberaba',Estado:'MG',Regiao:'Triângulo Mineiro',Populacao:336886,Pib:20000000,PibPc:59369,Distancia:290},
+    {Cidade:'Pouso Alegre',Estado:'MG',Regiao:'Sul de Minas',Populacao:150942,Pib:8000000,PibPc:53002,Distancia:205},
+    {Cidade:'Anápolis',Estado:'GO',Regiao:'Centro',Populacao:391772,Pib:22500000,PibPc:57431,Distancia:640},
+    {Cidade:'Ribeirão Preto',Estado:'SP',Regiao:'Ribeirão Preto',Populacao:718306,Pib:36000000,PibPc:50120,Distancia:505},
+    {Cidade:'Sorocaba',Estado:'SP',Regiao:'Sorocaba',Populacao:706322,Pib:31000000,PibPc:43892,Distancia:450},
+    {Cidade:'Serra',Estado:'ES',Regiao:'Metropolitana',Populacao:525002,Pib:30000000,PibPc:57143,Distancia:480},
+    {Cidade:'Vila Velha',Estado:'ES',Regiao:'Metropolitana',Populacao:493376,Pib:18700000,PibPc:37900,Distancia:485},
+    {Cidade:'Pará de Minas',Estado:'MG',Regiao:'Central',Populacao:99028,Pib:3900000,PibPc:39383,Distancia:95},
+    {Cidade:'São João del Rei',Estado:'MG',Regiao:'Campo das Vertentes',Populacao:90848,Pib:3700000,PibPc:40726,Distancia:175},
+    {Cidade:'Conselheiro Lafaiete',Estado:'MG',Regiao:'Central',Populacao:126820,Pib:5500000,PibPc:43369,Distancia:225},
+    {Cidade:'Governador Valadares',Estado:'MG',Regiao:'Vale do Rio Doce',Populacao:279498,Pib:9000000,PibPc:32203,Distancia:380},
+    {Cidade:'Montes Claros',Estado:'MG',Regiao:'Norte de Minas',Populacao:414238,Pib:11800000,PibPc:28484,Distancia:380},
+    {Cidade:'Santos',Estado:'SP',Regiao:'Baixada Santista',Populacao:433153,Pib:22070000,PibPc:50965,Distancia:490},
+    {Cidade:'Aparecida de Goiânia',Estado:'GO',Regiao:'Metropolitana',Populacao:590969,Pib:18000000,PibPc:30457,Distancia:600},
+    {Cidade:'Cariacica',Estado:'ES',Regiao:'Metropolitana',Populacao:390544,Pib:12500000,PibPc:32008,Distancia:490},
+    {Cidade:'São Gonçalo',Estado:'RJ',Regiao:'Metropolitana',Populacao:1091737,Pib:20000000,PibPc:18318,Distancia:570},
+    {Cidade:'Mauá',Estado:'SP',Regiao:'Metropolitana',Populacao:462963,Pib:21000000,PibPc:45357,Distancia:410},
+    {Cidade:'Barbacena',Estado:'MG',Regiao:'Campo das Vertentes',Populacao:137888,Pib:4900000,PibPc:35538,Distancia:250},
+  ];
+  populateSelectsFromData();
+  render();
+}
+</script>
