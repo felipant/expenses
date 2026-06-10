@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo de Produtos - Minas Gerais</title>
+    
+    <!-- Adicionando a biblioteca html2pdf.js para exportação perfeita -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    
+    <!-- Adicionando a biblioteca Cropper.js para recorte de imagens -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
+
+    <style>
+        /* Reset e Tipografia */
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            /* Fundo com tema de roça, queijo e café */
+            background-image: url('https://images.unsplash.com/photo-1495908333438-5f36a107380c?q=80&w=1920&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* Classe para o efeito fosco (Glassmorphism) */
+        .efeito-fosco {
+            background-color: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Controlos (Botões) */
+        .controls {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            z-index: 100;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: rgba(0, 123, 255, 0.9);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: 0.2s;
+            backdrop-filter: blur(5px);
+        }
+
+        button:hover {
+            background-color: rgba(0, 86, 179, 1);
+        }
+
+        #btn-export { background-color: rgba(40, 167, 69, 0.9); }
+        #btn-export:hover { background-color: rgba(33, 136, 56, 1); }
+        #btn-change-bg { background-color: rgba(253, 126, 20, 0.9); }
+        #btn-change-bg:hover { background-color: rgba(220, 100, 0, 1); }
+        #btn-bulk-price { background-color: rgba(23, 162, 184, 0.9); }
+        #btn-bulk-price:hover { background-color: rgba(19, 132, 150, 1); }
+        #btn-clear { background-color: rgba(108, 117, 125, 0.9); }
+        #btn-clear:hover { background-color: rgba(90, 98, 104, 1); }
+
+        /* Página A4 (Container para visualização no ecrã) */
+        .a4-page {
+            width: 210mm;
+            min-height: 297mm;
+            display: flex;
+            flex-direction: column;
+            padding: 5mm 15mm 15mm 15mm;
+            position: relative;
+        }
+
+        /* Cabeçalho */
+        header {
+            width: 30%;
+            aspect-ratio: 4 / 3;
+            height: auto;
+            margin: 0 auto 5mm auto;
+            border-radius: 12px;
+            cursor: pointer;
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        /* Lista de Produtos */
+        #product-list {
+            display: flex;
+            flex-wrap: wrap;
+            flex-grow: 1;
+            align-content: flex-start;
+            gap: 15px;
+        }
+
+        /* Box do Produto */
+        .product-wrapper {
+            width: calc(33.333% - 10px);
+            height: 60mm;
+            page-break-inside: avoid;
+        }
+
+        .product-box {
+            width: 100%;
+            height: 100%;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .product-box:hover {
+            background: rgba(255, 255, 255, 0.85);
+            border-color: rgba(255, 255, 255, 0.8);
+        }
+
+        .btn-delete {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            font-size: 12px;
+            cursor: pointer;
+            display: none;
+            z-index: 10;
+            padding: 0;
+            line-height: 24px;
+            text-align: center;
+        }
+
+        .product-box:hover .btn-delete {
+            display: block;
+        }
+
+        /* Imagem do Produto */
+        .product-img-container {
+            width: 100%;
+            height: 60%;
+            margin-right: 0;
+            margin-bottom: 6px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .product-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            border-radius: 6px;
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+
+        /* Detalhes do Produto */
+        .product-details {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            font-size: 12px;
+            color: #222;
+        }
+
+        .product-name {
+            font-weight: bold;
+            text-decoration: underline;
+            font-size: 1em; 
+            outline: none;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            line-height: 1.2;
+            margin-bottom: 2px;
+        }
+
+        .product-desc {
+            font-size: 0.9em;
+            color: #444;
+            margin-top: 0;
+            outline: none;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+
+        .product-weight {
+            font-size: 0.75em;
+            color: #666;
+            margin-top: 2px;
+            outline: none;
+            font-style: italic;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .product-price {
+            font-weight: bold;
+            font-size: 1.2em;
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            outline: none;
+            color: #111;
+        }
+
+        /* Rodapé */
+        footer {
+            margin-top: auto;
+            padding: 15px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border-radius: 12px;
+        }
+
+        .footer-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #222;
+        }
+
+        .footer-item img {
+            width: 24px;
+            cursor: pointer;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        /* Otimização para Impressão / Exportação PDF */
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+        }
+
+        /* Aumentar opacidade na hora de exportar para PDF */
+        body.export-mode .efeito-fosco {
+            background-color: rgba(255, 255, 255, 0.80) !important;
+        }
+
+        /* Aumentar verticalmente as caixas na exportação para preencher o espaço da folha A4 */
+        body.export-mode .product-wrapper {
+            height: 66mm !important;
+        }
+
+        /* Ajustes específicos para a exportação compacta (12 produtos) */
+        body.export-mode-12 .product-wrapper {
+            height: 62mm !important;
+        }
+
+        /* Dar um pouco mais de destaque à foto na nova caixa mais alta */
+        body.export-mode .product-img-container {
+            height: 60% !important;
+        }
+
+        /* Estilos do Modo de Seleção */
+        body.selection-mode .product-box {
+            cursor: pointer;
+            border: 2px dashed #17a2b8;
+            transition: all 0.2s;
+        }
+        body.selection-mode .product-box:hover {
+            background-color: rgba(23, 162, 184, 0.1);
+        }
+        body.selection-mode .product-box.selected {
+            border: 3px solid #28a745 !important;
+            background-color: rgba(40, 167, 69, 0.2) !important;
+            transform: scale(0.98);
+        }
+        body.selection-mode .product-name,
+        body.selection-mode .product-desc,
+        body.selection-mode .product-weight,
+        body.selection-mode .product-price,
+        body.selection-mode .product-img-container,
+        body.selection-mode .btn-delete {
+            pointer-events: none;
+        }
+        
+        /* Modal de Recorte (Cropper) */
+        #crop-modal {
+            display: none; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100vw; 
+            height: 100vh; 
+            background: rgba(0,0,0,0.85); 
+            z-index: 9999; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            padding: 20px;
+        }
+        .crop-container {
+            background: white; 
+            padding: 20px; 
+            border-radius: 12px; 
+            width: 90%; 
+            max-width: 600px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .img-preview-box {
+            width: 100%; 
+            max-height: 60vh; 
+            margin-bottom: 20px;
+        }
+        .img-preview-box img {
+            max-width: 100%;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="controls no-print">
+        <!-- Controlos Padrão -->
+        <div id="default-controls" style="display: flex; gap: 15px; flex-wrap: wrap; justify-content: center;">
+            <button id="btn-add">+ Adicionar Produto</button>
+            <button id="btn-change-bg">Mudar Fundo</button>
+            <input type="file" id="bg-upload" accept="image/*">
+            <button id="btn-bulk-price">Alterar Preços em Lote</button>
+            <button id="btn-export">Exportar Catálogo em PDF</button>
+            <button id="btn-export-compact" style="background-color: #6f42c1; color: white; border: none;">Exportar (12/pág)</button>
+            <button id="btn-clear">Limpar Memória</button>
+        </div>
+        
+        <!-- Painel de Seleção (Inicialmente Escondido) -->
+        <div id="selection-controls" style="display: none; gap: 15px; align-items: center; background: rgba(255,255,255,0.95); padding: 10px 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+            <span style="font-weight: bold; color: #333;">Selecione os produtos e digite o novo preço:</span>
+            <input type="text" id="bulk-price-input" placeholder="Ex: 50,00" style="padding: 8px; border: 1px solid #ccc; border-radius: 5px; font-size: 16px; width: 120px; outline: none;">
+            <button id="btn-apply-bulk" style="background-color: #28a745;">Aplicar Preço</button>
+            <button id="btn-cancel-bulk" style="background-color: #dc3545;">Cancelar</button>
+        </div>
+    </div>
+
+    <div class="a4-page" id="main-page">
+        <header id="header-box" onclick="document.getElementById('logo-upload').click()" title="Clique para alterar a imagem do cabeçalho" style="background-image: url('https://cdn-icons-png.flaticon.com/512/3082/3082008.png'); background-color: transparent; border: none; box-shadow: none;">
+            <input type="file" id="logo-upload" accept="image/*">
+        </header>
+
+        <main id="product-list">
+            <!-- Os produtos serão injetados aqui -->
+        </main>
+
+        <footer class="efeito-fosco">
+            <div class="footer-item">
+                <a id="insta-link" href="https://instagram.com" target="_blank" title="Clique no ícone para alterar a hiperligação">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Instagram_icon.png/600px-Instagram_icon.png" alt="Instagram">
+                </a>
+                <span id="insta-user" contenteditable="true">@artesanatomineiro</span>
+            </div>
+            <div class="footer-item">
+                <a id="wa-link" href="#" title="Clique para abrir conversa no WhatsApp">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/WhatsApp.svg/512px-WhatsApp.svg.png" alt="WhatsApp">
+                </a>
+                <span id="phone" contenteditable="true">(XX) XXXXX-XXXX</span>
+            </div>
+        </footer>
+    </div>
+    
+    <!-- Modal do Cropper -->
+    <div id="crop-modal" class="no-print">
+        <div class="crop-container">
+            <h3 style="margin-top: 0; color: #333;">Ajustar Imagem do Produto</h3>
+            <p style="font-size: 12px; color: #666; margin-top: -10px;">Arraste a imagem ou use a roda do rato para aproximar.</p>
+            <div class="img-preview-box">
+                <img id="image-to-crop" src="">
+            </div>
+            <div style="display: flex; gap: 15px; width: 100%; justify-content: center;">
+                <button id="btn-crop-cancel" style="background-color: #dc3545; width: 150px;">Cancelar</button>
+                <button id="btn-crop-save" style="background-color: #28a745; width: 150px;">Cortar e Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const productList = document.getElementById('product-list');
+        const headerBox = document.getElementById('header-box');
+        const logoUpload = document.getElementById('logo-upload');
+        const instaUser = document.getElementById('insta-user');
+        const instaLink = document.getElementById('insta-link');
+        const phoneText = document.getElementById('phone');
+        const waLink = document.getElementById('wa-link');
+        const bgUpload = document.getElementById('bg-upload');
+        const btnChangeBg = document.getElementById('btn-change-bg');
+        
+        // Elementos do Modo de Seleção
+        const defaultControls = document.getElementById('default-controls');
+        const selectionControls = document.getElementById('selection-controls');
+        const btnBulkPrice = document.getElementById('btn-bulk-price');
+        const btnApplyBulk = document.getElementById('btn-apply-bulk');
+        const btnCancelBulk = document.getElementById('btn-cancel-bulk');
+        const bulkPriceInput = document.getElementById('bulk-price-input');
+        let isSelectionMode = false;
+        
+        // Variáveis do Cropper
+        let cropper = null;
+        let targetProductImgDiv = null;
+
+        // Função de compressão de imagens (Agora suporta transparência em PNG)
+        function compressImage(base64Str, maxWidth, maxHeight, callback) {
+            const img = new Image();
+            img.src = base64Str;
+            img.onload = () => {
+                let width = img.width;
+                let height = img.height;
+                if (width > height) {
+                    if (width > maxWidth) {
+                        height *= maxWidth / width;
+                        width = maxWidth;
+                    }
+                } else {
+                    if (height > maxHeight) {
+                        width *= maxHeight / height;
+                        height = maxHeight;
+                    }
+                }
+                const canvas = document.createElement('canvas');
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+                
+                // Deteta se a imagem original é PNG para não a converter em JPEG (o que causava o fundo preto)
+                let outputMimeType = 'image/jpeg';
+                let quality = 0.75;
+                
+                if (base64Str.startsWith('data:image/png')) {
+                    outputMimeType = 'image/png';
+                    quality = undefined; // PNG não utiliza compressão com perda (mantém transparência)
+                }
+                
+                callback(canvas.toDataURL(outputMimeType, quality));
+            };
+        }
+
+        // Template de um novo produto (Com a classe efeito-fosco)
+        const productTemplate = `
+            <div class="product-box efeito-fosco">
+                <button class="btn-delete no-print">X</button>
+                <div class="product-img-container" title="Clique para alterar a imagem">
+                    <div class="product-img" style="background-image: url('https://cdn-icons-png.flaticon.com/512/1237/1237185.png');"></div>
+                    <input type="file" class="img-upload" accept="image/*">
+                </div>
+                <div class="product-details">
+                    <div class="product-name" contenteditable="true">Queijo Minas Artesanal</div>
+                    <div class="product-desc" contenteditable="true">Queijo tradicional da Serra da Canastra, curado e delicioso.</div>
+                    <div class="product-weight" contenteditable="true">Peso aprox: 500g</div>
+                    <div class="product-price" contenteditable="true">R$ 85,90</div>
+                </div>
+            </div>
+        `;
+
+        // 1. Carregar Dados da Memória (LocalStorage)
+        function loadData() {
+            if (localStorage.getItem('catalog_bg_v2')) document.body.style.backgroundImage = `url('${localStorage.getItem('catalog_bg_v2')}')`;
+            
+            let savedLogo = localStorage.getItem('catalog_logo_v2');
+            if (savedLogo) {
+                if (savedLogo.startsWith('data:')) {
+                    headerBox.style.backgroundImage = `url('${savedLogo}')`;
+                } else {
+                    headerBox.style.backgroundImage = savedLogo;
+                }
+            }
+
+            if (localStorage.getItem('catalog_insta_user_v2')) instaUser.innerText = localStorage.getItem('catalog_insta_user_v2');
+            if (localStorage.getItem('catalog_insta_link_v2')) instaLink.href = localStorage.getItem('catalog_insta_link_v2');
+            if (localStorage.getItem('catalog_phone_v2')) phoneText.innerText = localStorage.getItem('catalog_phone_v2');
+            if (localStorage.getItem('catalog_products_v2')) {
+                productList.innerHTML = localStorage.getItem('catalog_products_v2');
+                
+                let migrationNeeded = false;
+                document.querySelectorAll('#product-list img.product-img').forEach(img => {
+                    const div = document.createElement('div');
+                    div.className = 'product-img';
+                    div.style.backgroundImage = `url('${img.src}')`;
+                    img.parentNode.replaceChild(div, img);
+                    migrationNeeded = true;
+                });
+
+                document.querySelectorAll('#product-list .product-details').forEach(details => {
+                    if (!details.querySelector('.product-weight')) {
+                        const weightDiv = document.createElement('div');
+                        weightDiv.className = 'product-weight';
+                        weightDiv.contentEditable = 'true';
+                        weightDiv.innerText = 'Peso aprox: 500g';
+                        const priceEl = details.querySelector('.product-price');
+                        if (priceEl) {
+                            details.insertBefore(weightDiv, priceEl);
+                        } else {
+                            details.appendChild(weightDiv);
+                        }
+                        migrationNeeded = true;
+                    }
+                });
+
+                if (migrationNeeded) saveData();
+            }
+        }
+
+        // 2. Guardar Dados na Memória COM proteção anti-erro
+        function saveData() {
+            try {
+                localStorage.setItem('catalog_logo_v2', headerBox.style.backgroundImage);
+                localStorage.setItem('catalog_insta_user_v2', instaUser.innerText);
+                localStorage.setItem('catalog_insta_link_v2', instaLink.href);
+                localStorage.setItem('catalog_phone_v2', phoneText.innerText);
+                localStorage.setItem('catalog_products_v2', productList.innerHTML);
+            } catch (error) {
+                console.error("Erro ao guardar na memória:", error);
+                if (error.name === 'QuotaExceededError' || error.name === 'NS_ERROR_DOM_QUOTA_REACHED') {
+                    alert("Atenção: A memória do navegador está cheia! Remova produtos antigos ou certifique-se de usar ficheiros de imagem mais pequenos.");
+                }
+            }
+        }
+
+        document.addEventListener('input', saveData);
+
+        // 3. Adicionar Produto
+        document.getElementById('btn-add').addEventListener('click', () => {
+            const newDiv = document.createElement('div');
+            newDiv.className = 'product-wrapper';
+            newDiv.innerHTML = productTemplate;
+            productList.appendChild(newDiv);
+            saveData();
+        });
+
+        // 4. Delegação de Eventos para produtos dinâmicos
+        productList.addEventListener('click', (e) => {
+            if (isSelectionMode) {
+                const productBox = e.target.closest('.product-box');
+                if (productBox) {
+                    productBox.classList.toggle('selected');
+                }
+                return;
+            }
+
+            if (e.target.classList.contains('btn-delete')) {
+                if(confirm("Tem a certeza que deseja remover este produto?")) {
+                    e.target.closest('.product-wrapper').remove();
+                    saveData();
+                }
+            }
+            if (e.target.classList.contains('product-img')) {
+                const fileInput = e.target.nextElementSibling;
+                fileInput.click();
+            }
+        });
+
+        // 5. Novo Sistema de Upload de Imagens com Cropper.js (Pop-up de Recorte)
+        productList.addEventListener('change', (e) => {
+            if (e.target.classList.contains('img-upload')) {
+                const file = e.target.files[0];
+                targetProductImgDiv = e.target.previousElementSibling;
+                
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        // Mostra o Modal
+                        document.getElementById('crop-modal').style.display = 'flex';
+                        const imageElement = document.getElementById('image-to-crop');
+                        imageElement.src = event.target.result;
+                        
+                        // Inicializa o Cropper (Trava na proporção 5:3, ideal para o espaço do seu catálogo)
+                        if (cropper) cropper.destroy();
+                        cropper = new Cropper(imageElement, {
+                            aspectRatio: 5 / 3, // Proporção horizontal ideal para a sua nova caixa de produto
+                            viewMode: 1, // Restringe a caixa de corte dentro dos limites da imagem
+                            dragMode: 'move', // Permite arrastar a imagem
+                            autoCropArea: 0.9,
+                            background: false,
+                        });
+                    }
+                    reader.readAsDataURL(file);
+                }
+                e.target.value = ''; // Reseta o input para permitir selecionar a mesma foto caso feche
+            }
+        });
+
+        // Lógica do Modal de Recorte (Cancelar)
+        document.getElementById('btn-crop-cancel').addEventListener('click', () => {
+            document.getElementById('crop-modal').style.display = 'none';
+            if (cropper) { cropper.destroy(); cropper = null; }
+            targetProductImgDiv = null;
+        });
+
+        // Lógica do Modal de Recorte (Salvar)
+        document.getElementById('btn-crop-save').addEventListener('click', () => {
+            if (!cropper || !targetProductImgDiv) return;
+            
+            // O Cropper extrai a imagem já cortada e comprime automaticamente para o peso ideal
+            const canvas = cropper.getCroppedCanvas({
+                maxWidth: 600,
+                maxHeight: 600,
+                imageSmoothingEnabled: true,
+                imageSmoothingQuality: 'high',
+            });
+            
+            const finalImage = canvas.toDataURL('image/jpeg', 0.85); // JPEG de alta qualidade e leve
+            
+            // Atualiza a foto no catálogo
+            if (targetProductImgDiv.tagName.toLowerCase() === 'img') {
+                targetProductImgDiv.src = finalImage;
+            } else {
+                targetProductImgDiv.style.backgroundImage = `url('${finalImage}')`;
+            }
+            
+            saveData();
+            
+            // Fecha o modal e limpa a memória
+            document.getElementById('crop-modal').style.display = 'none';
+            cropper.destroy();
+            cropper = null;
+            targetProductImgDiv = null;
+        });
+
+        // Funções Originais de Upload (Logo e Fundo)
+        function handleImageUpload(inputElement, element) {
+            inputElement.addEventListener('change', function() {
+                const file = this.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        compressImage(e.target.result, 800, 600, (compressedImg) => {
+                            if (element.tagName.toLowerCase() === 'img') {
+                                element.src = compressedImg;
+                            } else {
+                                element.style.backgroundImage = `url('${compressedImg}')`;
+                            }
+                            saveData();
+                        });
+                    }
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+
+        handleImageUpload(logoUpload, headerBox);
+
+        btnChangeBg.addEventListener('click', () => { bgUpload.click(); });
+
+        bgUpload.addEventListener('change', function() {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    compressImage(e.target.result, 1600, 1200, (compressedImg) => {
+                        document.body.style.backgroundImage = `url('${compressedImg}')`;
+                        try {
+                            localStorage.setItem('catalog_bg_v2', compressedImg);
+                        } catch(err) {
+                            alert("O fundo é muito pesado para salvar na memória, mas será visível nesta sessão!");
+                        }
+                    });
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // 6. Alterar hiperligação do Instagram
+        instaLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            const currentUrl = instaLink.href;
+            const newUrl = prompt("Insira a hiperligação completa do seu perfil do Instagram:", currentUrl);
+            if (newUrl) {
+                instaLink.href = newUrl;
+                saveData();
+            } else if (newUrl === "") {
+                window.open(currentUrl, '_blank');
+            }
+        });
+
+        // 6.5. Abrir WhatsApp com o número inserido
+        waLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            let cleanNumber = phoneText.innerText.replace(/\D/g, ''); 
+            if (cleanNumber.length > 0) {
+                if ((cleanNumber.length === 10 || cleanNumber.length === 11) && !cleanNumber.startsWith('55')) {
+                    cleanNumber = '55' + cleanNumber;
+                }
+                window.open(`https://wa.me/${cleanNumber}?text=Olá!%20Gostaria%20de%20saber%20mais%20sobre%20os%20produtos.`, '_blank');
+            } else {
+                alert("Por favor, digite um número de telefone válido primeiro.");
+            }
+        });
+
+        // Função de Exportação Unificada
+        function exportCatalog(isCompact) {
+            const originalPage = document.getElementById('main-page');
+            const controls = document.querySelector('.controls');
+            
+            document.body.classList.add('export-mode');
+            if (isCompact) document.body.classList.add('export-mode-12');
+
+            const originalBodyPadding = document.body.style.padding;
+            document.body.style.padding = '0';
+
+            const allProducts = Array.from(document.querySelectorAll('.product-wrapper'));
+            const currentBg = document.body.style.backgroundImage || getComputedStyle(document.body).backgroundImage;
+
+            const exportContainer = document.createElement('div');
+            exportContainer.id = 'export-container';
+            exportContainer.style.display = 'flex';
+            exportContainer.style.flexDirection = 'column';
+            exportContainer.style.gap = '0';
+            
+            const chunkSize = isCompact ? 12 : 9;
+            const numPages = Math.max(1, Math.ceil(allProducts.length / chunkSize));
+
+            for (let i = 0; i < numPages; i++) {
+                const pageClone = originalPage.cloneNode(true);
+                pageClone.id = '';
+                
+                pageClone.style.height = '296.5mm';
+                pageClone.style.minHeight = '296.5mm';
+                pageClone.style.maxHeight = '296.5mm';
+                pageClone.style.overflow = 'hidden';
+                pageClone.style.backgroundImage = currentBg;
+                pageClone.style.backgroundSize = 'cover';
+                pageClone.style.backgroundPosition = 'center';
+                pageClone.style.backgroundAttachment = 'scroll';
+                pageClone.style.margin = '0';
+                pageClone.style.boxShadow = 'none';
+
+                if (isCompact) {
+                    const headerClone = pageClone.querySelector('header');
+                    const footerClone = pageClone.querySelector('footer');
+                    if (headerClone) headerClone.remove();
+                    if (footerClone) footerClone.remove();
+                    pageClone.style.padding = '15mm'; 
+                }
+                
+                pageClone.querySelectorAll('.btn-delete').forEach(btn => btn.remove());
+
+                const listClone = pageClone.querySelector('#product-list');
+                listClone.innerHTML = '';
+                
+                const chunk = allProducts.slice(i * chunkSize, (i + 1) * chunkSize);
+                chunk.forEach(prod => {
+                    const prodClone = prod.cloneNode(true);
+                    const delBtn = prodClone.querySelector('.btn-delete');
+                    if (delBtn) delBtn.remove();
+                    listClone.appendChild(prodClone);
+                });
+
+                exportContainer.appendChild(pageClone);
+            }
+
+            originalPage.style.display = 'none';
+            controls.style.display = 'none';
+            document.body.appendChild(exportContainer);
+
+            const opt = {
+                margin:       0,
+                filename:     isCompact ? 'catalogo-produtos-12.pdf' : 'catalogo-produtos-9.pdf',
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            const btnExport = document.getElementById(isCompact ? 'btn-export-compact' : 'btn-export');
+            const originalText = btnExport.innerText;
+            btnExport.innerText = "A Gerar PDF... Aguarde";
+            controls.style.display = 'flex';
+            
+            html2pdf().set(opt).from(exportContainer).save().then(() => {
+                document.body.removeChild(exportContainer);
+                originalPage.style.display = 'flex';
+                document.body.classList.remove('export-mode', 'export-mode-12');
+                document.body.style.padding = originalBodyPadding;
+                btnExport.innerText = originalText;
+            });
+        }
+
+        document.getElementById('btn-export').addEventListener('click', () => exportCatalog(false));
+        document.getElementById('btn-export-compact').addEventListener('click', () => exportCatalog(true));
+
+        document.getElementById('btn-clear').addEventListener('click', () => {
+            if(confirm("Tem a certeza? Isto irá apagar todo o catálogo guardado neste navegador.")) {
+                localStorage.clear();
+                location.reload();
+            }
+        });
+
+        // 9. Alteração de Preços por Seleção
+        function exitSelectionMode() {
+            isSelectionMode = false;
+            document.body.classList.remove('selection-mode');
+            document.querySelectorAll('.product-box.selected').forEach(el => el.classList.remove('selected'));
+            
+            selectionControls.style.display = 'none';
+            defaultControls.style.display = 'flex';
+            bulkPriceInput.value = '';
+        }
+
+        btnCancelBulk.addEventListener('click', exitSelectionMode);
+
+        btnBulkPrice.addEventListener('click', () => {
+            isSelectionMode = true;
+            document.body.classList.add('selection-mode');
+            
+            defaultControls.style.display = 'none';
+            selectionControls.style.display = 'flex';
+        });
+
+        btnApplyBulk.addEventListener('click', () => {
+            const selectedBoxes = document.querySelectorAll('.product-box.selected');
+            
+            if (selectedBoxes.length === 0) {
+                alert("Nenhum produto foi selecionado! Selecione os produtos primeiro.");
+                return;
+            }
+
+            const newValueStr = bulkPriceInput.value;
+            if (!newValueStr || newValueStr.trim() === '') {
+                alert("Por favor, digite o novo preço no espaço em branco.");
+                bulkPriceInput.focus();
+                return;
+            }
+            
+            let numStr = newValueStr.replace(/R\$\s?/g, '').trim();
+            numStr = numStr.replace(/\./g, '').replace(',', '.');
+            let price = parseFloat(numStr);
+
+            if (isNaN(price)) {
+                alert("Valor inválido. Por favor, introduza um número válido (ex: 50,00).");
+                return;
+            }
+
+            const formattedPrice = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(price);
+
+            selectedBoxes.forEach(box => {
+                const priceEl = box.querySelector('.product-price');
+                if (priceEl) priceEl.innerText = formattedPrice;
+            });
+
+            saveData();
+            alert(`${selectedBoxes.length} preços atualizados com sucesso!`);
+            exitSelectionMode();
+        });
+
+        // Iniciar
+        loadData();
+    </script>
+</body>
+</html>

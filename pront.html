@@ -1,0 +1,3677 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ficha Pediátrica — Anamnese & Exame Físico</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+        :root {
+            --bg: #f5f5f5;
+            --surface: #ffffff;
+            --border: #cccccc;
+            --border-light: #e0e0e0;
+            --text: #111111;
+            --text-secondary: #555555;
+            --accent: #222222;
+            --accent-light: #f0f0f0;
+            --accent-mid: #444444;
+            --red: #333333;
+            --red-light: #f5f5f5;
+            --green: #333333;
+            --green-light: #f5f5f5;
+            --yellow-light: #fafafa;
+            --yellow-border: #cccccc;
+            --section-1: #222222;
+            --section-2: #333333;
+            --section-3: #444444;
+            --section-4: #555555;
+            --radius: 6px;
+            --shadow: 0 1px 4px rgba(0, 0, 0, .08);
+            --font: 'IBM Plex Sans', system-ui, sans-serif;
+            --mono: 'IBM Plex Mono', monospace;
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            font-size: 13.5px;
+            line-height: 1.6;
+        }
+
+        /* ── TOP BAR ── */
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: #111;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 0 24px;
+            height: 52px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .18);
+        }
+
+        .topbar-brand {
+            font-weight: 600;
+            font-size: 14px;
+            letter-spacing: .02em;
+            margin-right: 16px;
+            white-space: nowrap;
+        }
+
+        .topbar-brand span {
+            font-weight: 300;
+            opacity: .75;
+        }
+
+        .topbar-nav {
+            display: flex;
+            gap: 2px;
+            flex: 1;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+
+        .topbar-nav::-webkit-scrollbar {
+            display: none;
+        }
+
+        .nav-pill {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 12px;
+            border-radius: 20px;
+            color: rgba(255, 255, 255, .8);
+            text-decoration: none;
+            font-size: 12.5px;
+            font-weight: 500;
+            white-space: nowrap;
+            transition: background .15s, color .15s;
+        }
+
+        .nav-pill:hover,
+        .nav-pill.active {
+            background: rgba(255, 255, 255, .18);
+            color: #fff;
+        }
+
+        .nav-pill .dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: currentColor;
+            opacity: .7;
+        }
+
+        .btn-pdf {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 16px;
+            border-radius: 4px;
+            background: #fff;
+            color: var(--accent);
+            font-family: var(--font);
+            font-size: 12.5px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: background .15s;
+            white-space: nowrap;
+            margin-left: 8px;
+        }
+
+        .btn-pdf:hover {
+            background: #e8f0fb;
+        }
+
+        .btn-pdf svg {
+            flex-shrink: 0;
+        }
+
+        .btn-reset {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 16px;
+            border-radius: 4px;
+            background: transparent;
+            color: #fff;
+            font-family: var(--font);
+            font-size: 12.5px;
+            font-weight: 600;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            cursor: pointer;
+            transition: background .15s, border-color .15s;
+            white-space: nowrap;
+            margin-left: 8px;
+        }
+
+        .btn-reset:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: #fff;
+        }
+
+        .btn-reset svg {
+            flex-shrink: 0;
+        }
+
+        /* ── LAYOUT ── */
+        .page-layout {
+            display: grid;
+            grid-template-columns: 220px 1fr 220px;
+            gap: 0;
+            min-height: calc(100vh - 52px);
+        }
+
+        .wrapper {
+            max-width: 860px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 28px 20px 60px;
+            min-width: 0;
+        }
+
+        /* ── LEFT SIDEBAR ── */
+        .sidebar-left {
+            position: sticky;
+            top: 52px;
+            height: calc(100vh - 52px);
+            overflow-y: auto;
+            padding: 16px 0 24px 16px;
+            border-right: 1px solid var(--border-light);
+            background: #fff;
+            scrollbar-width: thin;
+            scrollbar-color: #ddd transparent;
+        }
+
+        .sidebar-left::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .sidebar-left::-webkit-scrollbar-thumb {
+            background: #ddd;
+            border-radius: 2px;
+        }
+
+        .sidebar-left .side-nav-title {
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            color: #999;
+            padding: 0 12px;
+            margin-bottom: 8px;
+        }
+
+        .side-nav-group {
+            margin-bottom: 14px;
+        }
+
+        .side-nav-group-label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #222;
+            text-decoration: none;
+            border-radius: 4px 0 0 4px;
+            transition: background .12s;
+        }
+
+        .side-nav-group-label:hover {
+            background: #f0f0f0;
+        }
+
+        .side-nav-group-label .side-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #bbb;
+            flex-shrink: 0;
+        }
+
+        .side-nav-group-label.active {
+            background: #f0f0f0;
+        }
+
+        .side-nav-group-label.active .side-dot {
+            background: #222;
+        }
+
+        .side-nav-items {
+            list-style: none;
+            padding: 2px 0 0 24px;
+        }
+
+        .side-nav-items li a {
+            display: block;
+            padding: 3px 10px;
+            font-size: 11.5px;
+            color: #777;
+            text-decoration: none;
+            border-radius: 3px;
+            transition: color .12s, background .12s;
+            line-height: 1.4;
+        }
+
+        .side-nav-items li a:hover {
+            color: #222;
+            background: #f5f5f5;
+        }
+
+        /* ── RIGHT SIDEBAR ── */
+        .sidebar-right {
+            position: sticky;
+            top: 52px;
+            height: calc(100vh - 52px);
+            overflow-y: auto;
+            padding: 16px 16px 24px 0;
+            border-left: 1px solid var(--border-light);
+            background: #fff;
+            scrollbar-width: thin;
+            scrollbar-color: #ddd transparent;
+        }
+
+        .sidebar-right::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .sidebar-right::-webkit-scrollbar-thumb {
+            background: #ddd;
+            border-radius: 2px;
+        }
+
+        .sidebar-right .side-panel-title {
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            color: #999;
+            padding: 0 12px;
+            margin-bottom: 10px;
+        }
+
+        .ref-group {
+            margin-bottom: 14px;
+            padding: 0 12px;
+        }
+
+        .ref-group-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: #333;
+            text-transform: uppercase;
+            letter-spacing: .04em;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .ref-group-label svg {
+            flex-shrink: 0;
+            color: #888;
+        }
+
+        .ref-link {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 8px;
+            font-size: 11.5px;
+            color: #555;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background .12s, color .12s;
+            line-height: 1.35;
+        }
+
+        .ref-link:hover {
+            background: #f0f0f0;
+            color: #111;
+        }
+
+        .ref-link svg {
+            flex-shrink: 0;
+            color: #aaa;
+        }
+
+        .ref-divider {
+            border: none;
+            border-top: 1px solid #eee;
+            margin: 10px 12px;
+        }
+
+        /* ── PAGE HEADER ── */
+        .page-header {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px 24px;
+            margin-bottom: 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+            box-shadow: var(--shadow);
+        }
+
+        .page-header .hfield {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .page-header label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+        }
+
+        .page-header input[type=text],
+        .page-header input[type=date] {
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 5px 8px;
+            font-family: var(--font);
+            font-size: 13px;
+            color: var(--text);
+            background: var(--bg);
+        }
+
+        .page-header input:focus {
+            outline: 2px solid var(--accent-mid);
+            outline-offset: 1px;
+        }
+
+        .hfield-wide {
+            grid-column: 1 / -1;
+        }
+
+        /* ── SECTION ── */
+        .section {
+            margin-bottom: 20px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            background: var(--surface);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .section-head {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 13px 18px;
+            cursor: pointer;
+            user-select: none;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .section-head:hover {
+            background: var(--bg);
+        }
+
+        .section-num {
+            font-family: var(--mono);
+            font-size: 10px;
+            font-weight: 500;
+            color: #fff;
+            background: var(--accent);
+            padding: 2px 6px;
+            border-radius: 3px;
+            letter-spacing: .04em;
+        }
+
+        .section-title {
+            font-weight: 600;
+            font-size: 14px;
+            flex: 1;
+        }
+
+        .chevron {
+            width: 18px;
+            height: 18px;
+            color: var(--text-secondary);
+            transition: transform .2s;
+        }
+
+        .section.collapsed .chevron {
+            transform: rotate(-90deg);
+        }
+
+        .section-body {
+            padding: 16px 18px 20px;
+        }
+
+        .section.collapsed .section-body {
+            display: none;
+        }
+
+        /* ── SUBSECTION ── */
+        .sub {
+            margin-bottom: 18px;
+            padding-bottom: 18px;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .sub:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .sub-title {
+            font-size: 11.5px;
+            font-weight: 600;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: .07em;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .sub-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border-light);
+        }
+
+        /* ── FIELDS ── */
+        .fields {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px 16px;
+        }
+
+        .fields.cols-3 {
+            grid-template-columns: 1fr 1fr 1fr;
+        }
+
+        .fields.cols-1 {
+            grid-template-columns: 1fr;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .field.span-2 {
+            grid-column: span 2;
+        }
+
+        .field.span-3 {
+            grid-column: 1 / -1;
+        }
+
+        .field label {
+            font-size: 11.5px;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .field input[type=text],
+        .field input[type=number],
+        .field input[type=date],
+        .field select,
+        .field textarea {
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 6px 8px;
+            font-family: var(--font);
+            font-size: 13px;
+            color: var(--text);
+            background: var(--bg);
+            width: 100%;
+            transition: border-color .15s;
+        }
+
+        .field input:focus,
+        .field select:focus,
+        .field textarea:focus {
+            outline: 2px solid var(--accent-mid);
+            outline-offset: 1px;
+            border-color: var(--accent-mid);
+            background: #fff;
+        }
+
+        .field textarea {
+            resize: vertical;
+            min-height: 56px;
+        }
+
+        .field .unit {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-top: 1px;
+        }
+
+        /* ── INLINE UNIT FIELD ── */
+        .input-unit {
+            display: flex;
+            align-items: center;
+            gap: 0;
+        }
+
+        .input-unit input {
+            border-radius: 4px 0 0 4px !important;
+            flex: 1;
+        }
+
+        .input-unit .badge-unit {
+            background: var(--border-light);
+            border: 1px solid var(--border);
+            border-left: none;
+            border-radius: 0 4px 4px 0;
+            padding: 6px 8px;
+            font-size: 11px;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            font-family: var(--mono);
+        }
+
+        /* ── RADIOS / CHECKBOXES ── */
+        .option-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            align-items: center;
+            margin-top: 3px;
+        }
+
+        .option-row label {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .option-row input[type=radio],
+        .option-row input[type=checkbox] {
+            accent-color: var(--accent);
+            width: 13px;
+            height: 13px;
+            cursor: pointer;
+        }
+
+        .option-label {
+            font-size: 11.5px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        /* ── TOGGLE CHIPS ── */
+        .chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .chip {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 8px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: var(--bg);
+            cursor: pointer;
+            font-size: 12px;
+            transition: all .12s;
+            user-select: none;
+        }
+
+        .chip input {
+            display: none;
+        }
+
+        .chip:has(input:checked) {
+            background: #222;
+            border-color: #222;
+            color: #fff;
+            font-weight: 500;
+        }
+
+        /* ── RISK BOXES ── */
+        .risk-group {
+            background: var(--bg);
+            border: 1px solid var(--border-light);
+            border-radius: 4px;
+            padding: 10px 12px;
+            margin-bottom: 10px;
+        }
+
+        .risk-group-title {
+            font-size: 11.5px;
+            font-weight: 600;
+            color: var(--red);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            margin-bottom: 8px;
+        }
+
+        .risk-items {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .risk-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 7px;
+            cursor: pointer;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        .risk-item input {
+            accent-color: var(--red);
+            margin-top: 2px;
+            width: 13px;
+            height: 13px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        /* ── VITALS GRID ── */
+        .vitals-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .vital-card {
+            background: var(--bg);
+            border: 1px solid var(--border-light);
+            border-radius: 4px;
+            padding: 8px 10px;
+        }
+
+        .vital-card label {
+            font-size: 10.5px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            color: var(--text-secondary);
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .vital-card .input-unit input {
+            background: #fff;
+        }
+
+        /* ── SECTION COLORS ── */
+        #anamnese .section-num {
+            background: #222;
+        }
+
+        #exame .section-num {
+            background: #333;
+        }
+
+        #avaliacao .section-num {
+            background: #444;
+        }
+
+        #conduta .section-num {
+            background: #555;
+        }
+
+        /* ── AVALIAÇÃO / CONDUTA ── */
+        .dx-block {
+            background: #f5f5f5;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 12px 14px;
+            margin-bottom: 10px;
+        }
+
+        .dx-block label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #222;
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .dx-block textarea {
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 6px 8px;
+            font-family: var(--font);
+            font-size: 13px;
+            width: 100%;
+            resize: vertical;
+            min-height: 52px;
+            background: #fff;
+        }
+
+        .dx-block textarea:focus {
+            outline: 2px solid #444;
+            outline-offset: 1px;
+        }
+
+        .conduta-block {
+            background: #f5f5f5;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 12px 14px;
+            margin-bottom: 10px;
+        }
+
+        .conduta-block label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #333;
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .conduta-block textarea {
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 6px 8px;
+            font-family: var(--font);
+            font-size: 13px;
+            width: 100%;
+            resize: vertical;
+            min-height: 64px;
+            background: #fff;
+        }
+
+        .conduta-block textarea:focus {
+            outline: 2px solid #444;
+            outline-offset: 1px;
+        }
+
+        /* ── PRINT / PDF ── */
+        /* ── PRINT ── */
+        #print-view {
+            display: none;
+        }
+
+        @media print {
+            body {
+                background: #fff;
+                color: #000;
+            }
+
+            .topbar,
+            .page-layout,
+            .modal-overlay {
+                display: none !important;
+            }
+
+            #print-view {
+                display: block !important;
+                padding: 20px;
+                max-width: 800px;
+                margin: 0 auto;
+            }
+        }
+
+        /* ── SECTION ANCHOR OFFSET ── */
+        .anchor {
+            scroll-margin-top: 64px;
+        }
+
+        .section {
+            scroll-margin-top: 64px;
+        }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 1200px) {
+            .page-layout {
+                grid-template-columns: 200px 1fr;
+            }
+
+            .sidebar-right {
+                display: none;
+            }
+        }
+
+        @media (max-width: 860px) {
+            .page-layout {
+                display: block;
+            }
+
+            .sidebar-left {
+                display: none;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .fields {
+                grid-template-columns: 1fr;
+            }
+
+            .fields.cols-3 {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .vitals-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .page-header {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .topbar-brand {
+                display: none;
+            }
+
+            .field.span-2,
+            .field.span-3 {
+                grid-column: 1/-1;
+            }
+        }
+
+        /* ── SCREEN TIME BOX ── */
+        .screen-time-box {
+            background: #f9f9f9;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 12px 14px;
+            margin-top: 10px;
+        }
+
+        .screen-time-box .sub-title {
+            margin-bottom: 10px;
+        }
+
+        /* ── MODAL (MARCOS DESENVOLVIMENTO) ── */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            background: rgba(0, 0, 0, .45);
+            justify-content: center;
+            align-items: flex-start;
+            padding: 40px 20px;
+            overflow-y: auto;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-box {
+            background: #fff;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 780px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, .22);
+            animation: modalIn .2s ease;
+        }
+
+        @keyframes modalIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .modal-header h2 {
+            font-size: 15px;
+            font-weight: 600;
+            color: #111;
+        }
+
+        .modal-header .modal-age-badge {
+            font-size: 12px;
+            background: #222;
+            color: #fff;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-weight: 500;
+        }
+
+        .modal-close {
+            background: none;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 16px;
+            color: #555;
+            transition: background .15s;
+        }
+
+        .modal-close:hover {
+            background: #f0f0f0;
+        }
+
+        .modal-body {
+            padding: 16px 20px 20px;
+            max-height: 65vh;
+            overflow-y: auto;
+        }
+
+        .modal-body::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .modal-body::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 3px;
+        }
+
+        .modal-no-milestones {
+            text-align: center;
+            padding: 32px 20px;
+            color: #888;
+            font-size: 13px;
+        }
+
+        .milestone-group {
+            margin-bottom: 18px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .milestone-group:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .milestone-group-title {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            color: #222;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .milestone-group-title .age-range {
+            font-family: var(--mono);
+            font-size: 10px;
+            background: #eee;
+            padding: 2px 6px;
+            border-radius: 3px;
+            color: #555;
+        }
+
+        .milestone-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            padding: 6px 0;
+        }
+
+        .milestone-item input[type=checkbox] {
+            accent-color: #222;
+            width: 14px;
+            height: 14px;
+            margin-top: 2px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .milestone-item-content {
+            flex: 1;
+        }
+
+        .milestone-item-name {
+            font-size: 13px;
+            font-weight: 500;
+            color: #111;
+        }
+
+        .milestone-item-desc {
+            font-size: 11.5px;
+            color: #777;
+            margin-top: 2px;
+            line-height: 1.45;
+        }
+
+        .milestone-obs {
+            margin-top: 12px;
+        }
+
+        .milestone-obs label {
+            font-size: 11.5px;
+            font-weight: 500;
+            color: #555;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .milestone-obs textarea {
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 6px 8px;
+            font-family: var(--font);
+            font-size: 13px;
+            width: 100%;
+            resize: vertical;
+            min-height: 52px;
+            background: #fafafa;
+        }
+
+        .milestone-obs textarea:focus {
+            outline: 2px solid #444;
+            outline-offset: 1px;
+            background: #fff;
+        }
+
+        .btn-marcos {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 14px;
+            border-radius: 4px;
+            background: #222;
+            color: #fff;
+            font-family: var(--font);
+            font-size: 12.5px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: background .15s;
+            margin-top: 10px;
+        }
+
+        .btn-marcos:hover {
+            background: #444;
+        }
+
+        @media print {
+            .modal-overlay {
+                display: none !important;
+            }
+
+            .btn-marcos {
+                display: none;
+            }
+        }
+
+        /* ── DIAGNOSTIC BUTTONS ── */
+        .dx-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .dx-header label {
+            margin-bottom: 0 !important;
+        }
+
+        .dx-actions {
+            display: flex;
+            gap: 4px;
+        }
+
+        .btn-dx {
+            background: #fff;
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 2px 8px;
+            font-size: 11px;
+            font-weight: 500;
+            border-radius: 3px;
+            cursor: pointer;
+            font-family: var(--font);
+            transition: background 0.12s, border-color 0.12s;
+        }
+
+        .btn-dx:hover {
+            background: var(--accent-light);
+            border-color: var(--accent-mid);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- TOP BAR -->
+    <div class="topbar">
+        <div class="topbar-brand">Pediatria <span>/ Ficha Clínica</span></div>
+        <nav class="topbar-nav">
+            <a class="nav-pill" href="#anamnese"><span class="dot"></span>Anamnese</a>
+            <a class="nav-pill" href="#exame"><span class="dot"></span>Exame Físico</a>
+            <a class="nav-pill" href="#avaliacao"><span class="dot"></span>Avaliação</a>
+            <a class="nav-pill" href="#conduta"><span class="dot"></span>Conduta</a>
+        </nav>
+        <button class="btn-pdf" onclick="generatePDF()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6 9 6 2 18 2 18 9" />
+                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+                <rect x="6" y="14" width="12" height="8" />
+            </svg>
+            Exportar PDF
+        </button>
+        <button class="btn-reset" onclick="resetForm()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="1 4 1 10 7 10" />
+                <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
+            </svg>
+            Limpar
+        </button>
+    </div>
+
+    <div class="page-layout">
+
+        <!-- LEFT SIDEBAR: Navegação -->
+        <aside class="sidebar-left" id="sidebarLeft">
+            <div class="side-nav-title">Navegação</div>
+
+            <div class="side-nav-group">
+                <a href="#anamnese" class="side-nav-group-label"><span class="side-dot"></span>Anamnese</a>
+                <ul class="side-nav-items">
+                    <li><a href="#s1">01 · Queixa Principal / HDA</a></li>
+                    <li><a href="#s2">02 · Hábitos e Funções</a></li>
+                    <li><a href="#s3">03 · Hist. Gestacional</a></li>
+                    <li><a href="#s4">04 · Alimentação</a></li>
+                    <li><a href="#s5">05 · Vacinação</a></li>
+                    <li><a href="#s6">06 · DNPM</a></li>
+                    <li><a href="#s7">07 · Antec. Pessoais / Fam.</a></li>
+                    <li><a href="#s8">08 · Hist. Socioambiental</a></li>
+                </ul>
+            </div>
+
+            <div class="side-nav-group">
+                <a href="#exame" class="side-nav-group-label"><span class="side-dot"></span>Exame Físico</a>
+                <ul class="side-nav-items">
+                    <li><a href="#s9">01 · Sinais Vitais / Antrop.</a></li>
+                    <li><a href="#s10">02 · Ectoscopia</a></li>
+                    <li><a href="#s11">03 · Linfonodos</a></li>
+                    <li><a href="#s12">04 · Cabeça e Pescoço</a></li>
+                    <li><a href="#s13">05 · Tórax / Respiratório</a></li>
+                    <li><a href="#s14">06 · Cardiovascular</a></li>
+                    <li><a href="#s15">07 · Abdome</a></li>
+                    <li><a href="#s16">08 · Gênito-urinário</a></li>
+                    <li><a href="#s17">09 · Locomotor</a></li>
+                    <li><a href="#s18">10 · Neurológico</a></li>
+                </ul>
+            </div>
+
+            <div class="side-nav-group">
+                <a href="#avaliacao" class="side-nav-group-label"><span class="side-dot"></span>Avaliação</a>
+                <ul class="side-nav-items">
+                    <li><a href="#s19">Hipóteses Diagnósticas</a></li>
+                </ul>
+            </div>
+
+            <div class="side-nav-group">
+                <a href="#conduta" class="side-nav-group-label"><span class="side-dot"></span>Conduta</a>
+                <ul class="side-nav-items">
+                    <li><a href="#s20">Plano Terapêutico</a></li>
+                </ul>
+            </div>
+        </aside>
+
+        <div class="wrapper">
+
+            <!-- IDENTIFICAÇÃO DO PACIENTE -->
+            <div class="page-header">
+                <div class="hfield"><label>Data da consulta</label><input type="date" id="dataConsulta"></div>
+                <div class="hfield"><label>Nome da criança</label><input type="text" placeholder="Nome completo"></div>
+                <div class="hfield"><label>Data de nascimento</label><input type="date" id="dataNascimento"></div>
+                <div class="hfield">
+                    <label>Sexo</label>
+                    <div class="option-row">
+                        <label><input type="radio" name="sexo" value="M"> Masculino</label>
+                        <label><input type="radio" name="sexo" value="F"> Feminino</label>
+                    </div>
+                </div>
+                <div class="hfield"><label>Idade (calculada)</label><input type="text" id="idadeCalculada" readonly
+                        placeholder="Preencha a data de nascimento" style="background:#f0f0f0; font-weight:500;"></div>
+                <div class="hfield"><label>Naturalidade</label><input type="text" placeholder="Cidade – UF"></div>
+                <div class="hfield hfield-wide">
+                    <label>Responsável / Informante</label>
+                    <input type="text" placeholder="Nome, parentesco e telefone">
+                </div>
+                <div class="hfield"><label>Encaminhado por</label><input type="text" placeholder="Médico / Serviço">
+                </div>
+                <div class="hfield"><label>Prontuário / ID</label><input type="text" placeholder="Número do prontuário">
+                </div>
+            </div>
+
+            <!-- ══════════════════════════════════════════
+     BLOCO 1 — ANAMNESE
+══════════════════════════════════════════ -->
+            <div id="anamnese" class="anchor"></div>
+
+            <!-- 1 · Queixa Principal -->
+            <div class="section" id="s1">
+                <div class="section-head" onclick="toggleSection('s1')">
+                    <span class="section-num">ANAMNESE · 01</span>
+                    <span class="section-title">Queixa Principal e História da Doença Atual</span>
+                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <polyline points="6 9 12 15 18 9" />
+                    </svg>
+                </div>
+                <div class="section-body">
+                    <div class="sub">
+                        <div class="sub-title">Queixa Principal</div>
+                        <div class="fields cols-1">
+                            <div class="field"><label>Motivo da consulta (em palavras do acompanhante)</label><textarea
+                                    placeholder="Ex: 'Ela não consegue falar direito'"></textarea></div>
+                        </div>
+                    </div>
+                    <div class="sub">
+                        <div class="sub-title">História da Doença Atual (HDA)</div>
+                        <div class="fields cols-1">
+                            <div class="field"><label>Descrição detalhada — início, duração, evolução, fatores de
+                                    melhora/piora, sintomas associados</label><textarea rows="5"
+                                    placeholder="Descreva cronologicamente..."></textarea></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2 · Hábitos e Funções Fisiológicas -->
+            <div class="section" id="s2">
+                <div class="section-head" onclick="toggleSection('s2')">
+                    <span class="section-num">ANAMNESE · 02</span>
+                    <span class="section-title">Hábitos e Funções Fisiológicas</span>
+                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <polyline points="6 9 12 15 18 9" />
+                    </svg>
+                </div>
+                <div class="section-body">
+                    <div class="fields">
+                        <div class="field"><label>Apetite</label><textarea
+                                placeholder="Quantidade, preferências, recusas alimentares…"></textarea></div>
+                        <div class="field"><label>Sono</label><textarea
+                                placeholder="Horas/dia, despertares, roncos, parassonias…"></textarea></div>
+                        <div class="field"><label>Diurese</label><textarea
+                                placeholder="Frequência, cor, odor, polaciúria, disúria…"></textarea></div>
+                        <div class="field"><label>Evacuação / Intestino</label><textarea
+                                placeholder="Frequência, consistência, cor, sangue, dor…"></textarea></div>
+                        <div class="field"><label>Humor / Atividade / Disposição</label><textarea
+                                placeholder="Interação social, brincadeiras, escola…"></textarea></div>
+                        <div class="field"><label>Ciclo menstrual (adolescentes)</label><textarea
+                                placeholder="Regularidade, dismenorreia, data DUM…"></textarea></div>
+                    </div>
+                    <div class="screen-time-box">
+                        <div class="sub-title">Tempo de Tela</div>
+                        <div class="fields cols-3">
+                            <div class="field"><label>Tempo diário de tela</label>
+                                <div class="input-unit"><input type="number" step="0.5" placeholder="0"
+                                        id="tempoTela"><span class="badge-unit">h/dia</span></div>
+                            </div>
+                            <div class="field span-2">
+                                <label>Dispositivos utilizados</label>
+                                <div class="chips">
+                                    <label class="chip"><input type="checkbox">TV</label>
+                                    <label class="chip"><input type="checkbox">Celular</label>
+                                    <label class="chip"><input type="checkbox">Tablet</label>
+                                    <label class="chip"><input type="checkbox">Computador</label>
+                                </div>
+                            </div>
+                            <div class="field span-3"><label>Observações sobre tempo de tela</label><textarea
+                                    placeholder="Tipo de conteúdo, supervisão dos pais, horários, impacto no sono/comportamento…"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3 · História Gestacional -->
+            <div class="section" id="s3">
+                <div class="section-head" onclick="toggleSection('s3')">
+                    <span class="section-num">ANAMNESE · 03</span>
+                    <span class="section-title">História Gestacional e Período Neonatal</span>
+                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <polyline points="6 9 12 15 18 9" />
+                    </svg>
+                </div>
+                <div class="section-body">
+                    <div class="sub">
+                        <div class="sub-title">Gestação</div>
+                        <div class="fields cols-3">
+                            <div class="field"><label>Idade materna na gestação</label><input type="number"
+                                    placeholder="anos"></div>
+                            <div class="field"><label>Gesta / Para / Abortos</label><input type="text"
+                                    placeholder="G__ P__ A__"></div>
+                            <div class="field">
+                                <label>Pré-natal realizado?</label>
+                                <div class="option-row">
+                                    <label><input type="radio" name="prenatal" value="sim"> Sim</label>
+                                    <label><input type="radio" name="prenatal" value="nao"> Não</label>
+                                </div>
+                            </div>
+                            <div class="field"><label>Número de consultas pré-natal</label><input type="number"
+                                    placeholder="0"></div>
+                            <div class="field span-2"><label>Intercorrências na gestação</label><input type="text"
+                                    placeholder="Ex: pré-eclâmpsia, ITU, sangramento…"></div>
+                            <div class="field span-2"><label>Medicamentos na gestação</label><input type="text"
+                                    placeholder="Ex: metildopa, ácido fólico…"></div>
+                            <div class="field"><label>Tabagismo / Álcool / Drogas</label><input type="text"
+                                    placeholder="Descreva se houver"></div>
+                        </div>
+                    </div>
+                    <div class="sub">
+                        <div class="sub-title">Parto e Período Neonatal</div>
+                        <div class="fields cols-3">
+                            <div class="field">
+                                <label>Tipo de parto</label>
+                                <select>
+                                    <option value="">Selecione…</option>
+                                    <option>Vaginal (espontâneo)</option>
+                                    <option>Vaginal (fórceps)</option>
+                                    <option>Vaginal (vácuo extrator)</option>
+                                    <option>Cesariana eletiva</option>
+                                    <option>Cesariana de emergência</option>
+                                </select>
+                            </div>
+                            <div class="field"><label>Local do parto</label><input type="text"
+                                    placeholder="Hospital / maternidade"></div>
+                            <div class="field"><label>Idade gestacional</label>
+                                <div class="input-unit"><input type="number" placeholder="0"><span
+                                        class="badge-unit">sem</span></div>
+                            </div>
+                            <div class="field"><label>APGAR 1' / 5'</label><input type="text" placeholder="Ex: 8/9">
+                            </div>
+                            <div class="field"><label>Peso ao nascer</label>
+                                <div class="input-unit"><input type="number" placeholder="0"><span
+                                        class="badge-unit">g</span></div>
+                            </div>
+                            <div class="field"><label>Comprimento ao nascer</label>
+                                <div class="input-unit"><input type="number" placeholder="0"><span
+                                        class="badge-unit">cm</span></div>
+                            </div>
+                            <div class="field"><label>Perímetro Cefálico ao nascer</label>
+                                <div class="input-unit"><input type="number" placeholder="0"><span
+                                        class="badge-unit">cm</span></div>
+                            </div>
+                            <div class="field"><label>Peso na alta</label>
+                                <div class="input-unit"><input type="number" placeholder="0"><span
+                                        class="badge-unit">g</span></div>
+                            </div>
+                            <div class="field span-2"><label>Intercorrências neonatais</label><input type="text"
+                                    placeholder="Ex: hipoglicemia, icterícia, internação UTI…"></div>
+                            <div class="field">
+                                <label>Triagens neonatais</label>
+                                <div class="option-row">
+                                    <label><input type="radio" name="triagem" value="normais"> Normais</label>
+                                    <label><input type="radio" name="triagem" value="alteradas"> Alteradas</label>
+                                </div>
+                            </div>
+                            <div class="field span-2"><label>Observações sobre triagens</label><input type="text"
+                                    placeholder="Pezinho, orelhinha, olhinho, coraçãozinho…"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4 · Alimentação -->
+            <div class="section" id="s4">
+                <div class="section-head" onclick="toggleSection('s4')">
+                    <span class="section-num">ANAMNESE · 04</span>
+                    <span class="section-title">Alimentação</span>
+                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <polyline points="6 9 12 15 18 9" />
+                    </svg>
+                </div>
+                <div class="section-body">
+                    <div class="fields">
+                        <div class="field"><label>Aleitamento materno exclusivo até</label><input type="text"
+                                placeholder="Ex: 6 meses / não amamentou"></div>
+                        <div class="field"><label>Aleitamento materno total até</label><input type="text"
+                                placeholder="Ex: 1 ano e 2 meses"></div>
+                        <div class="field"><label>Início da introdução alimentar</label><input type="text"
+                                placeholder="Idade em meses"></div>
+                        <div class="field"><label>Suplementação de Vitamina D</label>
+                            <div class="option-row">
+                                <label><input type="radio" name="vitD" value="sim"> Sim</label>
+                                <label><input type="radio" name="vitD" value="nao"> Não</label>
+                            </div>
+                        </div>
+                        <div class="field"><label>Suplementação de Ferro</label>
+                            <div class="option-row">
+                                <label><input type="radio" name="ferro" value="sim"> Sim</label>
+                                <label><input type="radio" name="ferro" value="nao"> Não</label>
+                            </div>
+                        </div>
+                        <div class="field span-2"><label>Alimentação habitual / Recordatório alimentar</label><textarea
+                                rows="3" placeholder="Descreva as principais refeições e frequência…"></textarea></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5 · Vacinação -->
+            <div class="section" id="s5">
+                <div class="section-head" onclick="toggleSection('s5')">
+                    <span class="section-num">ANAMNESE · 05</span>
+                    <span class="section-title">Vacinação</span>
+                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <polyline points="6 9 12 15 18 9" />
+                    </svg>
+                </div>
+                <div class="section-body">
+                    <div class="sub">
+                        <div class="sub-title">Status Vacinal</div>
+                        <div class="option-row" style="margin-bottom:10px">
+                            <label><input type="radio" name="vacina" value="atualizado"> Calendário vacinal
+                                atualizado</label>
+                            <label><input type="radio" name="vacina" value="incompleto"> Incompleto</label>
+                            <label><input type="radio" name="vacina" value="desconhecido"> Desconhecido</label>
+                        </div>
+                        <div class="field cols-1">
+                            <label>Vacinas pendentes / observações</label>
+                            <textarea placeholder="Vacinas em atraso, reações adversas, recusa familiar…"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 6 · DNPM -->
+            <div class="section" id="s6">
+                <div class="section-head" onclick="toggleSection('s6')">
+                    <span class="section-num">ANAMNESE · 06</span>
+                    <span class="section-title">Desenvolvimento Neuropsicomotor (DNPM)</span>
+                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <polyline points="6 9 12 15 18 9" />
+                    </svg>
+                </div>
+                <div class="section-body">
+                    <div class="fields">
+                        <div class="field"><label>Denver II — resultado global</label>
+                            <select>
+                                <option value="">Selecione…</option>
+                                <option>Normal</option>
+                                <option>Suspeito</option>
+                                <option>Anormal</option>
+                                <option>Não aplicável (idade)</option>
+                                <option>Não realizado</option>
+                            </select>
+                        </div>
+                        <div class="field"><label>Controle esfincteriano / Desfralde</label><input type="text"
+                                placeholder="Diurno / noturno / idade…"></div>
+                        <div class="field"><label>Audição</label><input type="text"
+                                placeholder="Triagem, avaliação audiológica…"></div>
+                        <div class="field"><label>Visão</label><input type="text" placeholder="Acuidade, ortóptica…">
+                        </div>
+                        <div class="field"><label>Frequenta escola / creche?</label>
+                            <div class="option-row">
+                                <label><input type="radio" name="escola" value="sim"> Sim</label>
+                                <label><input type="radio" name="escola" value="nao"> Não</label>
+                            </div>
+                        </div>
+                        <div class="field"><label>Rendimento / adaptação escolar</label><input type="text"
+                                placeholder="Descreva…"></div>
+                        <div class="field span-2"><label>Marcos do desenvolvimento (descreva idades de
+                                aquisição)</label><textarea
+                                placeholder="Sustento de cabeça, sentar, engatinhar, andar, primeiras palavras, frases, leitura/escrita…"></textarea>
+                        </div>
+                        <div class="field span-2"><label>Observações sobre DNPM</label><textarea
+                                placeholder="Avaliação especializada prévia, terapias em andamento (fonoaudiologia, TO, fisioterapia)…"></textarea>
+                        </div>
+                        <div class="field span-2">
+                            <button type="button" class="btn-marcos" onclick="openMarcosModal()">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M9 11l3 3L22 4" />
+                                    <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+                                </svg>
+                                Avaliar Marcos do Desenvolvimento
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 7 · Antecedentes Pessoais e Familiares -->
+            <div class="section" id="s7">
+                <div class="section-head" onclick="toggleSection('s7')">
+                    <span class="section-num">ANAMNESE · 07</span>
+                    <span class="section-title">Antecedentes Pessoais e História Familiar</span>
+                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <polyline points="6 9 12 15 18 9" />
+                    </svg>
+                </div>
+                <div class="section-body">
+                    <div class="sub">
+                        <div class="sub-title">Antecedentes Pessoais</div>
+                        <div class="fields">
+                            <div class="field"><label>Doenças prévias</label><textarea
+                                    placeholder="Pneumonia, asma, otites de repetição…"></textarea></div>
+                            <div class="field"><label>Internações</label><textarea
+                                    placeholder="Motivo, local, duração…"></textarea></div>
+                            <div class="field"><label>Cirurgias / procedimentos</label><textarea
+                                    placeholder="Tipo e data…"></textarea></div>
+                            <div class="field"><label>Alergias</label><textarea
+                                    placeholder="Medicamentos, alimentos, látex — tipo de reação…"></textarea></div>
+                            <div class="field span-2"><label>Uso contínuo de medicamentos</label><textarea
+                                    placeholder="Nome, dose, frequência, indicação…"></textarea></div>
+                        </div>
+                    </div>
+                    <div class="sub">
+                        <div class="sub-title">História Familiar</div>
+                        <div class="fields">
+                            <div class="field span-2"><label>Doenças relevantes na família</label><textarea
+                                    placeholder="Asma, diabetes, cardiopatias, neoplasias, doenças genéticas, transtornos do neurodesenvolvimento…"></textarea>
+                            </div>
+                            <div class="field"><label>Consanguinidade entre os pais?</label>
+                                <div class="option-row">
+                                    <label><input type="radio" name="consang" value="sim"> Sim</label>
+                                    <label><input type="radio" name="consang" value="nao"> Não</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 8 · História Socioambiental -->
+            <div class="section" id="s8">
+                <div class="section-head" onclick="toggleSection('s8')">
+                    <span class="section-num">ANAMNESE · 08</span>
+                    <span class="section-title">História Socioambiental</span>
+                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <polyline points="6 9 12 15 18 9" />
+                    </svg>
+                </div>
+                <div class="section-body">
+                    <div class="fields cols-3">
+                        <div class="field"><label>Tipo de moradia</label>
+                            <select>
+                                <option value="">Selecione…</option>
+                                <option>Casa própria</option>
+                                <option>Casa alugada</option>
+                                <option>Favela / comunidade</option>
+                                <option>Área rural</option>
+                                <option>Abrigo / instituição</option>
+                            </select>
+                        </div>
+                        <div class="field"><label>Número de pessoas na casa</label><input type="number" placeholder="0">
+                        </div>
+                        <div class="field"><label>Renda familiar</label><input type="text"
+                                placeholder="Salários mínimos aprox."></div>
+                        <div class="field"><label>Água tratada?</label>
+                            <div class="option-row">
+                                <label><input type="radio" name="agua" value="sim"> Sim</label>
+                                <label><input type="radio" name="agua" value="nao"> Não</label>
+                            </div>
+                        </div>
+                        <div class="field"><label>Rede de esgoto?</label>
+                            <div class="option-row">
+                                <label><input type="radio" name="esgoto" value="sim"> Sim</label>
+                                <label><input type="radio" name="esgoto" value="nao"> Não</label>
+                            </div>
+                        </div>
+                        <div class="field"><label>Animais domésticos?</label>
+                            <div class="option-row">
+                                <label><input type="radio" name="animais" value="sim"> Sim</label>
+                                <label><input type="radio" name="animais" value="nao"> Não</label>
+                            </div>
+                        </div>
+                        <div class="field"><label>Tabagismo domiciliar?</label>
+                            <div class="option-row">
+                                <label><input type="radio" name="tabdom" value="sim"> Sim</label>
+                                <label><input type="radio" name="tabdom" value="nao"> Não</label>
+                            </div>
+                        </div>
+                        <div class="field span-2"><label>Observações adicionais</label><textarea
+                                placeholder="Relações familiares, rede de apoio, situação escolar dos pais…"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- ══════════════════════════════════════════
+     BLOCO 2 — EXAME FÍSICO
+══════════════════════════════════════════ -->
+            <div id="exame" class="anchor"></div>
+
+            <!-- EF·1 · Sinais Vitais & Antropometria -->
+            <div class="section" id="s9">
+                <div class="section-head" onclick="toggleSection('s9')">
+                    <span class="section-num" style="background:#333">EF · 01</span>
+                    <span class="section-title">Sinais Vitais e Antropometria</span>
+                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <polyline points="6 9 12 15 18 9" />
+                    </svg>
+                </div>
+                <div class="section-body">
+                    <div class="sub">
+                        <div class="sub-title">Sinais Vitais</div>
+                        <div class="vitals-grid">
+                            <div class="vital-card">
+                                <label>FC — Freq. Cardíaca</label>
+                                <div class="input-unit"><input type="number" placeholder="0"><span
+                                        class="badge-unit">bpm</span></div>
+                            </div>
+                            <div class="vital-card">
+                                <label>FR — Freq. Respiratória</label>
+                                <div class="input-unit"><input type="number" placeholder="0"><span
+                                        class="badge-unit">irpm</span></div>
+                            </div>
+                            <div class="vital-card">
+                                <label>Temperatura</label>
+                                <div class="input-unit"><input type="number" step="0.1" placeholder="36.5"><span
+                                        class="badge-unit">°C</span></div>
+                            </div>
+                            <div class="vital-card">
+                                <label>PA sistólica / diastólica</label>
+                                <div class="input-unit"><input type="text" placeholder="Ex: 100/60"><span
+                                        class="badge-unit">mmHg</span></div>
+                            </div>
+                            <div class="vital-card">
+                                <label>SpO₂ — Saturação O₂</label>
+                                <div class="input-unit"><input type="number" placeholder="98"><span
+                                        class="badge-unit">%</span></div>
+                            </div>
+                            <div class="vital-card">
+                                <label>Perfusão periférica</label>
+                                <div class="input-unit"><input type="number" step="0.5" placeholder="≤2"><span
+                                        class="badge-unit">seg</span></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sub">
+                        <div class="sub-title">Antropometria</div>
+                        <div class="vitals-grid">
+                            <div class="vital-card">
+                                <label>Peso</label>
+                                <div class="input-unit"><input type="number" id="input-peso" step="0.01"
+                                        placeholder="0.00"><span class="badge-unit">kg</span></div>
+                            </div>
+                            <div class="vital-card">
+                                <label>Comprimento / Estatura</label>
+                                <div class="input-unit"><input type="number" id="input-altura" step="0.1"
+                                        placeholder="0.0"><span class="badge-unit">cm</span></div>
+                            </div>
+                            <div class="vital-card">
+                                <label>IMC</label>
+                                <div class="input-unit"><input type="number" id="input-imc" step="0.01"
+                                        placeholder="—"><span class="badge-unit">kg/m²</span></div>
+                            </div>
+                            <div class="vital-card">
+                                <label>Perímetro Cefálico</label>
+                                <div class="input-unit"><input type="number" step="0.1" placeholder="0.0"><span
+                                        class="badge-unit">cm</span></div>
+                            </div>
+                            <div class="vital-card">
+                                <label>Perímetro Torácico</label>
+                                <div class="input-unit"><input type="number" step="0.1" placeholder="0.0"><span
+                                        class="badge-unit">cm</span></div>
+                            </div>
+                            <div class="vital-card">
+                                <label>Perímetro Abdominal</label>
+                                <div class="input-unit"><input type="number" step="0.1" placeholder="0.0"><span
+                                        class="badge-unit">cm</span></div>
+                            </div>
+                        </div>
+                        <div style="margin-top:10px" class="fields cols-3">
+                            <div class="field"><label>Escore Z — Peso/Idade</label><input type="text"
+                                    placeholder="Ex: +0,5"></div>
+                            <div class="field"><label>Escore Z — Estatura/Idade</label><input type="text"
+                                    placeholder="Ex: -1,2"></div>
+                            <div class="field"><label>Escore Z — IMC/Idade</label><input type="text"
+                                    placeholder="Ex: +1,0">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- EF·2 · Ectoscopia -->
+            <div class="section" id="s10">
+                <div class="section-head" onclick="toggleSection('s10')">
+                    <span class="section-num" style="background:#333">EF · 02</span>
+                    <span class="section-title">Ectoscopia — Inspeção Geral</span>
+                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <polyline points="6 9 12 15 18 9" />
+                    </svg>
+                </div>
+                <div class="section-body">
+
+                    <div class="sub">
+                        <div class="sub-title">Estado Geral</div>
+                        <div class="option-row">
+                            <label><input type="radio" name="eg" value="bom"> Bom</label>
+                            <label><input type="radio" name="eg" value="regular"> Regular / levemente
+                                comprometido</label>
+                            <label><input type="radio" name="eg" value="ruim"> Ruim / muito comprometido</label>
+                        </div>
+                    </div>
+
+                    <div class="sub">
+                        <div class="sub-title">Fácies</div>
+                        <div class="option-row" style="margin-bottom:6px">
+                            <label><input type="radio" name="facies" value="atipica"> Atípica (normal)</label>
+                            <label><input type="radio" name="facies" value="tipica"> Típica</label>
+                        </div>
+                        <div class="field">
+                            <label>Se típica — descrever (dor, sindrômica, adenoideana, cushingóide,
+                                hipotireoidiana…)</label>
+                            <input type="text" placeholder="Especificar…">
+                        </div>
+                    </div>
+
+                    <div class="sub">
+                        <div class="sub-title">Atitude</div>
+                        <div class="option-row">
+                            <label><input type="radio" name="atitude" value="ativa-atipica"> Ativa atípica
+                                (normal)</label>
+                            <label><input type="radio" name="atitude" value="ativa-tipica"> Ativa típica</label>
+                            <label><input type="radio" name="atitude" value="passiva"> Passiva</label>
+                        </div>
+                        <div class="field" style="margin-top:6px">
+                            <label>Se típica — especificar (ortopneica, opistótono, cócoras…)</label>
+                            <input type="text" placeholder="Especificar…">
+                        </div>
+                    </div>
+
+                    <div class="sub">
+                        <div class="sub-title">Estado Psíquico</div>
+                        <div class="chips">
+                            <label class="chip"><input type="checkbox">Alerta e interativo</label>
+                            <label class="chip"><input type="checkbox">Irritado</label>
+                            <label class="chip"><input type="checkbox">Letárgico / apático</label>
+                            <label class="chip"><input type="checkbox">Obnubilado</label>
+                            <label class="chip"><input type="checkbox">Sonolento</label>
+                            <label class="chip"><input type="checkbox">Comatoso</label>
+                            <label class="chip"><input type="checkbox">Agitado</label>
+                        </div>
+                        <div class="field" style="margin-top:8px">
+                            <label>Observações (TEA, TDAH, ansiedade, depressão…)</label>
+                            <input type="text" placeholder="Descreva alterações relevantes…">
+                        </div>
+                    </div>
+
+                    <div class="sub">
+                        <div class="sub-title">Coloração da Pele e Mucosas</div>
+                        <div class="chips" style="margin-bottom:8px">
+                            <label class="chip"><input type="checkbox">Normocorado</label>
+                            <label class="chip"><input type="checkbox">Pálido</label>
+                            <label class="chip"><input type="checkbox">Cianótico periférico</label>
+                            <label class="chip"><input type="checkbox">Cianótico central</label>
+                            <label class="chip"><input type="checkbox">Ictérico</label>
+                            <label class="chip"><input type="checkbox">Pletórico</label>
+                        </div>
+                        <div class="fields cols-3">
+                            <div class="field"><label>Grau de palidez (1+ a 4+)</label><input type="text"
+                                    placeholder="Ex: 2+"></div>
+                            <div class="field"><label>Grau de icterícia (1+ a 4+)</label><input type="text"
+                                    placeholder="Ex: 1+"></div>
+                            <div class="field"><label>Zona de Kramer (RN)</label><input type="text" placeholder="I–V">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="sub">
+                        <div class="sub-title">Grau de Hidratação</div>
+                        <div class="option-row" style="margin-bottom:6px">
+                            <label><input type="radio" name="hidrat" value="hidratado"> Hidratado</label>
+                            <label><input type="radio" name="hidrat" value="desid-leve"> Desidratação leve
+                                (3–5%)</label>
+                            <label><input type="radio" name="hidrat" value="desid-mod"> Desidratação moderada
+                                (6–9%)</label>
+                            <label><input type="radio" name="hidrat" value="desid-grave"> Desidratação grave
+                                (≥10%)</label>
+                        </div>
+                        <div class="chips">
+                            <label class="chip"><input type="checkbox">Lágrimas presentes</label>
+                            <label class="chip"><input type="checkbox">Mucosas úmidas</label>
+                            <label class="chip"><input type="checkbox">Mucosas ressecadas</label>
+                            <label class="chip"><input type="checkbox">Turgor normal</label>
+                            <label class="chip"><input type="checkbox">Turgor reduzido</label>
+                            <label class="chip"><input type="checkbox">Fontanela normal</label>
+                            <label class="chip"><input type="checkbox">Fontanela deprimida</label>
+                            <label class="chip"><input type="checkbox">Enoftalmia</label>
+                        </div>
+                    </div>
+
+                    <div class="sub">
+                        <div class="sub-title">Estado Nutricional</div>
+                        <div class="option-row">
+                            <label><input type="radio" name="nutri" value="eutrofico"> Eutrófico</label>
+                            <label><input type="radio" name="nutri" value="sobrepeso"> Sobrepeso</label>
+                            <label><input type="radio" name="nutri" value="obeso"> Obeso</label>
+                            <label><input type="radio" name="nutri" value="emagrecido"> Emagrecido</label>
+                            <label><input type="radio" name="nutri" value="marasmo"> Marasmo</label>
+                            <label><input type="radio" name="nutri" value="kwash"> Kwashiorkor</label>
+                        </div>
+                    </div>
+
+                    <div class="sub">
+                        <div class="sub-title">Pele, Anexos e Subcutâneo</div>
+                        <div class="fields">
+                            <div class="field"><label>Lesões cutâneas / erupções</label><textarea
+                                    placeholder="Tipo, localização, distribuição…"></textarea></div>
+                            <div class="field"><label>Alterações vasculares</label><textarea
+                                    placeholder="Telangiectasias, hemangiomas, petéquias, equimoses, circulação colateral…"></textarea>
+                            </div>
+                            <div class="field"><label>Unhas</label><input type="text"
+                                    placeholder="Cor, cianose, estrias, paroníquia…"></div>
+                            <div class="field"><label>Cabelos</label><input type="text"
+                                    placeholder="Distribuição, textura, coloração…"></div>
+                            <div class="field span-2"><label>Edema / outros achados cutâneos</label><input type="text"
+                                    placeholder="Localização, godet, xantomas, cicatrizes…"></div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- EF·3 · Linfonodos -->
+            <div class="section" id="s11">
+                <div class="section-head" onclick="toggleSection('s11')">
+                    <span class="section-num" style="background:#333">EF · 03</span>
+                    <span class="section-title">Exame dos Linfonodos</span>
+                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <polyline points="6 9 12 15 18 9" />
+                    </svg>
+                </div>
+                <div class="section-body">
+                    <div class="sub">
+                        <div class="sub-title">Cadeias Avaliadas — Marcar as alteradas</div>
+                        <div class="chips">
+                            <label class="chip"><input type="checkbox">Pré-auriculares</label>
+                            <label class="chip"><input type="checkbox">Retroauriculares</label>
+                            <label class="chip"><input type="checkbox">Occipitais</label>
+                            <label class="chip"><input type="checkbox">Ângulo da mandíbula</label>
+                            <label class="chip"><input type="checkbox">Submandibulares</label>
+                            <label class="chip"><input type="checkbox">Submentonianos</label>
+                            <label class="chip"><input type="checkbox">Cervicais anteriores</label>
+                            <label class="chip"><input type="checkbox">Cervicais posteriores</label>
+                            <label class="chip"><input type="checkbox">Supraclaviculares</label>
+                            <label class="chip"><input type="checkbox">Axilares</label>
+                            <label class="chip"><input type="checkbox">Epitrocleares</label>
+                            <label class="chip"><input type="checkbox">Inguinais</label>
+                            <label class="chip"><input type="checkbox">Poplíteos</label>
+                        </div>
+                    </div>
+                    <div class="fields" style="margin-top:12px">
+                        <div class="field"><label>Tamanho dos linfonodos alterados</label><input type="text"
+                                placeholder="Ex: 1,5 cm / >2 cm (patológico)"></div>
+                        <div class="field"><label>Consistência</label>
+                            <select>
+                                <option value="">Selecione…</option>
+                                <option>Fibroelástica (normal)</option>
+                                <option>Endurecida</option>
+                                <option>Pétrea</option>
+                                <option>Flutuação presente</option>
+                            </select>
+                        </div>
+                        <div class="field"><label>Mobilidade / Aderência</label>
+                            <select>
+                                <option value="">Selecione…</option>
+                                <option>Móvel</option>
+                                <option>Aderido aos planos vizinhos</option>
+                            </select>
+                        </div>
+                        <div class="field"><label>Sinais flogísticos</label>
+                            <div class="option-row">
+                                <label><input type="checkbox"> Dor</label>
+                                <label><input type="checkbox"> Calor</label>
+                                <label><input type="checkbox"> Eritema suprajacente</label>
+                                <label><input type="checkbox"> Flutuação</label>
+                            </div>
+                        </div>
+                        <div class="field"><label>Velocidade de crescimento</label>
+                            <select>
+                                <option value="">Selecione…</option>
+                                <option>Dias (agudo)</option>
+                                <option>Semanas</option>
+                                <option>Meses (crônico)</option>
+                            </select>
+                        </div>
+                        <div class="field"><label>Distribuição</label>
+                            <select>
+                                <option value="">Selecione…</option>
+                                <option>Localizada (1 cadeia)</option>
+                                <option>Generalizada (múltiplas cadeias)</option>
+                            </select>
+                        </div>
+                        <div class="field span-2"><label>Observações</label><textarea
+                                placeholder="Linfadenopatia supraclavicular esquerda (sinal de Virchow), hepatoesplenomegalia associada…"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- EF·4 · Cabeça e Pescoço -->
+            <div class="section" id="s12">
+                <div class="section-head" onclick="toggleSection('s12')">
+                    <span class="section-num" style="background:#333">EF · 04</span>
+                    <span class="section-title">Cabeça e Pescoço</span>
+                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <polyline points="6 9 12 15 18 9" />
+                    </svg>
+                </div>
+                <div class="section-body">
+                    <div class="sub">
+                        <div class="sub-title">Crânio e Couro Cabeludo</div>
+                        <div class="fields">
+                            <div class="field"><label>Dimensões e conformação</label><input type="text"
+                                    placeholder="Normocéfalo, micro, macrocefalia…"></div>
+                            <div class="field"><label>Suturas</label><input type="text"
+                                    placeholder="Fechadas, abertas, craniossinostose…"></div>
+                            <div class="field"><label>Fontanela anterior (bregmática)</label><input type="text"
+                                    placeholder="Dimensão, tensão, fechamento…"></div>
+                            <div class="field"><label>Fontanela posterior</label><input type="text"
+                                    placeholder="Aberta / fechada…"></div>
+                            <div class="field span-2"><label>Couro cabeludo — lesões, ectoparasitoses, distribuição
+                                    capilar</label><input type="text"
+                                    placeholder="Normal / pediculose / tinea / seborreia…"></div>
+                        </div>
+                    </div>
+                    <div class="sub">
+                        <div class="sub-title">Face</div>
+                        <div class="fields">
+                            <div class="field"><label>Simetria facial</label><input type="text"
+                                    placeholder="Simétrica / assimétrica…"></div>
+                            <div class="field"><label>Movimentos faciais / paralisias</label><input type="text"
+                                    placeholder="Normal / paresia facial…"></div>
+                            <div class="field span-2"><label>Edema de face / dismorfismos craniofaciais</label><input
+                                    type="text"
+                                    placeholder="Hipertelorismo, epicanto, hipognatismo, baixa implantação de orelhas…">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sub">
+                        <div class="sub-title">Olhos</div>
+                        <div class="fields">
+                            <div class="field"><label>Tamanho / posição dos globos</label><input type="text"
+                                    placeholder="Normal / exoftalmia / enoftalmia…"></div>
+                            <div class="field"><label>Pálpebras</label><input type="text"
+                                    placeholder="Ptose, edema, infecções…"></div>
+                            <div class="field"><label>Conjuntiva e córnea</label><input type="text"
+                                    placeholder="Hiperemia, secreção, opacidades…"></div>
+                            <div class="field"><label>Esclerótica</label><input type="text"
+                                    placeholder="Branca / ictérica / azulada…"></div>
+                            <div class="field"><label>Pupilas (simetria, fotorreatividade, anisocoria)</label><input
+                                    type="text" placeholder="Isocóricas, fotorreativas…"></div>
+                            <div class="field"><label>Estrabismo / nistagmo / movimentos oculares</label><input
+                                    type="text" placeholder="Presente / ausente…"></div>
+                        </div>
+                    </div>
+                    <div class="sub">
+                        <div class="sub-title">Orelhas</div>
+                        <div class="fields">
+                            <div class="field"><label>Tamanho e implantação</label><input type="text"
+                                    placeholder="Normal / baixa implantação / malformação…"></div>
+                            <div class="field"><label>Secreção / sensibilidade</label><input type="text"
+                                    placeholder="Otorreia, otalgia…"></div>
+                            <div class="field"><label>Otoscopia — conduto auditivo externo</label><input type="text"
+                                    placeholder="Pérvio, cerume, hiperemia…"></div>
+                            <div class="field"><label>Otoscopia — membrana timpânica</label><input type="text"
+                                    placeholder="Íntegra, triângulo luminoso, abaulamento, retração…"></div>
+                            <div class="field"><label>Mastóide</label><input type="text"
+                                    placeholder="Normal / dor à palpação…"></div>
+                        </div>
+                    </div>
+                    <div class="sub">
+                        <div class="sub-title">Nariz</div>
+                        <div class="fields">
+                            <div class="field"><label>Forma / septo</label><input type="text"
+                                    placeholder="Normal / desvio de septo…"></div>
+                            <div class="field"><label>Batimento de asas do nariz</label>
+                                <div class="option-row">
+                                    <label><input type="radio" name="bater_asas" value="ausente"> Ausente</label>
+                                    <label><input type="radio" name="bater_asas" value="presente"> Presente</label>
+                                </div>
+                            </div>
+                            <div class="field"><label>Mucosa / secreções / epistaxe</label><input type="text"
+                                    placeholder="Hiperemia, rinorreia hialina/purulenta…"></div>
+                            <div class="field"><label>Pólipos / tumores / seios paranasais</label><input type="text"
+                                    placeholder="Presente / ausente…"></div>
+                        </div>
+                    </div>
+                    <div class="sub">
+                        <div class="sub-title">Boca, Dentes e Faringe</div>
+                        <div class="fields">
+                            <div class="field"><label>Lábios</label><input type="text"
+                                    placeholder="Coloração, fissuras, vesículas, edema…"></div>
+                            <div class="field"><label>Boca — odor, salivação, trisma</label><input type="text"
+                                    placeholder="Normal / fétida / hipossalivação…"></div>
+                            <div class="field"><label>Dentes e gengiva</label><input type="text"
+                                    placeholder="N.º dentes, cárie, sangramento gengival…"></div>
+                            <div class="field"><label>Mucosa oral</label><input type="text"
+                                    placeholder="Normal / monilíase / petéquias / aftas…"></div>
+                            <div class="field"><label>Língua</label><input type="text"
+                                    placeholder="Aspecto (geográfica, framboesa), macroglossia, anquiloglossia…"></div>
+                            <div class="field"><label>Palato</label><input type="text"
+                                    placeholder="Íntegro / ogival / fenda palatina…"></div>
+                            <div class="field"><label>Amígdalas — tamanho e aspecto</label><input type="text"
+                                    placeholder="Grau I–IV, hiperemia, exsudato…"></div>
+                            <div class="field"><label>Faringe posterior</label><input type="text"
+                                    placeholder="Normal / hiperemia / secreção retrofaríngea…"></div>
+                            <div class="field"><label>Laringe — voz / rouquidão / estridor</label><input type="text"
+                                    placeholder="Normal / rouca / estridor inspiratório…"></div>
+                        </div>
+                    </div>
+                    <div class="sub">
+                        <div class="sub-title">Pescoço</div>
+                        <div class="fields">
+                            <div class="field"><label>Forma, simetria, mobilidade</label><input type="text"
+                                    placeholder="Normal / torcicolo / rigidez…"></div>
+                            <div class="field"><label>Tireoide</label><input type="text"
+                                    placeholder="Impalpável / bócio / nódulos…"></div>
+                            <div class="field"><label>Turgência jugular</label>
+                                <div class="option-row">
+                                    <label><input type="radio" name="turgencia" value="ausente"> Ausente</label>
+                                    <label><input type="radio" name="turgencia" value="presente"> Presente</label>
+                                </div>
+                            </div>
+                            <div class="field"><label>Pulsos carotídeos / sopros</label><input type="text"
+                                    placeholder="Simétricos / sopro carotídeo…"></div>
+                            <div class="field span-2"><label>Tumorações / anomalias</label><input type="text"
+                                    placeholder="Cisto branquial, higroma, fístulas…"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- EF·5 · Tórax e Sistema Respiratório -->
+            <div class="section" id="s13">
+                <div class="section-head" onclick="toggleSection('s13')">
+                    <span class="section-num" style="background:#333">EF · 05</span>
+                    <span class="section-title">Tórax e Sistema Respiratório</span>
+                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <polyline points="6 9 12 15 18 9" />
+                    </svg>
+                </div>
+                <div class="section-body">
+                    <div class="sub">
+                        <div class="sub-title">Inspeção do Tórax</div>
+                        <div class="fields">
+                            <div class="field"><label>Forma e simetria</label><input type="text"
+                                    placeholder="Simétrico, tórax em quilha, tórax escavado…"></div>
+                            <div class="field"><label>Desenvolvimento mamário (adolescentes)</label><input type="text"
+                                    placeholder="Tanner I–V / ginecomastia…"></div>
+                            <div class="field"><label>Tipo respiratório</label>
+                                <select>
+                                    <option value="">Selecione…</option>
+                                    <option>Abdominal (lactentes)</option>
+                                    <option>Torácico</option>
+                                    <option>Toracoabdominal</option>
+                                    <option>Nasal</option>
+                                    <option>Bucal</option>
+                                </select>
+                            </div>
+                            <div class="field"><label>Frequência respiratória — ritmo</label>
+                                <select>
+                                    <option value="">Selecione…</option>
+                                    <option>Eupneico</option>
+                                    <option>Taquipneico</option>
+                                    <option>Bradipneico</option>
+                                    <option>Kussmaul</option>
+                                    <option>Cheyne-Stokes</option>
+                                    <option>Biot</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="option-label" style="margin-top:8px">Sinais de esforço respiratório:</div>
+                        <div class="chips">
+                            <label class="chip"><input type="checkbox">Ausentes</label>
+                            <label class="chip"><input type="checkbox">Tiragem intercostal</label>
+                            <label class="chip"><input type="checkbox">Tiragem subcostal</label>
+                            <label class="chip"><input type="checkbox">Retração esternal</label>
+                            <label class="chip"><input type="checkbox">Retração de fúrcula</label>
+                            <label class="chip"><input type="checkbox">Hiperpneia</label>
+                            <label class="chip"><input type="checkbox">Uso de musculatura acessória</label>
+                        </div>
+                    </div>
+                    <div class="sub">
+                        <div class="sub-title">Palpação</div>
+                        <div class="fields">
+                            <div class="field"><label>Expansibilidade torácica</label><input type="text"
+                                    placeholder="Simétrica / assimétrica / reduzida…"></div>
+                            <div class="field"><label>Frêmito tóraco-vocal</label><input type="text"
+                                    placeholder="Normal / aumentado / abolido…"></div>
+                        </div>
+                    </div>
+                    <div class="sub">
+                        <div class="sub-title">Percussão</div>
+                        <div class="chips">
+                            <label class="chip"><input type="checkbox">Som claro pulmonar (normal)</label>
+                            <label class="chip"><input type="checkbox">Hipersonoridade / timpanismo</label>
+                            <label class="chip"><input type="checkbox">Submacicez</label>
+                            <label class="chip"><input type="checkbox">Macicez</label>
+                        </div>
+                        <div class="field" style="margin-top:8px"><label>Localização de alterações
+                                percussórias</label><input type="text" placeholder="Ex: macicez base direita…"></div>
+                    </div>
+                    <div class="sub">
+                        <div class="sub-title">Ausculta Pulmonar</div>
+                        <div class="fields">
+                            <div class="field"><label>Murmúrio vesicular</label>
+                                <select>
+                                    <option value="">Selecione…</option>
+                                    <option>Presente, simétrico e bem distribuído</option>
+                                    <option>Diminuído globalmente</option>
+                                    <option>Diminuído / abolido à direita</option>
+                                    <option>Diminuído / abolido à esquerda</option>
+                                </select>
+                            </div>
+                            <div class="field"><label>Ruídos adventícios</label>
+                                <div class="chips">
+                                    <label class="chip"><input type="checkbox">Ausentes</label>
+                                    <label class="chip"><input type="checkbox">Roncos</label>
+                                    <label class="chip"><input type="checkbox">Sibilos</label>
+                                    <label class="chip"><input type="checkbox">Estertores finos</label>
+                                    <label class="chip"><input type="checkbox">Estertores grossos</label>
+                                    <label class="chip"><input type="checkbox">Sopro tubário</label>
+                                    <label class="chip"><input type="checkbox">Atrito pleural</label>
+                                </div>
+                            </div>
+                            <div class="field span-2"><label>Observações (broncofonia, pectorilóquia, egofonia,
+                                    localização…)</label><input type="text" placeholder="Descreva…"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- EF·6 · Sistema Cardiovascular -->
+            <div class="section" id="s14">
+                <div class="section-head" onclick="toggleSection('s14')">
+                    <span class="section-num" style="background:#333">EF · 06</span>
+                    <span class="section-title">Sistema Cardiovascular</span>
+                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <polyline points="6 9 12 15 18 9" />
+                    </svg>
+                </div>
+                <div class="section-body">
+                    <div class="fields">
+                        <div class="field"><label>Ictus cordis — localização</label><input type="text"
+                                placeholder="Ex: 5.º EIC linha hemiclavicular esquerda"></div>
+                        <div class="field"><label>Ictus — extensão / amplitude / frêmito</label><input type="text"
+                                placeholder="Normal / propulsivo / frêmito sistólico…"></div>
+                        <div class="field"><label>Ritmo cardíaco</label>
+                            <select>
+                                <option value="">Selecione…</option>
+                                <option>Rítmico</option>
+                                <option>Arrítmico</option>
+                                <option>Irregular</option>
+                            </select>
+                        </div>
+                        <div class="field"><label>Bulhas cardíacas</label>
+                            <select>
+                                <option value="">Selecione…</option>
+                                <option>B1 e B2 normofonéticas, sem B3 ou B4</option>
+                                <option>B1 hiperfonética</option>
+                                <option>B1 hipofonética</option>
+                                <option>B2 hiperfonética</option>
+                                <option>B2 hipofonética</option>
+                                <option>B3 presente</option>
+                                <option>B4 presente</option>
+                            </select>
+                        </div>
+                        <div class="field"><label>Sopro cardíaco</label>
+                            <select>
+                                <option value="">Selecione…</option>
+                                <option>Ausente</option>
+                                <option>Sistólico</option>
+                                <option>Diastólico</option>
+                                <option>Contínuo</option>
+                                <option>Inocente / funcional</option>
+                            </select>
+                        </div>
+                        <div class="field"><label>Sopro — intensidade (Grau I–VI) / foco / irradiação</label><input
+                                type="text" placeholder="Ex: Grau II/VI, foco pulmonar, sem irradiação…"></div>
+                        <div class="field span-2"><label>Pulsos periféricos — radiais, braquiais, femorais,
+                                pediosos</label><textarea
+                                placeholder="Simétricos, cheios, normais / pulso femoral diminuído (coarctação) / pulso em martelo d'água…"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- EF·7 · Abdome -->
+            <div class="section" id="s15">
+                <div class="section-head" onclick="toggleSection('s15')">
+                    <span class="section-num" style="background:#333">EF · 07</span>
+                    <span class="section-title">Abdome</span>
+                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <polyline points="6 9 12 15 18 9" />
+                    </svg>
+                </div>
+                <div class="section-body">
+                    <div class="sub">
+                        <div class="sub-title">Inspeção</div>
+                        <div class="fields">
+                            <div class="field"><label>Forma geral</label>
+                                <select>
+                                    <option value="">Selecione…</option>
+                                    <option>Plano</option>
+                                    <option>Escavado</option>
+                                    <option>Globoso</option>
+                                    <option>Distendido</option>
+                                </select>
+                            </div>
+                            <div class="field"><label>Cicatriz umbilical / hérnias</label><input type="text"
+                                    placeholder="Normal / hérnia umbilical / hérnia epigástrica…"></div>
+                            <div class="field"><label>Circulação venosa superficial / peristaltismo
+                                    visível</label><input type="text" placeholder="Ausente / presente…"></div>
+                            <div class="field"><label>Pele abdominal</label><input type="text"
+                                    placeholder="Coloração, brilho, enrugamento, estrias, cicatrizes…"></div>
+                        </div>
+                    </div>
+                    <div class="sub">
+                        <div class="sub-title">Ausculta</div>
+                        <div class="fields">
+                            <div class="field"><label>Ruídos hidroaéreos / borborismos</label>
+                                <select>
+                                    <option value="">Selecione…</option>
+                                    <option>Presentes, normais</option>
+                                    <option>Aumentados (hiperperistaltismo)</option>
+                                    <option>Diminuídos</option>
+                                    <option>Ausentes (silêncio abdominal)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sub">
+                        <div class="sub-title">Percussão</div>
+                        <div class="chips">
+                            <label class="chip"><input type="checkbox">Timpanismo (normal)</label>
+                            <label class="chip"><input type="checkbox">Macicez hepática normal</label>
+                            <label class="chip"><input type="checkbox">Macicez esplênica normal</label>
+                            <label class="chip"><input type="checkbox">Macicez em flancos (ascite)</label>
+                            <label class="chip"><input type="checkbox">Timpanismo generalizado</label>
+                        </div>
+                    </div>
+                    <div class="sub">
+                        <div class="sub-title">Palpação</div>
+                        <div class="fields">
+                            <div class="field"><label>Parede abdominal — tensão / resistência</label><input type="text"
+                                    placeholder="Flácida, depressível / defesa / rigidez…"></div>
+                            <div class="field"><label>Dor à palpação</label><input type="text"
+                                    placeholder="Ausente / localização e caráter…"></div>
+                            <div class="field"><label>Fígado</label><input type="text"
+                                    placeholder="Não palpável / hepatomegalia X cm abaixo do RCD…"></div>
+                            <div class="field"><label>Baço</label><input type="text"
+                                    placeholder="Não palpável / esplenomegalia…"></div>
+                            <div class="field"><label>Massas / tumorações</label><input type="text"
+                                    placeholder="Ausentes / localização, tamanho, consistência…"></div>
+                            <div class="field"><label>Ascite (sinal do piparote / macicez móvel)</label>
+                                <div class="option-row">
+                                    <label><input type="radio" name="ascite" value="ausente"> Ausente</label>
+                                    <label><input type="radio" name="ascite" value="presente"> Presente</label>
+                                </div>
+                            </div>
+                            <div class="field span-2"><label>Punho-percussão lombar (rins)</label><input type="text"
+                                    placeholder="Negativa bilateral / positiva direita / positiva esquerda…"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- EF·8 · Gênito-urinário -->
+            <div class="section" id="s16">
+                <div class="section-head" onclick="toggleSection('s16')">
+                    <span class="section-num" style="background:#333">EF · 08</span>
+                    <span class="section-title">Gênito-urinário e Região Perineal</span>
+                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <polyline points="6 9 12 15 18 9" />
+                    </svg>
+                </div>
+                <div class="section-body">
+                    <div class="sub">
+                        <div class="sub-title">Meninos</div>
+                        <div class="fields">
+                            <div class="field"><label>Pênis — fimose</label><input type="text"
+                                    placeholder="Grau de exposição da glande, prepúcio retrátil…"></div>
+                            <div class="field"><label>Hipospádia / epispádia</label>
+                                <div class="option-row">
+                                    <label><input type="radio" name="hipospadias" value="ausente"> Ausente</label>
+                                    <label><input type="radio" name="hipospadias" value="presente"> Presente</label>
+                                </div>
+                            </div>
+                            <div class="field"><label>Bolsa escrotal — testículos</label><input type="text"
+                                    placeholder="Bilateralmente tópicos, consistência, volume…"></div>
+                            <div class="field"><label>Criptorquidia / testículo retrátil / ectópico</label><input
+                                    type="text" placeholder="Ausente / presente — localização…"></div>
+                            <div class="field"><label>Hidrocele / cisto de cordão</label>
+                                <div class="option-row">
+                                    <label><input type="radio" name="hidrocele" value="ausente"> Ausente</label>
+                                    <label><input type="radio" name="hidrocele" value="presente"> Presente</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sub">
+                        <div class="sub-title">Meninas</div>
+                        <div class="fields">
+                            <div class="field"><label>Clitóris</label><input type="text"
+                                    placeholder="Tamanho e características…"></div>
+                            <div class="field"><label>Lábios maiores e menores</label><input type="text"
+                                    placeholder="Normal / sinéquia de pequenos lábios…"></div>
+                            <div class="field"><label>Sinais inflamatórios / corrimento vaginal</label><input
+                                    type="text" placeholder="Ausente / tipo de corrimento…"></div>
+                            <div class="field"><label>Aspecto do hímen / anomalias congênitas</label><input type="text"
+                                    placeholder="Normal / imperfurado…"></div>
+                        </div>
+                    </div>
+                    <div class="sub">
+                        <div class="sub-title">Estadiamento de Tanner (adolescentes)</div>
+                        <div class="fields cols-3">
+                            <div class="field"><label>Mamas (M)</label><input type="text" placeholder="M1–M5"></div>
+                            <div class="field"><label>Pelos pubianos (P)</label><input type="text" placeholder="P1–P5">
+                            </div>
+                            <div class="field"><label>Genitália masculina (G)</label><input type="text"
+                                    placeholder="G1–G5">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sub">
+                        <div class="sub-title">Região Anal e Perineal</div>
+                        <div class="fields">
+                            <div class="field"><label>Ânus</label><input type="text"
+                                    placeholder="Normal / fissuras / fístulas / abscesso / anomalias anorretais…"></div>
+                            <div class="field"><label>Prolapso retal / pólipos</label><input type="text"
+                                    placeholder="Ausente / presente…"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- EF·9 · Sistema Locomotor -->
+            <div class="section" id="s17">
+                <div class="section-head" onclick="toggleSection('s17')">
+                    <span class="section-num" style="background:#333">EF · 09</span>
+                    <span class="section-title">Sistema Locomotor</span>
+                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <polyline points="6 9 12 15 18 9" />
+                    </svg>
+                </div>
+                <div class="section-body">
+                    <div class="sub">
+                        <div class="sub-title">Extremidades</div>
+                        <div class="fields">
+                            <div class="field"><label>Mobilidade dos quatro membros</label><input type="text"
+                                    placeholder="Preservada / limitada — especificar…"></div>
+                            <div class="field"><label>Sinais inflamatórios articulares (artrites,
+                                    miosites)</label><input type="text" placeholder="Ausentes / articulação acometida…">
+                            </div>
+                            <div class="field"><label>Deformidades</label>
+                                <div class="chips">
+                                    <label class="chip"><input type="checkbox">Ausentes</label>
+                                    <label class="chip"><input type="checkbox">Genu varo</label>
+                                    <label class="chip"><input type="checkbox">Genu valgo</label>
+                                    <label class="chip"><input type="checkbox">Pé plano</label>
+                                    <label class="chip"><input type="checkbox">Polidactilia</label>
+                                    <label class="chip"><input type="checkbox">Sindactilia</label>
+                                </div>
+                            </div>
+                            <div class="field"><label>Marcha</label>
+                                <select>
+                                    <option value="">Selecione…</option>
+                                    <option>Normal</option>
+                                    <option>Atáxica</option>
+                                    <option>Claudicante</option>
+                                    <option>Espástica</option>
+                                    <option>Em tesoura</option>
+                                    <option>Escarvante</option>
+                                </select>
+                            </div>
+                            <div class="field"><label>Edema de membros inferiores</label>
+                                <div class="option-row">
+                                    <label><input type="radio" name="edema_mmii" value="ausente"> Ausente</label>
+                                    <label><input type="radio" name="edema_mmii" value="presente"> Presente</label>
+                                </div>
+                            </div>
+                            <div class="field"><label>Manobra de Ortolani (RN / lactentes)</label>
+                                <div class="option-row">
+                                    <label><input type="radio" name="ortolani" value="negativa"> Negativa</label>
+                                    <label><input type="radio" name="ortolani" value="positiva"> Positiva</label>
+                                    <label><input type="radio" name="ortolani" value="na"> N/A</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sub">
+                        <div class="sub-title">Coluna Vertebral</div>
+                        <div class="fields">
+                            <div class="field"><label>Alinhamento</label>
+                                <div class="chips">
+                                    <label class="chip"><input type="checkbox">Normal</label>
+                                    <label class="chip"><input type="checkbox">Escoliose</label>
+                                    <label class="chip"><input type="checkbox">Cifose</label>
+                                    <label class="chip"><input type="checkbox">Lordose acentuada</label>
+                                    <label class="chip"><input type="checkbox">Opistótono</label>
+                                </div>
+                            </div>
+                            <div class="field"><label>Mobilidade / dor à palpação</label><input type="text"
+                                    placeholder="Normal / limitada / ponto de dor…"></div>
+                            <div class="field span-2"><label>Anomalias (cistos, dimple sacral, tufo de pelo, espinha
+                                    bífida,
+                                    mielomeningocele)</label><input type="text"
+                                    placeholder="Ausentes / presente — descrever…"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- EF·10 · Exame Neurológico -->
+            <div class="section" id="s18">
+                <div class="section-head" onclick="toggleSection('s18')">
+                    <span class="section-num" style="background:#333">EF · 10</span>
+                    <span class="section-title">Exame Neurológico</span>
+                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <polyline points="6 9 12 15 18 9" />
+                    </svg>
+                </div>
+                <div class="section-body">
+                    <div class="fields">
+                        <div class="field"><label>Nível de consciência</label>
+                            <select>
+                                <option value="">Selecione…</option>
+                                <option>Alerta</option>
+                                <option>Obnubilado</option>
+                                <option>Sonolento</option>
+                                <option>Estupor</option>
+                                <option>Coma</option>
+                            </select>
+                        </div>
+                        <div class="field"><label>Escala de Glasgow</label><input type="text"
+                                placeholder="Ex: 15 (AO4, RV5, RM6)"></div>
+                        <div class="field"><label>Estigmas neurocutâneos (pele)</label><input type="text"
+                                placeholder="Manchas café-com-leite, hipocromias, adenomas sebáceos…"></div>
+                        <div class="field"><label>Tônus muscular</label>
+                            <select>
+                                <option value="">Selecione…</option>
+                                <option>Normal (normotônico)</option>
+                                <option>Hipotônico</option>
+                                <option>Hipertônico / espástico</option>
+                                <option>Hipertônico / rígido</option>
+                            </select>
+                        </div>
+                        <div class="field"><label>Força muscular</label><input type="text"
+                                placeholder="Preservada / paresia / plegia — localização…"></div>
+                        <div class="field"><label>Reflexos osteotendinosos (ROTs)</label><input type="text"
+                                placeholder="Presentes e simétricos / hiporreflexia / hiper-reflexia…"></div>
+                        <div class="field"><label>Coordenação e equilíbrio</label><input type="text"
+                                placeholder="Normal / dismetria / ataxia…"></div>
+                        <div class="field"><label>Sensibilidade superficial e profunda</label><input type="text"
+                                placeholder="Normal / hipoestesia / parestesia…"></div>
+                        <div class="field"><label>Pares cranianos</label><input type="text"
+                                placeholder="Sem alterações / especificar par acometido…"></div>
+                        <div class="field"><label>Reflexos primitivos e posturais (RN/lactentes)</label><textarea
+                                placeholder="Sucção, Moro, Preensão palmar/plantar, Galant, Marcha reflexa…"></textarea>
+                        </div>
+                        <div class="field"><label>Sinais de irritação meníngea</label>
+                            <div class="option-row">
+                                <label><input type="radio" name="meningeo" value="ausentes"> Ausentes</label>
+                                <label><input type="radio" name="meningeo" value="presentes"> Presentes</label>
+                            </div>
+                        </div>
+                        <div class="field"><label>Se presentes — especificar (Brudzinski, Kernig, Lasègue)</label><input
+                                type="text" placeholder="Descreva…"></div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- ══════════════════════════════════════════
+     BLOCO 3 — AVALIAÇÃO
+══════════════════════════════════════════ -->
+            <div id="avaliacao" class="anchor"></div>
+
+            <div class="section" id="s19">
+                <div class="section-head" onclick="toggleSection('s19')">
+                    <span class="section-num" style="background:#444">AVALIAÇÃO</span>
+                    <span class="section-title">Hipóteses Diagnósticas</span>
+                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <polyline points="6 9 12 15 18 9" />
+                    </svg>
+                </div>
+                <div class="section-body">
+
+                    <div class="dx-block">
+                        <label>Diagnóstico Clínico — Hipótese(s) Principal(ais)</label>
+                        <textarea rows="3"
+                            placeholder="Ex: Transtorno do Espectro Autista (F84.0); Atraso na aquisição da linguagem…"></textarea>
+                    </div>
+
+                    <div class="dx-block">
+                        <label>Diagnósticos Diferenciais</label>
+                        <textarea rows="3"
+                            placeholder="Liste as hipóteses alternativas em ordem de probabilidade…"></textarea>
+                    </div>
+
+                    <div class="dx-block">
+                        <div class="dx-header">
+                            <label>Diagnóstico Nutricional</label>
+                            <div class="dx-actions">
+                                <button type="button" class="btn-dx"
+                                    onclick="fillDx('dx-nutricional', 'Eutrófico para a idade')">Normal</button>
+                            </div>
+                        </div>
+                        <textarea id="dx-nutricional" rows="2"
+                            placeholder="Ex: Eutrófico para idade. IMC no percentil 50."></textarea>
+                    </div>
+
+                    <div class="dx-block">
+                        <div class="dx-header">
+                            <label>Diagnóstico Neuropsicomotor</label>
+                            <div class="dx-actions">
+                                <button type="button" class="btn-dx"
+                                    onclick="fillDx('dx-neuro', 'Desenvolvimento adequado para a idade')">Normal</button>
+                                <button type="button" class="btn-dx"
+                                    onclick="fillDx('dx-neuro', 'Alerta para o desenvolvimento')">Alerta</button>
+                                <button type="button" class="btn-dx"
+                                    onclick="fillDx('dx-neuro', 'Possível atraso no desenvolvimento')">Atraso</button>
+                            </div>
+                        </div>
+                        <textarea id="dx-neuro" rows="2"
+                            placeholder="Ex: Atraso no desenvolvimento da linguagem. Denver II suspeito na área pessoal-social."></textarea>
+                    </div>
+
+                    <div class="dx-block">
+                        <div class="dx-header">
+                            <label>Diagnóstico Vacinal</label>
+                            <div class="dx-actions">
+                                <button type="button" class="btn-dx"
+                                    onclick="fillDx('dx-vacinal', 'Calendário vacinal atualizado')">Normal</button>
+                            </div>
+                        </div>
+                        <textarea id="dx-vacinal" rows="2"
+                            placeholder="Ex: Calendário vacinal atualizado / vacinas X e Y em atraso."></textarea>
+                    </div>
+
+                    <div
+                        style="background:#f5f5f5; border:1px solid #ccc; border-radius:4px; padding:12px 14px; margin-bottom:10px">
+                        <div style="font-size:12px; font-weight:600; color:#333; margin-bottom:10px">Diagnóstico de
+                            Risco
+                            — marcar se aplicável</div>
+
+                        <div class="risk-group">
+                            <div class="risk-group-title">1 · Evidência ou suspeita de violência</div>
+                            <div class="risk-items">
+                                <label class="risk-item"><input type="checkbox"> Negligência / Abandono</label>
+                                <label class="risk-item"><input type="checkbox"> Abuso e maus-tratos na família e nas
+                                    instituições</label>
+                                <label class="risk-item"><input type="checkbox"> Exploração e abuso sexual</label>
+                                <label class="risk-item"><input type="checkbox"> Trabalho abusivo e explorador</label>
+                                <label class="risk-item"><input type="checkbox"> Tráfico de crianças e
+                                    adolescentes</label>
+                                <label class="risk-item"><input type="checkbox"> Uso e tráfico de drogas</label>
+                                <label class="risk-item"><input type="checkbox"> Conflito com a lei</label>
+                            </div>
+                        </div>
+
+                        <div class="risk-group">
+                            <div class="risk-group-title">2 · Risco pelo período perinatal</div>
+                            <div class="risk-items">
+                                <label class="risk-item"><input type="checkbox"> Peso ao nascer &lt; 2.500 g (baixo
+                                    peso)</label>
+                                <label class="risk-item"><input type="checkbox"> Prematuridade</label>
+                                <label class="risk-item"><input type="checkbox"> Asfixia (Apgar &lt; 7 no 5.º
+                                    minuto)</label>
+                                <label class="risk-item"><input type="checkbox"> Internação do RN em UI/UTI após alta
+                                    materna</label>
+                                <label class="risk-item"><input type="checkbox"> Criança manifestamente
+                                    indesejada</label>
+                                <label class="risk-item"><input type="checkbox"> Não comparecimento para o Teste do
+                                    Pezinho</label>
+                                <label class="risk-item"><input type="checkbox"> Falha em triagem neonatal sem
+                                    acompanhamento</label>
+                            </div>
+                        </div>
+
+                        <div class="risk-group">
+                            <div class="risk-group-title">3 · Falha no acompanhamento de puericultura</div>
+                            <div class="risk-items">
+                                <label class="risk-item"><input type="checkbox"> Vacinas em atraso</label>
+                                <label class="risk-item"><input type="checkbox"> Menor de 6 meses não amamenta no
+                                    peito</label>
+                                <label class="risk-item"><input type="checkbox"> Menor de 1 ano sem acompanhamento
+                                    pediátrico</label>
+                                <label class="risk-item"><input type="checkbox"> Criança desnutrida</label>
+                            </div>
+                        </div>
+
+                        <div class="risk-group">
+                            <div class="risk-group-title">4 · Evidência de risco por patologias prévias</div>
+                            <div class="risk-items">
+                                <label class="risk-item"><input type="checkbox"> Grande frequência em serviços de
+                                    urgência</label>
+                                <label class="risk-item"><input type="checkbox"> Criança hospitalizada mais de 1
+                                    vez/ano</label>
+                                <label class="risk-item"><input type="checkbox"> Egresso de internação hospitalar
+                                    recente</label>
+                                <label class="risk-item"><input type="checkbox"> História de desnutrição em outros
+                                    filhos da
+                                    família</label>
+                                <label class="risk-item"><input type="checkbox"> Criança com anemia ou sinais de
+                                    hipovitaminose</label>
+                                <label class="risk-item"><input type="checkbox"> Criança com sobrepeso /
+                                    obesidade</label>
+                                <label class="risk-item"><input type="checkbox"> Criança com diarreia persistente ou
+                                    recorrente</label>
+                                <label class="risk-item"><input type="checkbox"> Criança com asma sem
+                                    acompanhamento</label>
+                            </div>
+                        </div>
+
+                        <div class="risk-group">
+                            <div class="risk-group-title">5 · Risco familiar e socioambiental</div>
+                            <div class="risk-items">
+                                <label class="risk-item"><input type="checkbox"> Mãe adolescente abaixo de 16
+                                    anos</label>
+                                <label class="risk-item"><input type="checkbox"> Mãe analfabeta ou com baixa instrução
+                                    (&lt;
+                                    4 anos de escola)</label>
+                                <label class="risk-item"><input type="checkbox"> Mãe sem suporte ou apoio
+                                    familiar</label>
+                                <label class="risk-item"><input type="checkbox"> Família sem fonte de renda mínima
+                                    regular</label>
+                                <label class="risk-item"><input type="checkbox"> Mãe com deficiência que impossibilite o
+                                    cuidado da criança</label>
+                                <label class="risk-item"><input type="checkbox"> Mãe ou pai com história de problemas
+                                    psiquiátricos</label>
+                                <label class="risk-item"><input type="checkbox"> Mãe ou pai dependentes de álcool ou
+                                    drogas
+                                    ilícitas</label>
+                                <label class="risk-item"><input type="checkbox"> Mãe residente em área sem saneamento
+                                    básico</label>
+                                <label class="risk-item"><input type="checkbox"> Mãe residente em área social de
+                                    risco</label>
+                                <label class="risk-item"><input type="checkbox"> História de migração da família há
+                                    menos de
+                                    2 anos</label>
+                                <label class="risk-item"><input type="checkbox"> Morte de irmão menor de 5 anos</label>
+                            </div>
+                        </div>
+
+                        <div class="field" style="margin-top:10px">
+                            <label style="font-size:12px; color:#333; font-weight:600">Observações sobre risco
+                                identificado</label>
+                            <textarea
+                                style="border:1px solid var(--border); border-radius:4px; padding:6px 8px; font-family:var(--font); font-size:13px; width:100%; min-height:52px; resize:vertical; background:#fff;"
+                                placeholder="Descreva achados, encaminhamentos ao CRAS, CREAS, conselho tutelar…"></textarea>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+
+            <!-- ══════════════════════════════════════════
+     BLOCO 4 — CONDUTA
+══════════════════════════════════════════ -->
+            <div id="conduta" class="anchor"></div>
+
+            <div class="section" id="s20">
+                <div class="section-head" onclick="toggleSection('s20')">
+                    <span class="section-num" style="background:#555">CONDUTA</span>
+                    <span class="section-title">Plano Terapêutico e Orientações</span>
+                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <polyline points="6 9 12 15 18 9" />
+                    </svg>
+                </div>
+                <div class="section-body">
+
+                    <div class="conduta-block">
+                        <label>Exames complementares solicitados (laboratoriais e/ou de imagem)</label>
+                        <textarea rows="3"
+                            placeholder="Ex: Hemograma completo, PCR, Rx tórax PA…&#10;Avaliação audiológica (BERA)…"></textarea>
+                    </div>
+
+                    <div class="conduta-block">
+                        <label>Pareceres / Encaminhamentos especializados</label>
+                        <textarea rows="3"
+                            placeholder="Ex: Fonoaudiologia, Neurologia Pediátrica, Psicologia, Fisioterapia…"></textarea>
+                    </div>
+
+                    <div class="conduta-block">
+                        <label>Prescrição — Tratamento Farmacológico</label>
+                        <textarea rows="4"
+                            placeholder="Medicamento — dose — frequência — duração — via&#10;Ex: Amoxicilina 50 mg/kg/dia VO 8/8h por 7 dias"></textarea>
+                    </div>
+
+                    <div class="conduta-block">
+                        <label>Tratamento Não Farmacológico</label>
+                        <textarea rows="3"
+                            placeholder="Ex: Estimulação da linguagem, terapia ocupacional, dieta modificada…"></textarea>
+                    </div>
+
+                    <div class="conduta-block">
+                        <label>Orientações ao responsável</label>
+                        <textarea rows="4"
+                            placeholder="Orientações sobre a doença, sinais de alerta para retorno, cuidados em casa, alimentação, higiene, vacinação pendente…"></textarea>
+                    </div>
+
+                    <div class="conduta-block">
+                        <label>Retorno / seguimento</label>
+                        <textarea rows="2"
+                            placeholder="Ex: Retorno em 15 dias ou antes se piora clínica. Próxima puericultura em…"></textarea>
+                    </div>
+
+                    <div
+                        style="margin-top:10px; border:1px solid var(--border-light); border-radius:4px; padding:12px 14px;">
+                        <div
+                            style="font-size:12px; font-weight:600; color:var(--text-secondary); margin-bottom:8px; text-transform:uppercase; letter-spacing:.05em">
+                            Assinatura e Identificação do Médico</div>
+                        <div class="fields cols-3">
+                            <div class="field span-2"><label>Nome completo do médico(a)</label><input type="text"
+                                    placeholder="Dr(a). Nome"></div>
+                            <div class="field"><label>CRM</label><input type="text" placeholder="CRM/UF 000000"></div>
+                            <div class="field"><label>Data</label><input type="date"></div>
+                            <div class="field"><label>Instituição / Serviço</label><input type="text"
+                                    placeholder="Ex: UBS / Ambulatório de Pediatria / Hospital…"></div>
+                            <div class="field"></div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div><!-- /wrapper -->
+
+        <!-- RIGHT SIDEBAR: Referências -->
+        <aside class="sidebar-right" id="sidebarRight">
+            <div class="side-panel-title">Referências e Manuais</div>
+
+            <div class="ref-group">
+                <div class="ref-group-label">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                    </svg>
+                    Cadernetas da Criança
+                </div>
+                <a href="https://bvsms.saude.gov.br/bvs/publicacoes/caderneta_crianca_menina_passaporte_cidadania_7ed.pdf"
+                    target="_blank" class="ref-link">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                        <polyline points="15 3 21 3 21 9"></polyline>
+                        <line x1="10" y1="14" x2="21" y2="3"></line>
+                    </svg>
+                    Menina
+                </a>
+                <a href="https://bvsms.saude.gov.br/bvs/publicacoes/caderneta_crianca_menino_passaporte_cidadania_7ed.pdf"
+                    target="_blank" class="ref-link">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                        <polyline points="15 3 21 3 21 9"></polyline>
+                        <line x1="10" y1="14" x2="21" y2="3"></line>
+                    </svg>
+                    Menino
+                </a>
+            </div>
+
+            <hr class="ref-divider">
+
+            <div class="ref-group">
+                <div class="ref-group-label">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    </svg>
+                    Cadernetas do Adolescente
+                </div>
+                <a href="https://bvsms.saude.gov.br/bvs/publicacoes/caderneta_saude_adolescente_feminina_4ed1rempr.pdf"
+                    target="_blank" class="ref-link">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                        <polyline points="15 3 21 3 21 9"></polyline>
+                        <line x1="10" y1="14" x2="21" y2="3"></line>
+                    </svg>
+                    Menina
+                </a>
+                <a href="https://bvsms.saude.gov.br/bvs/publicacoes/caderneta_saude_adolescente_masculino_4ed1rempr.pdf"
+                    target="_blank" class="ref-link">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                        <polyline points="15 3 21 3 21 9"></polyline>
+                        <line x1="10" y1="14" x2="21" y2="3"></line>
+                    </svg>
+                    Menino
+                </a>
+            </div>
+
+            <hr class="ref-divider">
+
+            <div class="ref-group">
+                <div class="ref-group-label">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <polyline points="10 9 9 9 8 9"></polyline>
+                    </svg>
+                    Ferramentas e Escalas
+                </div>
+                <a href="https://mchatscreen.com/wp-content/uploads/2020/09/M-CHAT-R_F_Brazilian_Portuguese_v2.pdf"
+                    target="_blank" class="ref-link">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                        <polyline points="15 3 21 3 21 9"></polyline>
+                        <line x1="10" y1="14" x2="21" y2="3"></line>
+                    </svg>
+                    M-CHAT-R/F (Autismo)
+                </a>
+                <a href="https://www.sbp.com.br/departamentos/endocrinologia/graficos-de-crescimento/" target="_blank"
+                    class="ref-link">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                        <polyline points="15 3 21 3 21 9"></polyline>
+                        <line x1="10" y1="14" x2="21" y2="3"></line>
+                    </svg>
+                    Curvas de crescimento
+                </a>
+                <a href="https://www.sbp.com.br/fileadmin/user_upload/21635c-MO_-_Hipertensao_Arterial_Infanc_e_Adolesc.pdf"
+                    target="_blank" class="ref-link">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                        <polyline points="15 3 21 3 21 9"></polyline>
+                        <line x1="10" y1="14" x2="21" y2="3"></line>
+                    </svg>
+                    Pressão arterial
+                </a>
+                <a href="https://sbim.org.br/calendario-de-vacinacao" target="_blank" class="ref-link">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                        <polyline points="15 3 21 3 21 9"></polyline>
+                        <line x1="10" y1="14" x2="21" y2="3"></line>
+                    </svg>
+                    SBIm
+                </a>
+                <a href="https://www.gov.br/saude/pt-br/vacinacao/calendario" target="_blank" class="ref-link">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                        <polyline points="15 3 21 3 21 9"></polyline>
+                        <line x1="10" y1="14" x2="21" y2="3"></line>
+                    </svg>
+                    Calendário vacinal SUS
+                </a>
+            </div>
+        </aside>
+
+    </div><!-- /page-layout -->
+
+    <!-- MODAL: Marcos do Desenvolvimento -->
+    <div class="modal-overlay" id="marcosModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <h2>Marcos do Desenvolvimento</h2>
+                    <span class="modal-age-badge" id="modalAgeBadge">—</span>
+                </div>
+                <button class="modal-close" onclick="closeMarcosModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="marcosBody">
+                <div class="modal-no-milestones">Preencha a data de nascimento para visualizar os marcos esperados.
+                </div>
+            </div>
+            <div style="padding:0 20px 16px;">
+                <div class="milestone-obs">
+                    <label>Observações gerais sobre marcos do desenvolvimento</label>
+                    <textarea id="marcosObs"
+                        placeholder="Registre achados relevantes, marcos ausentes, necessidade de encaminhamento…"></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ── Global state and auto-save variables ──
+        let savedMilestones = new Set();
+
+        // ── Toggle section ──
+        function toggleSection(id) {
+            const el = document.getElementById(id);
+            el.classList.toggle('collapsed');
+        }
+
+        // ── Highlight active nav on scroll ──
+        const anchors = ['anamnese', 'exame', 'avaliacao', 'conduta'];
+        const pills = document.querySelectorAll('.nav-pill');
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    const id = e.target.id;
+                    pills.forEach(p => {
+                        p.classList.toggle('active', p.getAttribute('href') === '#' + id);
+                    });
+                }
+            });
+        }, { rootMargin: '-52px 0px -80% 0px', threshold: 0 });
+        anchors.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) observer.observe(el);
+        });
+
+        // ── Default consultation date to today ──
+        (function () {
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dd = String(today.getDate()).padStart(2, '0');
+            document.getElementById('dataConsulta').value = `${yyyy}-${mm}-${dd}`;
+        })();
+
+        // ── Auto-calculate age ──
+        function calcularIdade() {
+            const nascInput = document.getElementById('dataNascimento').value;
+            const consultaInput = document.getElementById('dataConsulta').value;
+            const idadeField = document.getElementById('idadeCalculada');
+            if (!nascInput) { idadeField.value = ''; return; }
+            const nasc = new Date(nascInput + 'T00:00:00');
+            const ref = consultaInput ? new Date(consultaInput + 'T00:00:00') : new Date();
+            if (nasc > ref) { idadeField.value = 'Data inválida'; return; }
+            let anos = ref.getFullYear() - nasc.getFullYear();
+            let meses = ref.getMonth() - nasc.getMonth();
+            let dias = ref.getDate() - nasc.getDate();
+            if (dias < 0) { meses--; const prevMonth = new Date(ref.getFullYear(), ref.getMonth(), 0); dias += prevMonth.getDate(); }
+            if (meses < 0) { anos--; meses += 12; }
+            const parts = [];
+            if (anos > 0) parts.push(anos + (anos === 1 ? ' ano' : ' anos'));
+            if (meses > 0) parts.push(meses + (meses === 1 ? ' mês' : ' meses'));
+            if (dias > 0 || parts.length === 0) parts.push(dias + (dias === 1 ? ' dia' : ' dias'));
+            idadeField.value = parts.join(', ');
+        }
+        document.getElementById('dataNascimento').addEventListener('change', calcularIdade);
+        document.getElementById('dataConsulta').addEventListener('change', calcularIdade);
+
+        // ── BMI calculation logic with manual override ──
+        let imcManual = false;
+        function calcularIMC() {
+            if (imcManual) return;
+            const pesoInput = document.getElementById('input-peso');
+            const alturaInput = document.getElementById('input-altura');
+            const imcInput = document.getElementById('input-imc');
+            if (!pesoInput || !alturaInput || !imcInput) return;
+            const peso = parseFloat(pesoInput.value);
+            const altura = parseFloat(alturaInput.value);
+            if (!isNaN(peso) && !isNaN(altura) && altura > 0) {
+                const alturaMetros = altura / 100;
+                const imc = peso / (alturaMetros * alturaMetros);
+                imcInput.value = imc.toFixed(2);
+            } else {
+                imcInput.value = '';
+            }
+        }
+        document.getElementById('input-peso').addEventListener('input', calcularIMC);
+        document.getElementById('input-altura').addEventListener('input', calcularIMC);
+        document.getElementById('input-imc').addEventListener('input', function (e) {
+            if (e.target.value === '') {
+                imcManual = false;
+                calcularIMC();
+            } else {
+                imcManual = true;
+            }
+        });
+
+        // ── Diagnósticos Quick Fill Helper ──
+        function fillDx(id, text) {
+            const el = document.getElementById(id);
+            if (el) {
+                el.value = text;
+                el.dispatchEvent(new Event('input', { bubbles: true }));
+            }
+        }
+
+        // ── Milestones Data (Caderneta da Criança, pages 83–87) ──
+        const MARCOS = [
+            // Nascimento a 6 meses
+            { nome: 'Postura: pernas e braços fletidos, cabeça lateralizada', desc: 'Deite a criança de costas; observe se braços e pernas ficam flexionados e cabeça lateralizada.', minMeses: 0, maxMeses: 1 },
+            { nome: 'Observa um rosto', desc: 'Posicione seu rosto a ~30 cm acima do rosto da criança e observe se ela olha para você.', minMeses: 0, maxMeses: 1 },
+            { nome: 'Reage ao som', desc: 'Bata palmas ou balance chocalho a ~30 cm de cada orelha; observe reação com olhos ou expressão facial.', minMeses: 0, maxMeses: 1 },
+            { nome: 'Eleva a cabeça', desc: 'De bruços, observe se levanta a cabeça desencostando o queixo da superfície.', minMeses: 1, maxMeses: 2 },
+            { nome: 'Sorri quando estimulada', desc: 'Sorria e converse com a criança sem tocar sua face. Observe se responde com sorriso.', minMeses: 1, maxMeses: 2 },
+            { nome: 'Abre as mãos', desc: 'Observe se em alguns momentos a criança abre as mãos espontaneamente.', minMeses: 2, maxMeses: 3 },
+            { nome: 'Emite sons', desc: 'Observe se emite algum som que não seja choro. Pergunte ao acompanhante se faz em casa.', minMeses: 2, maxMeses: 4 },
+            { nome: 'Movimenta os membros', desc: 'Observe se movimenta ativamente os membros superiores e inferiores.', minMeses: 2, maxMeses: 4 },
+            { nome: 'Responde ativamente ao contato social', desc: 'Converse com o bebê; observe se responde com sorriso e emissão de sons.', minMeses: 3, maxMeses: 4 },
+            { nome: 'Segura objetos', desc: 'Ofereça objeto tocando no dorso da mão; criança deve abrir e segurar por alguns segundos.', minMeses: 3, maxMeses: 5 },
+            { nome: 'Emite sons, ri alto', desc: 'Converse com a criança; observe se emite sons (gugu, eeee) e ri emitindo sons (gargalhada).', minMeses: 4, maxMeses: 5 },
+            { nome: 'Levanta a cabeça e apoia-se nos antebraços, de bruços', desc: 'De bruços, chame atenção à frente; observe se levanta cabeça apoiando-se nos antebraços.', minMeses: 4, maxMeses: 5 },
+            { nome: 'Busca ativa de objetos', desc: 'Coloque objeto ao alcance; observe se tenta alcançá-lo.', minMeses: 4, maxMeses: 6 },
+            { nome: 'Leva objetos à boca', desc: 'Ofereça objeto na mão e observe se o leva à boca.', minMeses: 4, maxMeses: 6 },
+            { nome: 'Localiza o som', desc: 'Faça barulho suave próximo à orelha; observe se vira a cabeça em direção ao som.', minMeses: 5, maxMeses: 6 },
+            { nome: 'Muda de posição (rola)', desc: 'De barriga para cima, incentive a virar para a posição de bruços.', minMeses: 5, maxMeses: 6 },
+            // 6 meses a 1 ano e meio
+            { nome: 'Brinca de esconde-achou', desc: 'Brinque de aparecer e desaparecer atrás de pano; observe se procura quando desaparece.', minMeses: 6, maxMeses: 9 },
+            { nome: 'Transfere objetos de uma mão para outra', desc: 'Ofereça objeto e observe se transfere de uma mão para outra.', minMeses: 6, maxMeses: 9 },
+            { nome: 'Duplica sílabas', desc: 'Observe se fala "papá", "dadá", "mamã". Pergunte à mãe se faz em casa.', minMeses: 7, maxMeses: 9 },
+            { nome: 'Senta-se sem apoio', desc: 'Coloque sentada em superfície firme; observe se fica sentada sem apoio das mãos.', minMeses: 7, maxMeses: 9 },
+            { nome: 'Imita gestos', desc: 'Faça gesto como bater palmas ou dar tchau; observe se imita.', minMeses: 9, maxMeses: 12 },
+            { nome: 'Faz pinça', desc: 'Coloque objeto pequeno próximo; observe se pega com movimento de pinça (polegar + indicador).', minMeses: 9, maxMeses: 12 },
+            { nome: 'Produz "jargão"', desc: 'Observe se produz conversação incompreensível consigo mesma ou com outros.', minMeses: 9, maxMeses: 12 },
+            { nome: 'Anda com apoio', desc: 'Observe se dá alguns passos com apoio.', minMeses: 9, maxMeses: 12 },
+            { nome: 'Mostra o que quer', desc: 'Indica o que quer sem choro: apontando, estendendo a mão ou usando palavras/sons.', minMeses: 11, maxMeses: 14 },
+            { nome: 'Coloca blocos na caneca', desc: 'Estimule a colocar blocos dentro da caneca; observe se coloca pelo menos um e solta.', minMeses: 11, maxMeses: 14 },
+            { nome: 'Diz uma palavra', desc: 'Observe se diz pelo menos uma palavra (exceto nomes de família ou animais de estimação).', minMeses: 12, maxMeses: 15 },
+            { nome: 'Anda sem apoio', desc: 'Observe se anda com bom equilíbrio, sem se apoiar.', minMeses: 12, maxMeses: 15 },
+            { nome: 'Usa colher ou garfo', desc: 'Usa colher ou garfo derramando pouco fora da boca.', minMeses: 13, maxMeses: 18 },
+            { nome: 'Constrói torre de 2 cubos', desc: 'Observe se coloca um cubo sobre o outro sem cair ao retirar a mão.', minMeses: 14, maxMeses: 18 },
+            { nome: 'Fala 3 palavras', desc: 'Observe se diz três palavras (exceto nomes de família ou animais de estimação).', minMeses: 14, maxMeses: 18 },
+            { nome: 'Anda para trás', desc: 'Peça para abrir porta/gaveta; observe se dá dois passos para trás sem cair.', minMeses: 16, maxMeses: 18 },
+            // 1 ano e meio a 3 anos e meio
+            { nome: 'Tira roupa', desc: 'Observe se é capaz de remover alguma peça de roupa (sapatos, casacos, calças, camisetas).', minMeses: 18, maxMeses: 24 },
+            { nome: 'Constrói torre de 3 cubos', desc: 'Observe se empilha três cubos sem que caiam ao retirar a mão.', minMeses: 18, maxMeses: 24 },
+            { nome: 'Aponta 2 figuras', desc: 'Observe se aponta duas de um grupo de cinco figuras.', minMeses: 18, maxMeses: 24 },
+            { nome: 'Chuta bola', desc: 'Observe se chuta a bola sem apoiar-se em objetos.', minMeses: 18, maxMeses: 24 },
+            { nome: 'Veste-se com supervisão', desc: 'Pergunte se é capaz de vestir alguma peça de roupa (calcinha, cueca, meias, sapatos, casaco).', minMeses: 24, maxMeses: 30 },
+            { nome: 'Constrói torre de 6 cubos', desc: 'Observe se empilha seis cubos sem que caiam ao retirar a mão.', minMeses: 24, maxMeses: 30 },
+            { nome: 'Frases com 2 palavras', desc: 'Observe se combina duas palavras formando frase com significado ("quer água", "chuta bola").', minMeses: 24, maxMeses: 30 },
+            { nome: 'Pula com ambos os pés', desc: 'Observe se pula com os dois pés atingindo o chão ao mesmo tempo.', minMeses: 24, maxMeses: 30 },
+            { nome: 'Brinca com outras crianças', desc: 'Pergunte se participa de brincadeiras com outras crianças.', minMeses: 30, maxMeses: 36 },
+            { nome: 'Imita o desenho de uma linha', desc: 'Após demonstração, observe se faz uma linha de pelo menos 5 cm.', minMeses: 30, maxMeses: 36 },
+            { nome: 'Reconhece 2 ações', desc: 'Observe se aponta figura de acordo com ação ("quem mia?", "quem late?").', minMeses: 30, maxMeses: 36 },
+            { nome: 'Arremessa bola', desc: 'Observe se arremessa a bola acima do braço.', minMeses: 30, maxMeses: 36 },
+            { nome: 'Veste uma camiseta', desc: 'Pergunte se é capaz de vestir camiseta e/ou casaco sem botão ou zíper, sem ajuda.', minMeses: 36, maxMeses: 42 },
+            { nome: 'Move o polegar com a mão fechada', desc: 'Demonstre e observe se move o polegar em sinal de "OK" com uma ou ambas as mãos.', minMeses: 36, maxMeses: 42 },
+            { nome: 'Compreende 2 adjetivos', desc: 'Pergunte: "O que faz quando está com fome/frio/cansado?" — verifique respostas coerentes.', minMeses: 36, maxMeses: 42 },
+            { nome: 'Equilibra-se em cada pé 1 segundo', desc: 'Após demonstração, verifique se fica em um pé só pelo menos 1 segundo. Repita com o outro.', minMeses: 36, maxMeses: 42 },
+            // 3 anos e meio a 5 anos
+            { nome: 'Emparelha cores', desc: 'Observe se emparelha objetos da mesma cor (ex.: cubos).', minMeses: 42, maxMeses: 48 },
+            { nome: 'Copia círculos', desc: 'Mostre figura de círculo; verifique se desenha forma fechada ou quase fechada.', minMeses: 42, maxMeses: 48 },
+            { nome: 'Fala clara e compreensível', desc: 'Observe a inteligibilidade da fala (articulação e verbalização de ideias em sequência).', minMeses: 42, maxMeses: 48 },
+            { nome: 'Pula em um pé só', desc: 'Demonstre e verifique se pula em um pé só, duas ou mais vezes, sem apoio.', minMeses: 42, maxMeses: 48 },
+            { nome: 'Veste-se sem ajuda', desc: 'Pergunte se é capaz de se vestir sem alguma ajuda.', minMeses: 48, maxMeses: 54 },
+            { nome: 'Copia cruz', desc: 'Mostre figura de cruz; verifique se desenha duas linhas que se cruzem próximo ao ponto médio.', minMeses: 48, maxMeses: 54 },
+            { nome: 'Compreende 4 preposições', desc: 'Peça para colocar bloco em cima, embaixo, na frente e atrás. Observe se cumpre os 4 comandos.', minMeses: 48, maxMeses: 54 },
+            { nome: 'Equilibra-se em cada pé 3 segundos', desc: 'Verifique se fica em um pé só por 3 segundos ou mais.', minMeses: 48, maxMeses: 54 },
+            { nome: 'Escova dentes sem ajuda', desc: 'Pergunte se escova os dentes sem ajuda, inclusive pasta, dentes posteriores e fio dental.', minMeses: 54, maxMeses: 60 },
+            { nome: 'Aponta a linha mais comprida', desc: 'Mostre ficha com duas linhas paralelas verticais; verifique se aponta a mais comprida (3/3 ou 5/6).', minMeses: 54, maxMeses: 60 },
+            { nome: 'Define 5 palavras', desc: 'Pergunte "O que é uma bola?" etc. Deve definir 5 de 7 palavras (uso, forma, material, categoria).', minMeses: 54, maxMeses: 60 },
+            { nome: 'Equilibra-se em um pé 5 segundos', desc: 'Verifique se fica em um pé só por 5 segundos ou mais.', minMeses: 54, maxMeses: 60 },
+            // 5 a 6 anos
+            { nome: 'Brinca de fazer de conta com outras crianças', desc: 'Pergunte se participa de brincadeiras de fazer de conta (casinha, escola) em contexto familiar e escolar.', minMeses: 60, maxMeses: 66 },
+            { nome: 'Desenha pessoa com 6 partes', desc: 'Peça para desenhar uma pessoa. Partes em pares contam como uma. Deve ter 6 partes.', minMeses: 60, maxMeses: 66 },
+            { nome: 'Faz analogia', desc: 'Pergunte: "Se o cavalo é grande, o rato é…" etc. Deve completar 2 de 3 frases.', minMeses: 60, maxMeses: 66 },
+            { nome: 'Marcha ponta-calcanhar', desc: 'Demonstre andar em linha reta encostando ponta no calcanhar. Deve dar 4+ passos.', minMeses: 60, maxMeses: 66 },
+            { nome: 'Aceita e segue regras nos jogos de mesa', desc: 'Pergunte se é capaz de aceitar e seguir regras dos jogos de mesa.', minMeses: 66, maxMeses: 72 },
+            { nome: 'Copia um quadrado', desc: 'Mostre desenho de quadrado e peça para copiar. Se não conseguir, demonstre desenhando lados opostos.', minMeses: 66, maxMeses: 72 },
+            { nome: 'Define 7 palavras', desc: 'Procedimento semelhante a "Define 5 palavras". Agora deve definir 7 palavras.', minMeses: 66, maxMeses: 72 },
+            { nome: 'Equilibra-se em cada pé por 7 segundos', desc: 'Verifique se fica em um pé só por 7 segundos ou mais.', minMeses: 66, maxMeses: 72 }
+        ];
+
+        const FAIXAS = [
+            { label: 'Nascimento a 6 meses', min: 0, max: 6 },
+            { label: '6 meses a 1 ano e meio', min: 6, max: 18 },
+            { label: '1 ano e meio a 3 anos e meio', min: 18, max: 42 },
+            { label: '3 anos e meio a 5 anos', min: 42, max: 60 },
+            { label: '5 a 6 anos', min: 60, max: 72 }
+        ];
+
+        function getIdadeEmMeses() {
+            const nascInput = document.getElementById('dataNascimento').value;
+            const consultaInput = document.getElementById('dataConsulta').value;
+            if (!nascInput) return null;
+            const nasc = new Date(nascInput + 'T00:00:00');
+            const ref = consultaInput ? new Date(consultaInput + 'T00:00:00') : new Date();
+            if (nasc > ref) return null;
+            return (ref.getFullYear() - nasc.getFullYear()) * 12 + (ref.getMonth() - nasc.getMonth()) + (ref.getDate() >= nasc.getDate() ? 0 : -1);
+        }
+
+        function openMarcosModal() {
+            const modal = document.getElementById('marcosModal');
+            const body = document.getElementById('marcosBody');
+            const badge = document.getElementById('modalAgeBadge');
+            const meses = getIdadeEmMeses();
+
+            if (meses === null) {
+                badge.textContent = '—';
+                body.innerHTML = '<div class="modal-no-milestones">Preencha a data de nascimento para visualizar os marcos esperados.</div>';
+                modal.classList.add('active');
+                return;
+            }
+
+            // Format age for badge
+            const anos = Math.floor(meses / 12);
+            const mResto = meses % 12;
+            let ageStr = '';
+            if (anos > 0) ageStr += anos + (anos === 1 ? ' ano' : ' anos');
+            if (mResto > 0) ageStr += (ageStr ? ' e ' : '') + mResto + (mResto === 1 ? ' mês' : ' meses');
+            if (!ageStr) ageStr = 'Recém-nascido';
+            badge.textContent = ageStr;
+
+            // Filter relevant milestones: show current age group + previous group
+            let relevantFaixas = FAIXAS.filter(f => meses >= f.min - 3 && meses < f.max + 6);
+            if (relevantFaixas.length === 0) {
+                // Show closest group
+                if (meses < 0) relevantFaixas = [FAIXAS[0]];
+                else relevantFaixas = [FAIXAS[FAIXAS.length - 1]];
+            }
+
+            let html = '';
+            relevantFaixas.forEach(faixa => {
+                const marcosGrupo = MARCOS.filter(m => m.minMeses >= faixa.min && m.minMeses < faixa.max);
+                if (marcosGrupo.length === 0) return;
+                html += `<div class="milestone-group">`;
+                html += `<div class="milestone-group-title">${faixa.label} <span class="age-range">${faixa.min}–${faixa.max} meses</span></div>`;
+                marcosGrupo.forEach((m, i) => {
+                    const isExpected = meses >= m.minMeses;
+                    const isChecked = savedMilestones.has(`marco_${faixa.min}_${i}`);
+                    html += `<div class="milestone-item" style="${isExpected ? '' : 'opacity:.55'}">`;
+                    html += `<input type="checkbox" id="marco_${faixa.min}_${i}" ${isChecked ? 'checked' : ''}>`;
+                    html += `<label for="marco_${faixa.min}_${i}" class="milestone-item-content">`;
+                    html += `<div class="milestone-item-name">${m.nome}${isExpected ? '' : ' <span style="font-size:10px;color:#999">(ainda não esperado)</span>'}</div>`;
+                    html += `<div class="milestone-item-desc">${m.desc}</div>`;
+                    html += `</label></div>`;
+                });
+                html += `</div>`;
+            });
+
+            if (!html) {
+                html = '<div class="modal-no-milestones">Idade fora da faixa de marcos disponíveis (0–72 meses).</div>';
+            }
+
+            body.innerHTML = html;
+            modal.classList.add('active');
+        }
+
+        function closeMarcosModal() {
+            document.getElementById('marcosModal').classList.remove('active');
+        }
+        // Close modal on overlay click
+        document.getElementById('marcosModal').addEventListener('click', function (e) {
+            if (e.target === this) closeMarcosModal();
+        });
+        // Close on Escape
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') closeMarcosModal();
+        });
+        function generatePDF() {
+            let printView = document.getElementById('print-view');
+            if (!printView) {
+                printView = document.createElement('div');
+                printView.id = 'print-view';
+                document.body.appendChild(printView);
+            }
+            printView.innerHTML = '';
+
+            let html = '';
+
+            function getFieldValue(el) {
+                let val = '';
+                let inputs = el.querySelectorAll('input:not([type="checkbox"]):not([type="radio"]), textarea, select');
+                if (inputs.length > 0) {
+                    let vals = Array.from(inputs).map(inp => {
+                        let v = inp.value.trim();
+                        if (v && inp.nextElementSibling && inp.nextElementSibling.classList.contains('badge-unit')) {
+                            v += ' ' + inp.nextElementSibling.textContent.trim();
+                        }
+                        return v;
+                    }).filter(v => v !== '');
+                    if (vals.length > 0) {
+                        val = vals.join(' ');
+                    }
+                }
+                let radios = el.querySelectorAll('input[type="radio"]:checked');
+                if (radios.length > 0) {
+                    let rVals = Array.from(radios).map(r => r.parentElement.textContent.trim());
+                    val += (val ? ' — ' : '') + rVals.join(', ');
+                }
+                let checks = el.querySelectorAll('input[type="checkbox"]:checked');
+                if (checks.length > 0) {
+                    let cVals = Array.from(checks).map(c => c.parentElement.textContent.trim());
+                    val += (val ? ' — ' : '') + cVals.join(', ');
+                }
+                return val;
+            }
+
+            // 1. IDENTIFICAÇÃO
+            let identFields = [];
+            document.querySelectorAll('.page-header .hfield').forEach(field => {
+                let label = field.querySelector('label')?.textContent.trim() || '';
+                let val = getFieldValue(field);
+                if (label.endsWith(':')) label = label.slice(0, -1).trim();
+                if (val && label) {
+                    identFields.push({ label, val, isLong: val.length > 60 });
+                }
+            });
+
+            if (identFields.length > 0) {
+                let identFieldsHtml = '';
+                identFields.forEach(fd => {
+                    identFieldsHtml += `
+                    <div style="flex: 1 1 180px; min-width: 140px; font-size: 10.5px; line-height: 1.4; margin-bottom: 2px; box-sizing: border-box; max-width: 100%; word-break: break-word; overflow-wrap: break-word;">
+                        <span style="color: #444; font-weight: normal;">${fd.label}:</span>
+                        <span style="color: #000; font-weight: normal; margin-left: 2px;">${fd.val}</span>
+                    </div>`;
+                });
+                html += `
+                <div style="border: 1px solid #000; border-radius: 4px; padding: 8px 10px; margin-bottom: 12px; page-break-inside: avoid; box-sizing: border-box; max-width: 100%; word-break: break-word; overflow-wrap: break-word;">
+                    <div style="font-size: 11px; font-weight: bold; border-bottom: 1px solid #ddd; padding-bottom: 4px; margin-bottom: 6px; text-transform: uppercase;">
+                        Identificação
+                    </div>
+                    <div style="display: flex; flex-wrap: wrap; gap: 4px 12px; box-sizing: border-box; max-width: 100%;">
+                        ${identFieldsHtml}
+                    </div>
+                </div>`;
+            }
+
+            const majorSections = [
+                { title: 'ANAMNESE', ids: ['s1', 's2', 's3', 's4', 's5', 's6', 's7', 's8'] },
+                { title: 'EXAME FÍSICO', ids: ['s9', 's10', 's11', 's12', 's13', 's14', 's15', 's16', 's17', 's18'] },
+                { title: 'AVALIAÇÃO', ids: ['s19'] },
+                { title: 'CONDUTA', ids: ['s20'] }
+            ];
+
+            majorSections.forEach(major => {
+                let majorHtml = '';
+
+                major.ids.forEach(id => {
+                    let sEl = document.getElementById(id);
+                    if (!sEl) return;
+
+                    if (id === 's10') {
+                        let subEls = sEl.querySelectorAll('.sub');
+                        subEls.forEach(subEl => {
+                            let subTitleText = subEl.querySelector('.sub-title')?.textContent.trim() || '';
+                            if (subTitleText) {
+                                subTitleText = 'Ectoscopia — ' + subTitleText;
+                            } else {
+                                subTitleText = 'Ectoscopia';
+                            }
+
+                            let fields = [];
+                            let containers = subEl.querySelectorAll('.field, .vital-card, .risk-group, .dx-block, .conduta-block, .option-row, .chips');
+
+                            let outermost = [];
+                            containers.forEach(c => {
+                                let parent = c.parentElement;
+                                let isNested = false;
+                                while (parent && parent !== subEl) {
+                                    if (parent.classList.contains('field') ||
+                                        parent.classList.contains('vital-card') ||
+                                        parent.classList.contains('risk-group') ||
+                                        parent.classList.contains('dx-block') ||
+                                        parent.classList.contains('conduta-block') ||
+                                        parent.classList.contains('option-row') ||
+                                        parent.classList.contains('chips')) {
+                                        isNested = true;
+                                        break;
+                                    }
+                                    parent = parent.parentElement;
+                                }
+                                if (!isNested) {
+                                    outermost.push(c);
+                                }
+                            });
+
+                            outermost.forEach(f => {
+                                let label = '';
+                                let val = '';
+
+                                if (f.classList.contains('vital-card')) {
+                                    label = f.querySelector('label')?.textContent.trim() || '';
+                                    val = getFieldValue(f);
+                                } else if (f.classList.contains('risk-group')) {
+                                    label = f.querySelector('.risk-group-title')?.textContent.trim() || '';
+                                    let checks = f.querySelectorAll('input[type="checkbox"]:checked');
+                                    if (checks.length > 0) {
+                                        val = Array.from(checks).map(ch => ch.parentElement.textContent.trim()).join(', ');
+                                    }
+                                } else if (f.classList.contains('option-row') || f.classList.contains('chips')) {
+                                    let prev = f.previousElementSibling;
+                                    if (prev && (prev.classList.contains('sub-title') || prev.classList.contains('option-label') || prev.tagName === 'LABEL')) {
+                                        label = prev.textContent.trim();
+                                    } else {
+                                        let subTitle = f.closest('.sub')?.querySelector('.sub-title');
+                                        label = subTitle ? subTitle.textContent.trim() : 'Opção';
+                                    }
+                                    val = getFieldValue(f);
+                                } else {
+                                    label = f.querySelector('label')?.textContent.trim() || '';
+                                    val = getFieldValue(f);
+                                }
+
+                                if (label.endsWith(':')) {
+                                    label = label.slice(0, -1).trim();
+                                }
+
+                                if (val && label) {
+                                    let isLong = val.length > 60 || val.includes('\n') || f.querySelector('textarea') !== null;
+                                    fields.push({ label, val, isLong });
+                                }
+                            });
+
+                            if (fields.length > 0) {
+                                let fieldsHtml = '';
+                                fields.forEach(fd => {
+                                    if (fd.isLong) {
+                                        fieldsHtml += `
+                                        <div style="flex: 1 1 100%; width: 100%; font-size: 10.5px; line-height: 1.45; margin-top: 3px; margin-bottom: 3px; box-sizing: border-box; max-width: 100%; word-break: break-word; overflow-wrap: break-word;">
+                                            <div style="color: #444; font-weight: normal; margin-bottom: 2px;">${fd.label}:</div>
+                                            <div style="color: #000; font-weight: normal; padding-left: 8px; border-left: 2px solid #eee; white-space: pre-wrap; word-break: break-word; overflow-wrap: break-word;">${fd.val}</div>
+                                        </div>`;
+                                    } else {
+                                        fieldsHtml += `
+                                        <div style="flex: 1 1 180px; min-width: 140px; font-size: 10.5px; line-height: 1.4; margin-bottom: 2px; box-sizing: border-box; max-width: 100%; word-break: break-word; overflow-wrap: break-word;">
+                                            <span style="color: #444; font-weight: normal;">${fd.label}:</span>
+                                            <span style="color: #000; font-weight: normal; margin-left: 2px;">${fd.val}</span>
+                                        </div>`;
+                                    }
+                                });
+
+                                majorHtml += `
+                                <div style="border: 1px solid #000; border-radius: 4px; padding: 8px 10px; margin-bottom: 10px; page-break-inside: avoid; box-sizing: border-box; max-width: 100%; word-break: break-word; overflow-wrap: break-word;">
+                                    <div style="font-size: 11px; font-weight: bold; border-bottom: 1px solid #ddd; padding-bottom: 4px; margin-bottom: 6px; text-transform: uppercase;">
+                                        ${subTitleText}
+                                    </div>
+                                    <div style="display: flex; flex-wrap: wrap; gap: 4px 12px; box-sizing: border-box; max-width: 100%;">
+                                        ${fieldsHtml}
+                                    </div>
+                                </div>`;
+                            }
+                        });
+                    } else {
+                        let subTitleText = sEl.querySelector('.section-title')?.textContent.trim() || '';
+                        if (subTitleText) {
+                            subTitleText = subTitleText.charAt(0).toUpperCase() + subTitleText.slice(1);
+                        }
+
+                        let fields = [];
+                        let containers = sEl.querySelectorAll('.field, .vital-card, .risk-group, .dx-block, .conduta-block, .option-row, .chips');
+
+                        let outermost = [];
+                        containers.forEach(c => {
+                            let parent = c.parentElement;
+                            let isNested = false;
+                            while (parent && parent !== sEl) {
+                                if (parent.classList.contains('field') ||
+                                    parent.classList.contains('vital-card') ||
+                                    parent.classList.contains('risk-group') ||
+                                    parent.classList.contains('dx-block') ||
+                                    parent.classList.contains('conduta-block') ||
+                                    parent.classList.contains('option-row') ||
+                                    parent.classList.contains('chips')) {
+                                    isNested = true;
+                                    break;
+                                }
+                                parent = parent.parentElement;
+                            }
+                            if (!isNested) {
+                                outermost.push(c);
+                            }
+                        });
+
+                        outermost.forEach(f => {
+                            let label = '';
+                            let val = '';
+
+                            if (f.classList.contains('vital-card')) {
+                                label = f.querySelector('label')?.textContent.trim() || '';
+                                val = getFieldValue(f);
+                            } else if (f.classList.contains('risk-group')) {
+                                label = f.querySelector('.risk-group-title')?.textContent.trim() || '';
+                                let checks = f.querySelectorAll('input[type="checkbox"]:checked');
+                                if (checks.length > 0) {
+                                    val = Array.from(checks).map(ch => ch.parentElement.textContent.trim()).join(', ');
+                                }
+                            } else if (f.classList.contains('option-row') || f.classList.contains('chips')) {
+                                let prev = f.previousElementSibling;
+                                if (prev && (prev.classList.contains('sub-title') || prev.classList.contains('option-label') || prev.tagName === 'LABEL')) {
+                                    label = prev.textContent.trim();
+                                } else {
+                                    let subTitle = f.closest('.sub')?.querySelector('.sub-title');
+                                    label = subTitle ? subTitle.textContent.trim() : 'Opção';
+                                }
+                                val = getFieldValue(f);
+                            } else {
+                                label = f.querySelector('label')?.textContent.trim() || '';
+                                val = getFieldValue(f);
+                            }
+
+                            if (label.endsWith(':')) {
+                                label = label.slice(0, -1).trim();
+                            }
+
+                            if (val && label) {
+                                let isLong = val.length > 60 || val.includes('\n') || f.querySelector('textarea') !== null;
+                                fields.push({ label, val, isLong });
+                            }
+                        });
+
+                        if (fields.length > 0) {
+                            let fieldsHtml = '';
+                            fields.forEach(fd => {
+                                if (fd.isLong) {
+                                    fieldsHtml += `
+                                    <div style="flex: 1 1 100%; width: 100%; font-size: 10.5px; line-height: 1.45; margin-top: 3px; margin-bottom: 3px; box-sizing: border-box; max-width: 100%; word-break: break-word; overflow-wrap: break-word;">
+                                        <div style="color: #444; font-weight: normal; margin-bottom: 2px;">${fd.label}:</div>
+                                        <div style="color: #000; font-weight: normal; padding-left: 8px; border-left: 2px solid #eee; white-space: pre-wrap; word-break: break-word; overflow-wrap: break-word;">${fd.val}</div>
+                                    </div>`;
+                                } else {
+                                    fieldsHtml += `
+                                    <div style="flex: 1 1 180px; min-width: 140px; font-size: 10.5px; line-height: 1.4; margin-bottom: 2px; box-sizing: border-box; max-width: 100%; word-break: break-word; overflow-wrap: break-word;">
+                                        <span style="color: #444; font-weight: normal;">${fd.label}:</span>
+                                        <span style="color: #000; font-weight: normal; margin-left: 2px;">${fd.val}</span>
+                                    </div>`;
+                                }
+                            });
+
+                            majorHtml += `
+                            <div style="border: 1px solid #000; border-radius: 4px; padding: 8px 10px; margin-bottom: 10px; page-break-inside: avoid; box-sizing: border-box; max-width: 100%; word-break: break-word; overflow-wrap: break-word;">
+                                <div style="font-size: 11px; font-weight: bold; border-bottom: 1px solid #ddd; padding-bottom: 4px; margin-bottom: 6px; text-transform: uppercase;">
+                                    ${subTitleText}
+                                </div>
+                                <div style="display: flex; flex-wrap: wrap; gap: 4px 12px; box-sizing: border-box; max-width: 100%;">
+                                    ${fieldsHtml}
+                                </div>
+                            </div>`;
+                        }
+                    }
+                });
+
+                if (majorHtml) {
+                    html += `
+                    <div style="margin-bottom: 20px;">
+                        <div style="font-size: 13px; font-weight: bold; text-transform: uppercase; margin-top: 15px; margin-bottom: 8px; border-bottom: 2px solid #000; padding-bottom: 3px;">
+                            ${major.title}
+                        </div>
+                        ${majorHtml}
+                    </div>`;
+                }
+            });
+
+            printView.innerHTML = `
+            <div style="font-family: Arial, sans-serif; font-size: 11px; line-height: 1.4; color: #000; box-sizing: border-box; max-width: 100%; word-break: break-word; overflow-wrap: break-word;">
+                ${html}
+            </div>`;
+            window.print();
+        }
+
+        // ── state saving to localStorage ──
+        function saveFormState() {
+            const data = {
+                textValues: [],
+                checkboxValues: [],
+                radioValues: [],
+                imcManual: imcManual,
+                checkedMilestones: Array.from(savedMilestones)
+            };
+
+            const textElements = document.querySelectorAll('input:not([type="checkbox"]):not([type="radio"]):not(#marcosModal *), select:not(#marcosModal *), textarea:not(#marcosModal *)');
+            textElements.forEach((el, index) => {
+                data.textValues.push({ index, val: el.value });
+            });
+
+            const checkboxElements = document.querySelectorAll('input[type="checkbox"]:not(#marcosModal *)');
+            checkboxElements.forEach((el, index) => {
+                data.checkboxValues.push({ index, checked: el.checked });
+            });
+
+            const radioElements = document.querySelectorAll('input[type="radio"]:not(#marcosModal *)');
+            radioElements.forEach((el, index) => {
+                data.radioValues.push({ index, checked: el.checked });
+            });
+
+            localStorage.setItem('emr_ped_state', JSON.stringify(data));
+        }
+
+        function loadFormState() {
+            const raw = localStorage.getItem('emr_ped_state');
+            if (!raw) return;
+            try {
+                const data = JSON.parse(raw);
+
+                if (data.imcManual !== undefined) {
+                    imcManual = data.imcManual;
+                }
+
+                if (data.checkedMilestones) {
+                    savedMilestones = new Set(data.checkedMilestones);
+                }
+
+                if (data.textValues) {
+                    const textElements = document.querySelectorAll('input:not([type="checkbox"]):not([type="radio"]):not(#marcosModal *), select:not(#marcosModal *), textarea:not(#marcosModal *)');
+                    data.textValues.forEach(item => {
+                        if (textElements[item.index]) {
+                            textElements[item.index].value = item.val;
+                        }
+                    });
+                }
+
+                if (data.checkboxValues) {
+                    const checkboxElements = document.querySelectorAll('input[type="checkbox"]:not(#marcosModal *)');
+                    data.checkboxValues.forEach(item => {
+                        if (checkboxElements[item.index]) {
+                            checkboxElements[item.index].checked = item.checked;
+                        }
+                    });
+                }
+
+                if (data.radioValues) {
+                    const radioElements = document.querySelectorAll('input[type="radio"]:not(#marcosModal *)');
+                    data.radioValues.forEach(item => {
+                        if (radioElements[item.index]) {
+                            radioElements[item.index].checked = item.checked;
+                        }
+                    });
+                }
+
+                calcularIdade();
+
+            } catch (e) {
+                console.error('Error loading form state:', e);
+            }
+        }
+
+        function resetForm() {
+            if (!confirm("Tem certeza de que deseja limpar todo o formulário? Todos os dados salvos serão apagados definitivamente.")) {
+                return;
+            }
+
+            localStorage.removeItem('emr_ped_state');
+            imcManual = false;
+            savedMilestones.clear();
+
+            const textElements = document.querySelectorAll('input:not([type="checkbox"]):not([type="radio"]):not(#marcosModal *), select:not(#marcosModal *), textarea:not(#marcosModal *)');
+            textElements.forEach(el => {
+                if (el.id === 'dataConsulta') {
+                    const today = new Date();
+                    const yyyy = today.getFullYear();
+                    const mm = String(today.getMonth() + 1).padStart(2, '0');
+                    const dd = String(today.getDate()).padStart(2, '0');
+                    el.value = `${yyyy}-${mm}-${dd}`;
+                } else {
+                    el.value = '';
+                }
+            });
+
+            const checkboxElements = document.querySelectorAll('input[type="checkbox"]:not(#marcosModal *)');
+            checkboxElements.forEach(el => {
+                el.checked = false;
+            });
+
+            const radioElements = document.querySelectorAll('input[type="radio"]:not(#marcosModal *)');
+            radioElements.forEach(el => {
+                el.checked = false;
+            });
+
+            calcularIdade();
+        }
+
+        // Debounce helper
+        function debounce(func, wait) {
+            let timeout;
+            return function (...args) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(this, args), wait);
+            };
+        }
+
+        // Listeners for auto-save
+        const debouncedSave = debounce(saveFormState, 500);
+        document.body.addEventListener('input', function (e) {
+            if (!e.target.closest('#marcosModal')) {
+                debouncedSave();
+            }
+        });
+        document.body.addEventListener('change', function (e) {
+            if (!e.target.closest('#marcosModal')) {
+                debouncedSave();
+            }
+        });
+
+        // Milestones modal checkbox listener
+        document.getElementById('marcosModal').addEventListener('change', function (e) {
+            if (e.target && e.target.type === 'checkbox' && e.target.id.startsWith('marco_')) {
+                if (e.target.checked) {
+                    savedMilestones.add(e.target.id);
+                } else {
+                    savedMilestones.delete(e.target.id);
+                }
+                saveFormState();
+            }
+        });
+
+        // Initialize state load on page load
+        document.addEventListener('DOMContentLoaded', loadFormState);
+    </script>
+</body>
+
+</html>
