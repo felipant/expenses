@@ -1308,9 +1308,16 @@
                         <div class="sub-title">História da Doença Atual (HDA)</div>
                         <div class="fields cols-1">
                             <div class="field"><label>Descrição detalhada — início, duração, evolução, fatores de
-                                    melhora/piora, sintomas associados</label><textarea rows="5"
-                                    placeholder="Descreva cronologicamente..."></textarea></div>
+                                    melhora/piora, sintomas associados</label><textarea id="hda-principal" rows="5"
+                                    placeholder="Descreva cronologicamente..." oninput="updateHdaSummary()"></textarea>
+                            </div>
                         </div>
+                    </div>
+                    <div id="secondary-complaints-container"></div>
+                    <div style="margin-top: 10px; margin-bottom: 10px;">
+                        <button type="button" class="btn-dx"
+                            style="padding: 6px 12px; font-size: 13px; cursor: pointer;"
+                            onclick="addSecondaryComplaint()">+ Adicionar Queixa Secundária</button>
                     </div>
                 </div>
             </div>
@@ -2614,6 +2621,23 @@
                         <label>Diagnóstico Clínico — Hipótese(s) Principal(ais)</label>
                         <textarea rows="3"
                             placeholder="Ex: Transtorno do Espectro Autista (F84.0); Atraso na aquisição da linguagem…"></textarea>
+
+                        <div style="margin-top: 8px; border: 1px solid #ddd; border-radius: 4px; overflow: hidden;">
+                            <div style="background: #f9f9f9; padding: 6px 10px; cursor: pointer; display: flex; justify-content: space-between; align-items: center;"
+                                onclick="toggleHdaSummary()">
+                                <span
+                                    style="font-size: 11px; font-weight: 600; color: #555; text-transform: uppercase;">Revisar
+                                    HMA e Queixas Secundárias</span>
+                                <svg id="hda-summary-chevron" viewBox="0 0 24 24" width="14" height="14" fill="none"
+                                    stroke="currentColor" stroke-width="2">
+                                    <polyline points="6 9 12 15 18 9" />
+                                </svg>
+                            </div>
+                            <div id="hda-summary-content"
+                                style="display: none; padding: 10px; font-size: 13px; color: #333; background: #fff; white-space: pre-wrap; max-height: 200px; overflow-y: auto;">
+                                <em style="color: #999;">Preencha a HMA primeiro...</em>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="dx-block">
@@ -3684,6 +3708,68 @@
                 saveFormState();
             }
         });
+
+        // --- QUEIXAS SECUNDÁRIAS E HMA SUMMARY ---
+        let secondaryComplaintCount = 1; // Start from 2 for S2
+
+        function addSecondaryComplaint() {
+            secondaryComplaintCount++;
+            const sNum = secondaryComplaintCount;
+            const container = document.getElementById('secondary-complaints-container');
+
+            const div = document.createElement('div');
+            div.className = 'sub';
+            div.innerHTML = `
+                <div class="sub-title" style="display: flex; justify-content: space-between; align-items: center;">
+                    <span>Queixa Secundária (S${sNum})</span>
+                    <button type="button" onclick="this.closest('.sub').remove(); updateHdaSummary();" style="background: none; border: none; color: #d9534f; cursor: pointer; font-size: 12px; font-weight: bold;">Remover</button>
+                </div>
+                <div class="fields cols-1">
+                    <div class="field">
+                        <label>História da queixa S${sNum}</label>
+                        <textarea class="secondary-complaint-textarea" rows="3" placeholder="Descreva cronologicamente..." oninput="updateHdaSummary()"></textarea>
+                    </div>
+                </div>
+            `;
+            container.appendChild(div);
+        }
+
+        function toggleHdaSummary() {
+            const content = document.getElementById('hda-summary-content');
+            const chevron = document.getElementById('hda-summary-chevron');
+            if (content.style.display === 'none') {
+                content.style.display = 'block';
+                chevron.style.transform = 'rotate(180deg)';
+                updateHdaSummary();
+            } else {
+                content.style.display = 'none';
+                chevron.style.transform = 'rotate(0deg)';
+            }
+        }
+
+        function updateHdaSummary() {
+            const content = document.getElementById('hda-summary-content');
+            if (!content || content.style.display === 'none') return;
+
+            let summary = '';
+            const hdaPrincipal = document.getElementById('hda-principal');
+            if (hdaPrincipal && hdaPrincipal.value.trim()) {
+                summary += 'HMA / Queixa Principal:\n' + hdaPrincipal.value.trim() + '\n\n';
+            }
+
+            const secondaryTextareas = document.querySelectorAll('.secondary-complaint-textarea');
+            secondaryTextareas.forEach((textarea, index) => {
+                if (textarea.value.trim()) {
+                    summary += 'Queixa Secundária S' + (index + 2) + ':\n' + textarea.value.trim() + '\n\n';
+                }
+            });
+
+            if (!summary) {
+                content.innerHTML = '<em style="color: #999;">Preencha a HMA ou queixas secundárias...</em>';
+            } else {
+                content.textContent = summary.trim();
+            }
+        }
 
         // Initialize state load on page load
         document.addEventListener('DOMContentLoaded', loadFormState);
