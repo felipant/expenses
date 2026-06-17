@@ -2571,27 +2571,15 @@
                 <div class="section-body">
 
                     <div class="dx-block">
-                        <label>Diagnóstico Clínico — Hipótese(s) Principal(ais)</label>
-                        <textarea rows="3"
-                            placeholder="Ex: Transtorno do Espectro Autista (F84.0); Atraso na aquisição da linguagem…"></textarea>
-                    </div>
-
-                    <div class="dx-block">
-                        <label>Diagnósticos Diferenciais</label>
-                        <textarea rows="3"
-                            placeholder="Liste as hipóteses alternativas em ordem de probabilidade…"></textarea>
-                    </div>
-
-                    <div class="dx-block">
                         <div class="dx-header">
-                            <label>Diagnóstico Nutricional</label>
+                            <label>Diagnóstico Vacinal</label>
                             <div class="dx-actions">
                                 <button type="button" class="btn-dx"
-                                    onclick="fillDx('dx-nutricional', 'Eutrófico para a idade')">Normal</button>
+                                    onclick="fillDx('dx-vacinal', 'Calendário vacinal atualizado')">Normal</button>
                             </div>
                         </div>
-                        <textarea id="dx-nutricional" rows="2"
-                            placeholder="Ex: Eutrófico para idade. IMC no percentil 50."></textarea>
+                        <textarea id="dx-vacinal" rows="2"
+                            placeholder="Ex: Calendário vacinal atualizado / vacinas X e Y em atraso."></textarea>
                     </div>
 
                     <div class="dx-block">
@@ -2612,14 +2600,26 @@
 
                     <div class="dx-block">
                         <div class="dx-header">
-                            <label>Diagnóstico Vacinal</label>
+                            <label>Diagnóstico Nutricional</label>
                             <div class="dx-actions">
                                 <button type="button" class="btn-dx"
-                                    onclick="fillDx('dx-vacinal', 'Calendário vacinal atualizado')">Normal</button>
+                                    onclick="fillDx('dx-nutricional', 'Eutrófico para a idade')">Normal</button>
                             </div>
                         </div>
-                        <textarea id="dx-vacinal" rows="2"
-                            placeholder="Ex: Calendário vacinal atualizado / vacinas X e Y em atraso."></textarea>
+                        <textarea id="dx-nutricional" rows="2"
+                            placeholder="Ex: Eutrófico para idade. IMC no percentil 50."></textarea>
+                    </div>
+
+                    <div class="dx-block">
+                        <label>Diagnóstico Clínico — Hipótese(s) Principal(ais)</label>
+                        <textarea rows="3"
+                            placeholder="Ex: Transtorno do Espectro Autista (F84.0); Atraso na aquisição da linguagem…"></textarea>
+                    </div>
+
+                    <div class="dx-block">
+                        <label>Diagnósticos Diferenciais</label>
+                        <textarea rows="3"
+                            placeholder="Liste as hipóteses alternativas em ordem de probabilidade…"></textarea>
                     </div>
 
                     <div
@@ -2939,6 +2939,14 @@
                         <line x1="10" y1="14" x2="21" y2="3"></line>
                     </svg>
                     e-Lactancia
+                </a>
+                <a href="https://uticalc.pitt.edu" target="_blank" class="ref-link">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                        <polyline points="15 3 21 3 21 9"></polyline>
+                        <line x1="10" y1="14" x2="21" y2="3"></line>
+                    </svg>
+                    Calculadora de risco de ITU
                 </a>
             </div>
         </aside>
