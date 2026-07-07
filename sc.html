@@ -1,37 +1,576 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="820" height="160" viewBox="0 0 820 160" role="img" aria-label="Linha do tempo: Janeiro a Agosto de 2019">
-  <style>
-    .bg { fill: #f1f4ee; }
-    .axis { stroke: #333; stroke-width: 2; }
-    .tick { stroke: #666; stroke-width: 1; }
-    .label { font-family: "Segoe UI", Roboto, Arial, sans-serif; font-size: 12px; fill: #222; }
-    .period { fill: #2b8cbe; fill-opacity: 0.18; stroke: #1f6f9a; stroke-opacity: 0.9; rx:6; ry:6; }
-    .period-label { font-weight: 700; font-size: 13px; fill: #0b3b52; }
-    .marker { fill: #1f6f9a; }
-    .year { font-weight: 600; font-size: 12px; }
-  </style>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#12161C">
+<title>Manobras Ortopédicas · Revisão</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B0E13;
+    --app-bg:#12161C;
+    --surface:#1A2029;
+    --surface-2:#212836;
+    --text:#F1EDE4;
+    --muted:#8B93A1;
+    --muted-dim:#5C6472;
+    --line: rgba(241,237,228,0.09);
+    --teal:#4FB8AE;
+    --teal-dim: rgba(79,184,174,0.14);
+    --amber:#E8A33D;
+    --amber-dim: rgba(232,163,61,0.16);
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;height:100%;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'IBM Plex Sans', system-ui, sans-serif;
+    display:flex;
+    justify-content:center;
+    min-height:100dvh;
+  }
+  .app{
+    width:100%;
+    max-width:480px;
+    min-height:100dvh;
+    background:var(--app-bg);
+    display:flex;
+    flex-direction:column;
+    position:relative;
+    padding-top:env(safe-area-inset-top);
+    padding-bottom:env(safe-area-inset-bottom);
+  }
+  @media (min-width:600px){
+    .app{ box-shadow:0 0 60px rgba(0,0,0,.5); margin:24px 0; min-height:calc(100dvh - 48px); border-radius:20px; overflow:hidden;}
+  }
 
-  <rect class="bg" x="0" y="0" width="820" height="160"/>
+  .topbar{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:18px 20px 8px;
+  }
+  .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10.5px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--muted-dim);
+  }
+  .counter{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    color:var(--muted);
+    letter-spacing:.04em;
+  }
+  .progress{
+    height:2px; margin:6px 20px 0; background:var(--line); border-radius:2px; overflow:hidden;
+  }
+  .progress-fill{
+    height:100%; width:0%; background:var(--teal); transition:width .35s ease;
+  }
 
-  <line class="axis" x1="50" y1="90" x2="750" y2="90" />
+  .card{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:22px;
+    padding:20px 24px 8px;
+    text-align:center;
+    touch-action: pan-y;
+  }
 
-  <rect class="period" x="400" y="64" width="204" height="52" rx="8" ry="8"/>
+  .chip{
+    display:inline-block;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    color:var(--teal);
+    border:1px solid rgba(79,184,174,0.4);
+    background:var(--teal-dim);
+    padding:5px 12px;
+    border-radius:999px;
+  }
 
-  <circle class="marker" cx="400" cy="90" r="4"/>
-  <text class="label" x="400" y="54" text-anchor="middle">Jan 2019</text>
+  .maneuver-name{
+    font-family:'Source Serif 4', serif;
+    font-weight:600;
+    font-size:clamp(26px, 7.5vw, 36px);
+    line-height:1.18;
+    margin:0;
+    padding:0 6px;
+    min-height:2.4em;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
 
-  <circle class="marker" cx="604" cy="90" r="4"/>
-  <text class="label" x="604" y="54" text-anchor="middle">Ago 2019</text>
+  .goniometer{
+    position:relative;
+    width:min(56vw, 208px);
+    height:min(56vw, 208px);
+    margin:0 auto;
+  }
+  .goniometer-svg{ position:absolute; inset:0; width:100%; height:100%; overflow:visible; }
+  .dial-ring{ fill:none; stroke:var(--line); stroke-width:1.5; transition:opacity .3s; }
+  .tick{ stroke:var(--muted-dim); stroke-width:1.4; opacity:.55; }
+  .tick-major{ stroke:var(--teal); stroke-width:2; opacity:.85; }
+  #armLine{
+    stroke:var(--amber);
+    stroke-width:3;
+    stroke-linecap:round;
+    opacity:0;
+    transform-origin:100px 100px;
+    filter:drop-shadow(0 0 6px rgba(232,163,61,.55));
+  }
+  .goniometer.playing .dial-ring{ animation:pulseRing 1.6s ease-in-out infinite; }
+  .goniometer.playing #armLine{ opacity:1; animation:sweep 1.6s ease-in-out infinite alternate; }
+  @keyframes sweep{ from{ transform:rotate(-62deg); } to{ transform:rotate(62deg); } }
+  @keyframes pulseRing{ 0%,100%{ opacity:.55; } 50%{ opacity:1; } }
 
+  .play-btn{
+    position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+    width:58%; height:58%;
+    border-radius:50%;
+    border:1px solid var(--line);
+    background:linear-gradient(160deg, var(--surface-2), var(--surface));
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer;
+    color:var(--amber);
+    box-shadow:0 10px 26px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.04);
+    transition:box-shadow .25s ease, background .25s ease, color .25s ease;
+  }
+  .play-btn:active{ transform:translate(-50%,-50%) scale(.95); }
+  .play-btn svg{ width:36%; height:36%; }
+  .play-btn .icon-stop{ display:none; }
+  .play-btn.is-playing{
+    color:var(--app-bg);
+    background:var(--amber);
+    box-shadow:0 0 0 10px var(--amber-dim), 0 10px 26px rgba(0,0,0,.4);
+  }
+  .play-btn.is-playing .icon-speaker{ display:none; }
+  .play-btn.is-playing .icon-stop{ display:block; }
 
-  <line class="tick" x1="50" y1="84" x2="50" y2="96"/>
-  <text class="year" x="50" y="112" text-anchor="middle">2018</text>
+  .caption{
+    margin:0;
+    font-size:13px;
+    color:var(--muted);
+    min-height:1.4em;
+  }
 
-  <line class="tick" x1="400" y1="84" x2="400" y2="96"/>
-  <text class="year" x="400" y="112" text-anchor="middle">2019</text>
+  .rate-control{
+    display:flex; gap:6px; padding:3px; background:var(--surface); border:1px solid var(--line); border-radius:999px;
+  }
+  .rate-btn{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    letter-spacing:.03em;
+    color:var(--muted);
+    background:transparent;
+    border:none;
+    padding:6px 12px;
+    border-radius:999px;
+    cursor:pointer;
+  }
+  .rate-btn.is-active{ background:var(--surface-2); color:var(--text); }
 
-  <line class="tick" x1="750" y1="84" x2="750" y2="96"/>
-  <text class="year" x="750" y="112" text-anchor="middle">2020</text>
+  .bottombar{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:14px 18px calc(14px + env(safe-area-inset-bottom));
+    border-top:1px solid var(--line);
+    gap:10px;
+  }
+  .nav-btn{
+    width:52px; height:52px; border-radius:50%;
+    border:1px solid var(--line);
+    background:var(--surface);
+    color:var(--text);
+    font-size:22px;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer;
+    flex-shrink:0;
+  }
+  .nav-btn:active{ background:var(--surface-2); }
+  .mid-controls{ display:flex; gap:10px; }
+  .icon-btn{
+    width:44px; height:44px; border-radius:14px;
+    border:1px solid var(--line);
+    background:var(--surface);
+    color:var(--muted);
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer;
+  }
+  .icon-btn svg{ width:19px; height:19px; }
+  .icon-btn.is-active{ color:var(--teal); border-color:rgba(79,184,174,.4); background:var(--teal-dim); }
 
-  <rect x="60" y="20" width="14" height="10" class="period" />
-  <text class="label" x="82" y="30" alignment-baseline="middle">Intervalo de dados</text>
-</svg>
+  .sheet-overlay{
+    position:fixed; inset:0; background:rgba(6,8,11,.6);
+    backdrop-filter: blur(2px);
+    display:none; align-items:flex-end; justify-content:center;
+    z-index:20;
+  }
+  .sheet-overlay.open{ display:flex; }
+  .sheet{
+    width:100%; max-width:480px;
+    background:var(--surface);
+    border-top:1px solid var(--line);
+    border-radius:20px 20px 0 0;
+    max-height:82vh;
+    display:flex; flex-direction:column;
+    padding:10px 16px calc(16px + env(safe-area-inset-bottom));
+    animation:slideUp .25s ease;
+  }
+  @keyframes slideUp{ from{ transform:translateY(24px); opacity:.6;} to{ transform:translateY(0); opacity:1;} }
+  .sheet-handle{
+    width:36px; height:4px; border-radius:2px; background:var(--line);
+    margin:2px auto 12px;
+  }
+  .search-input{
+    width:100%;
+    background:var(--surface-2);
+    border:1px solid var(--line);
+    color:var(--text);
+    font-family:'IBM Plex Sans', sans-serif;
+    font-size:14px;
+    padding:11px 14px;
+    border-radius:12px;
+    margin-bottom:10px;
+    outline:none;
+  }
+  .search-input::placeholder{ color:var(--muted-dim); }
+  .sheet-list{ overflow-y:auto; flex:1; }
+  .sheet-group-label{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10.5px; letter-spacing:.12em; text-transform:uppercase;
+    color:var(--teal); padding:14px 4px 6px;
+  }
+  .sheet-item{
+    width:100%; text-align:left;
+    background:transparent; border:none; color:var(--text);
+    font-family:'IBM Plex Sans', sans-serif;
+    font-size:15px;
+    padding:10px 4px;
+    border-bottom:1px solid var(--line);
+    cursor:pointer;
+    display:flex; align-items:center; justify-content:space-between; gap:8px;
+  }
+  .sheet-item.is-current{ color:var(--teal); }
+  .sheet-item span.num{ font-family:'IBM Plex Mono', monospace; font-size:11px; color:var(--muted-dim); }
+
+  @media (prefers-reduced-motion: reduce){
+    .goniometer.playing #armLine{ animation:none; opacity:1; }
+    .goniometer.playing .dial-ring{ animation:none; opacity:.9; }
+    .sheet{ animation:none; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="topbar">
+    <span class="eyebrow">Semiologia Ortopédica</span>
+    <span class="counter" id="counter">01 / 49</span>
+  </div>
+  <div class="progress"><div class="progress-fill" id="progressFill"></div></div>
+
+  <main class="card" id="cardArea">
+    <span class="chip" id="categoryChip">Ombro</span>
+    <h1 class="maneuver-name" id="maneuverName">Manobra de Adson</h1>
+
+    <div class="goniometer" id="goniometer">
+      <svg class="goniometer-svg" viewBox="0 0 200 200">
+        <circle class="dial-ring" cx="100" cy="100" r="90"></circle>
+        <g id="ticks"></g>
+        <line id="armLine" x1="100" y1="100" x2="100" y2="16"></line>
+      </svg>
+      <button class="play-btn" id="playBtn" aria-label="Ouvir objetivo e técnica da manobra">
+        <svg class="icon icon-speaker" viewBox="0 0 24 24" fill="none">
+          <path d="M4 9v6h3.6l5 4V5l-5 4H4z" fill="currentColor"/>
+          <path d="M16.2 8.6a5 5 0 0 1 0 6.8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          <path d="M18.8 6a8.6 8.6 0 0 1 0 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" opacity=".55"/>
+        </svg>
+        <svg class="icon icon-stop" viewBox="0 0 24 24" fill="none">
+          <rect x="6" y="6" width="12" height="12" rx="2.5" fill="currentColor"/>
+        </svg>
+      </button>
+    </div>
+    <p class="caption" id="caption">Toque para ouvir o objetivo e a técnica</p>
+
+    <div class="rate-control" role="group" aria-label="Velocidade da narração">
+      <button class="rate-btn" data-rate="0.8">Lento</button>
+      <button class="rate-btn is-active" data-rate="1">Normal</button>
+      <button class="rate-btn" data-rate="1.15">Rápido</button>
+    </div>
+  </main>
+
+  <div class="bottombar">
+    <button class="nav-btn" id="prevBtn" aria-label="Manobra anterior">‹</button>
+    <div class="mid-controls">
+      <button class="icon-btn" id="shuffleBtn" aria-label="Ordem aleatória" title="Ordem aleatória">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M17 3h4v4M21 3l-7 7M7 21H3v-4M3 21l7-7M3 7l4 4M21 17l-4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <button class="icon-btn" id="listBtn" aria-label="Ver lista completa" title="Ver lista completa">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <button class="nav-btn" id="nextBtn" aria-label="Próxima manobra">›</button>
+  </div>
+
+  <div class="sheet-overlay" id="sheetOverlay">
+    <div class="sheet">
+      <div class="sheet-handle"></div>
+      <input type="search" id="searchInput" class="search-input" placeholder="Buscar manobra ou sinal...">
+      <div class="sheet-list" id="sheetList"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const DATA = [
+  {cat:"Ombro", name:"Manobra de Adson", text:"Avalia a compressão do feixe neurovascular na região do desfiladeiro torácico, devendo ser realizada em pacientes que relatam parestesia nos membros superiores. Técnica: o examinador abduz o braço do paciente a noventa graus e realiza rotação externa do membro, palpando o pulso radial. Orienta-se que o paciente rotacione a cabeça para o lado contrário e realize uma inspiração profunda, prendendo a respiração. A diminuição ou o desaparecimento do pulso radial sugere compressão no desfiladeiro torácico."},
+  {cat:"Ombro", name:"Manobra de Wright (hiperabdução)", text:"Avalia a compressão da região do desfiladeiro torácico. Técnica: o examinador abduz, roda externamente e hiperestende ambos os braços do paciente, palpando o pulso radial. Dor e diminuição simétrica do pulso podem ocorrer em até vinte por cento dos indivíduos normais, mas a assimetria sugere compressão neurovascular abaixo do processo coracoide e do tendão do peitoral menor. A compressão da artéria axilar pelo peitoral maior também reduz o pulso."},
+  {cat:"Ombro", name:"Teste da Apreensão", text:"Avalia a frouxidão ligamentar que favorece a luxação anterior da articulação escápulo-umeral, sendo indicado principalmente em casos recidivantes de luxação de ombro. Técnica: com o paciente sentado ou em pé, o examinador se posiciona atrás dele e realiza abdução, rotação externa e extensão passivas forçadas do braço, enquanto pressiona com o polegar a face posterior da cabeça do úmero. Quando há instabilidade anterior, a sensação de luxação iminente provoca temor e apreensão no paciente, que pode até impedir a continuidade do movimento."},
+  {cat:"Ombro", name:"Teste de Apley Scratch", text:"Avalia a amplitude de movimento da articulação do ombro. Para a adução, pede-se que o paciente estenda a mão sobre o peito e toque a borda superior da escápula do lado oposto. Para a rotação externa e abdução, o paciente deve alcançar atrás da cabeça e tocar a ponta superior da escápula contralateral. Para a rotação interna e adução, o paciente alcança as costas e toca a borda inferior da escápula contralateral. Dificuldade em realizar esses movimentos indica limitação articular."},
+  {cat:"Ombro", name:"Teste do Subescapular de Gerber (Lift-off)", text:"Avalia a integridade do músculo subescapular. Técnica: o paciente coloca o dorso da mão nas costas, na máxima rotação interna, e tenta afastá-la ativamente do corpo. O examinador pode opor resistência com a mão. A incapacidade de realizar essa manobra indica lesão do subescapular."},
+  {cat:"Ombro", name:"Teste de Hawkins", text:"Avalia patologias tendíneas do manguito rotador, como tendinite ou ruptura. Técnica: o examinador estabiliza a escápula com uma das mãos e, com a outra, mantém o braço do paciente abduzido e fletido a noventa graus, realizando rotação interna. Pode-se pedir ao paciente que faça rotação externa contra resistência. Na presença de patologia, o paciente refere dor, pois o movimento provoca o impacto da tuberosidade maior do úmero contra o acrômio e o ligamento coracoacromial."},
+  {cat:"Ombro", name:"Teste de Jobe", text:"Avalia a força do músculo supraespinhoso. Técnica: o paciente abduz os ombros com rotação interna, com os polegares apontando para o chão, enquanto o examinador aplica uma força para baixo e o paciente resiste. Se houver rotura do supraespinhoso, o paciente não consegue manter o movimento no lado lesado."},
+  {cat:"Ombro", name:"Teste de Neer (do impacto)", text:"Avalia a bursa subacromial e o músculo supraespinhoso. Técnica: o examinador estabiliza a escápula com uma mão e, com a outra, realiza rotação interna do braço seguida de abdução passiva até cento e vinte graus, produzindo o impacto da cabeça do úmero contra o acrômio. Na presença de patologia, o paciente refere dor."},
+  {cat:"Ombro", name:"Teste da Compressão Ativa de O'Brien", text:"Avalia a articulação acromioclavicular em casos degenerativos. Técnica: o paciente posiciona o braço com o cotovelo em extensão, o ombro em noventa graus de flexão, discreta adução e rotação interna máxima, com o polegar apontando para baixo, enquanto o examinador força o membro para baixo e o paciente resiste. Em seguida, o paciente repete o movimento em rotação externa, com a palma da mão para cima. Dor na articulação acromioclavicular ou no ápice do ombro, que alivia ao retornar à posição neutra, sugere alteração acromioclavicular."},
+  {cat:"Ombro", name:"Teste de Patte", text:"Avalia o músculo infraespinhoso. Técnica: o braço do paciente é posicionado em elevação de noventa graus, com o cotovelo também fletido a noventa graus, e o paciente deve forçar a rotação externa contra a resistência do examinador. Dor ou incapacidade de movimentação sugere patologia."},
+  {cat:"Ombro", name:"Teste de Yergason", text:"Diagnostica tenossinovite ou subluxação da porção longa do bíceps. Técnica: o examinador posiciona o cotovelo do paciente fletido a noventa graus, palpando a inserção do tendão do bíceps, e solicita prono-supinação do antebraço contra resistência. Dor no sulco bicipital ou deslocamento do tendão indicam patologia do bíceps."},
+  {cat:"Ombro", name:"Teste de Cozen", text:"Avalia epicondilite lateral do cotovelo. Técnica: com o cotovelo do paciente em noventa graus de flexão e o antebraço em pronação, o examinador realiza extensão do punho contra resistência. Dor no epicôndilo lateral confirma o teste."},
+  {cat:"Ombro", name:"Teste de Mill", text:"Avalia epicondilite lateral do cotovelo. Técnica: o examinador realiza extensão passiva do cotovelo, pronação do antebraço e flexão do punho, seguida de extensão progressiva do cotovelo. Dor no epicôndilo lateral indica epicondilite."},
+
+  {cat:"Cotovelo, Punho e Mão", name:"Teste de Apley (tendão flexor)", text:"Avalia a integridade do tendão flexor superficial dos dedos. Técnica: o examinador segura a falange média do dedo do paciente e solicita a flexão da falange distal. Deve ser realizado sempre que houver ferimento corto-contuso na mão, sendo mandatório avaliar o tendão antes de suturar o ferimento."},
+  {cat:"Cotovelo, Punho e Mão", name:"Teste de Finkelstein", text:"Diagnostica a tenossinovite de De Quervain, que acomete os tendões do abdutor longo e do extensor curto do polegar. Técnica: o examinador realiza passivamente o desvio ulnar do punho, mantendo o polegar aduzido e fletido na palma da mão. O teste é positivo se reproduzir a dor na região do processo estiloide do rádio. É comum em gestantes e puérperas, que sentem dor no dia a dia ao manusear objetos."},
+  {cat:"Cotovelo, Punho e Mão", name:"Teste de Froment", text:"Diagnostica lesão do nervo ulnar. Técnica: solicita-se que o paciente faça uma pinça de ponta entre o indicador e o polegar, podendo segurar uma folha de papel entre os dois dedos. A incapacidade de realizar a tarefa indica paralisia dos músculos interósseos."},
+  {cat:"Cotovelo, Punho e Mão", name:"Teste de Phalen", text:"Avalia a síndrome do túnel do carpo, por compressão do nervo mediano. Técnica: o paciente mantém os punhos com os dorsos das mãos encostados, em flexão forçada, por um a dois minutos. O surgimento de dormência nos dedos, principalmente no dedo médio, sugere a síndrome."},
+
+  {cat:"Sinais — Membro Superior", name:"Sinal de Duchenne", text:"Avalia patologias que envolvem degeneração neuromuscular, como síndromes neurogênicas e mielopatias. Observa-se deformidade em garra, com hiperextensão das articulações metacarpofalangianas e flexão das interfalangianas, postura característica de repouso do quarto e quinto dedos."},
+  {cat:"Sinais — Membro Superior", name:"Sinal de Tinel", text:"Avalia o possível sítio de uma síndrome compressiva nervosa, não sendo específico para o túnel do carpo, podendo ocorrer em qualquer síndrome compressiva. Técnica: o examinador percute o nervo mediano na face volar do punho. A presença de dor irradiada ou sensação de choque no território do nervo indica o sinal."},
+  {cat:"Sinais — Membro Superior", name:"Sinal de Benediction", text:"Avalia lesão ou compressão do nervo interósseo anterior. Técnica: solicita-se que o paciente toque o polegar com o indicador, formando o sinal de ok. Quando há lesão do flexor longo do polegar e do flexor profundo do indicador, o paciente não consegue fletir as falanges distais, que permanecem em extensão."},
+  {cat:"Sinais — Membro Superior", name:"Sinal de Popeye", text:"Avalia a ruptura do tendão da cabeça longa do bíceps. Observa-se o surgimento de uma corcova no ventre muscular do bíceps, próximo ao cotovelo, achado comum em pacientes idosos. Geralmente não há comprometimento funcional importante, pois a função é compensada pelo músculo braquial, e o tratamento costuma ser conservador, exceto em atletas de alta performance."},
+
+  {cat:"Quadril", name:"Teste de Patrick (FABERE)", text:"Avalia patologia da articulação coxofemoral do lado examinado e da articulação sacroilíaca do lado oposto. Técnica: com o paciente em decúbito dorsal, a perna é posicionada em formato de quatro, com o quadril abduzido, fletido e em rotação lateral, e o tornozelo apoiado sobre o joelho oposto. O examinador pressiona o joelho e a crista ilíaca contra a mesa. Dor na região sacroilíaca posterior contralateral indica patologia dessa articulação, enquanto dor na região inguinal do mesmo lado sugere doença do quadril. Também é útil na bursite trocantérica."},
+  {cat:"Quadril", name:"Manobra de Thomas", text:"Avalia contratura em flexão do quadril, ajudando a distinguir entre lombalgia e artrose do quadril. Técnica: com o paciente em decúbito dorsal e os membros inferiores esticados, o quadril examinado permanece retificado enquanto o outro é fletido a cento e vinte graus. Mede-se o ângulo entre a diáfise do fêmur e o plano horizontal da mesa. O teste é positivo quando há incapacidade de extensão completa do quadril examinado, ou quando o paciente compensa o movimento."},
+
+  {cat:"Joelho", name:"Teste de Apley (joelho)", text:"Avalia lesões meniscais ou cápsulo-ligamentares do joelho. Técnica: com o paciente em decúbito ventral e o joelho fletido a noventa graus, o examinador segura o pé do paciente e traciona e roda a perna, o que provoca dor em caso de lesão capsular ou ligamentar. Na mesma posição, realiza-se compressão do eixo da perna associada à rotação; dor ou estalido na interlinha articular sugerem lesão meniscal."},
+  {cat:"Joelho", name:"Teste de Jerk", text:"Avalia lesão do ligamento cruzado anterior na instabilidade ântero-lateral do joelho. Técnica: com o paciente em decúbito dorsal, o examinador mantém a perna em rotação interna e o joelho fletido, com estresse em valgo, e realiza a extensão do joelho mantendo a tíbia anteriorizada em relação ao fêmur. Um ressalto ao final da extensão indica o teste positivo. Em paciente acordado, o movimento costuma travar e o teste é negativo; sob anestesia, o teste pode se tornar positivo."},
+  {cat:"Joelho", name:"Teste de Lachman", text:"Avalia lesão do ligamento cruzado anterior e do ligamento cruzado posterior. Técnica: com o paciente em decúbito dorsal, o examinador segura firmemente o fêmur distal e a tíbia proximal, realizando movimentos de deslocamento ântero-posterior e póstero-anterior. Anteriorização exagerada da tíbia indica lesão do ligamento cruzado anterior, sendo esta a lesão mais frequente; posteriorização exagerada indica lesão do ligamento cruzado posterior, que é mais rara."},
+  {cat:"Joelho", name:"Teste de McMurray", text:"Avalia lesão do corno posterior do menisco. Técnica: com o paciente em decúbito dorsal e o joelho em flexão forçada, o examinador palpa a interlinha articular enquanto estende o joelho, associando rotação interna ou externa da perna. A rotação interna durante a extensão avalia o menisco lateral, e a rotação externa avalia o menisco medial. Um estalido palpável na interlinha, geralmente entre a flexão máxima e noventa graus, indica teste positivo."},
+  {cat:"Joelho", name:"Teste de Glid", text:"Avalia o grau de mobilidade da patela em relação ao fêmur, podendo diagnosticar subluxação patelar, condropatia ou artrose retropatelar. Técnica: com o paciente em decúbito dorsal e as pernas estendidas, o examinador segura a patela e realiza um deslocamento lateral. Apreensão do paciente durante a manobra sugere instabilidade patelar."},
+
+  {cat:"Pé e Tornozelo", name:"Teste de Gansslen", text:"Diagnostica a neuralgia de Morton, um neuroma que se desenvolve no terceiro espaço interdigital do pé, sendo mais comum em mulheres. Técnica: o examinador fixa a cabeça do metatarso com uma das mãos e realiza compressão lateral das cabeças do primeiro e do quinto metatarso com a outra. Dor importante confirma o teste."},
+  {cat:"Pé e Tornozelo", name:"Prova de McBride", text:"Avalia o grau de retração das partes moles no hálux valgo. Técnica: com o paciente em apoio bipodálico, o examinador segura o hálux, que está em abdução, e tenta reduzi-lo com uma força de adução. Quando não há contratura, o dedo se alinha ao metatarso; quando o dedo permanece travado, há retração das estruturas laterais."},
+  {cat:"Pé e Tornozelo", name:"Teste Rangido", text:"Avalia o hálux rígido, diagnosticando artrose da articulação metatarsofalangiana do hálux. Técnica: o examinador segura a falange distal do hálux e realiza movimentos de flexão e extensão. A percepção de um atrito articular, como um ranger, indica desgaste da cartilagem."},
+  {cat:"Pé e Tornozelo", name:"Teste da Ponta dos Pés", text:"Avalia a mobilidade da articulação subtalar e a integridade dos tendões do calcâneo e tibial posterior. Técnica: solicita-se que o paciente fique na ponta dos pés, enquanto o examinador avalia a redutibilidade do valgismo do calcâneo. O normal é o calcâneo entrar em varo; se ele permanecer retificado, há alteração do tendão tibial posterior."},
+
+  {cat:"Sinais — Membro Inferior", name:"Sinal de Trendelemburg-Duchenne", text:"Avalia a força do músculo glúteo médio por meio da marcha característica, com insuficiência do apoio monopodálico. Observa-se a báscula da bacia, ou seja, a pelve cai para o lado contrário ao membro de apoio, com oscilação lateral do tronco durante a marcha, devido à deficiência dos abdutores do quadril. Pode estar associada à hérnia de disco entre L quatro e L cinco, que inerva o glúteo médio."},
+  {cat:"Sinais — Membro Inferior", name:"Sinal de Galeazzi", text:"Diagnostica displasia do quadril. Técnica: com o paciente em decúbito dorsal e as pernas estendidas paralelamente, observam-se os níveis relativos dos maléolos mediais. Em seguida, o examinador flexiona os quadris a noventa graus e observa a altura relativa dos joelhos. Um joelho encurtado indica que a cabeça do fêmur sofreu posteriorização."},
+  {cat:"Sinais — Membro Inferior", name:"Sinal de Childress", text:"Avalia a presença de lesão meniscal. Técnica: o paciente se posiciona de cócoras, com as mãos apoiadas na região occipital, e tenta caminhar agachado. A presença de dor na interlinha articular do joelho, que interrompe imediatamente o movimento, caracteriza o sinal."},
+  {cat:"Sinais — Membro Inferior", name:"Sinal de Thompson", text:"Avalia a integridade do tendão de Aquiles. Técnica: com o paciente em decúbito ventral e joelho e tornozelo a noventa graus, o examinador comprime a massa muscular do tríceps sural. A ausência de flexão plantar do pé indica rompimento do tendão."},
+
+  {cat:"Exame do Recém-Nascido", name:"Manobra de Ortolani", text:"Diagnostica a luxação congênita de quadril, promovendo a redução da articulação. Técnica: com o paciente despido e em decúbito dorsal, cada quadril é avaliado separadamente, com os membros em flexão de noventa graus e os joelhos fletidos. Ao realizar a abdução do quadril, a redução da luxação produz um ressalto ou clique articular audível, correspondente ao retorno da cabeça do fêmur à cavidade acetabular."},
+  {cat:"Exame do Recém-Nascido", name:"Manobra de Barlow", text:"Diagnostica instabilidade do quadril; a extensão do quadril aumenta a instabilidade, enquanto a hiperflexão o torna mais estável. Técnica: com a criança posicionada como no teste de Ortolani, realiza-se adução do quadril associada a uma leve pressão posterior sobre a coxa, tentando luxar a cabeça femoral. Se o quadril for instável, sente-se um ressalto no momento da luxação."},
+  {cat:"Exame do Recém-Nascido", name:"Sinal de Peter Bade", text:"Diagnostica displasia de quadril. O sinal se apresenta como um encurtamento aparente do membro acometido, associado a assimetria das pregas cutâneas, principalmente das pregas inguinais e glúteas."},
+
+  {cat:"Redução — Ombro", name:"Manobra de Hipócrates", text:"Manobra para redução da luxação de ombro. Técnica: com o paciente em decúbito dorsal, o médico realiza tração longitudinal do membro superior segurando o punho, enquanto posiciona o próprio pé na axila do paciente como contratração, aplicando a técnica de alavanca. Se a redução não for bem-sucedida, ou se o fragmento estiver mal posicionado ou tiver ascendido para a cavidade subacromial, o tratamento passa a ser cirúrgico."},
+  {cat:"Redução — Ombro", name:"Manobra de Stimson (ombro)", text:"Manobra para redução da luxação de ombro. Técnica: o paciente é deitado em decúbito ventral, com o membro luxado pendente para fora da maca, e um peso é amarrado na extremidade do braço para tracioná-lo, promovendo relaxamento muscular até que a redução ocorra passivamente. Essa redução pode levar de quinze a vinte minutos."},
+  {cat:"Redução — Ombro", name:"Tração com Contratração Longitudinal", text:"Manobra para redução da luxação de ombro, na qual as forças de tração e contratração são aplicadas na mesma linha do braço. Técnica: um auxiliar usa um lençol para realizar a contratração, enquanto o médico faz a tração longitudinal até que a cabeça do úmero retorne à cavidade glenoide, geralmente associando movimentos suaves de rotação interna e externa."},
+  {cat:"Redução — Ombro", name:"Manobra de Kocher", text:"Manobra para redução da luxação de ombro, baseada no princípio de alavanca; se não for realizada de forma suave, pode causar lesão adicional à articulação. Técnica: aplica-se tração contínua no braço com o cotovelo em noventa graus. Após o relaxamento muscular, realiza-se rotação externa gradativa até o ponto zero, seguida de adução e flexão do braço sobre o tórax, e finalmente rotação interna, o que leva à redução. Não se deve ultrapassar o ponto zero durante a abdução sob tração, para evitar estiramento do nervo axilar e paralisia do músculo deltoide."},
+
+  {cat:"Redução — Quadril", name:"Manobra de Bigelow", text:"Manobra para redução da luxação anterior da coxofemoral. Técnica: com o paciente em decúbito dorsal, o assistente estabiliza a pelve apoiando as mãos nas espinhas ilíacas ântero-superiores. O examinador abraça a perna abaixo da fossa poplítea e aplica tração longitudinal, seguida de flexão do quadril de pelo menos noventa graus, mantendo o membro aduzido e em rotação interna. Em seguida, tenta-se levar a cabeça do fêmur à cavidade acetabular por meio de abdução, rotação externa e extensão do quadril. Está associada a fraturas iatrogênicas do colo femoral e, por isso, é pouco utilizada."},
+  {cat:"Redução — Quadril", name:"Manobra de Stimson (quadril)", text:"Manobra para redução da luxação posterior da coxofemoral. Técnica: com o paciente anestesiado e em decúbito ventral, o membro afetado fica pendente para fora da maca, com o quadril e o joelho fletidos a noventa graus. Um assistente imobiliza a pelve enquanto o examinador aplica força na face posterior da panturrilha, tracionando o fêmur longitudinalmente; movimentos rotacionais suaves podem auxiliar na redução."},
+  {cat:"Redução — Quadril", name:"Manobra de Ális", text:"Manobra para redução da luxação posterior da coxofemoral. Técnica: com o paciente em decúbito dorsal, o assistente estabiliza a pelve apoiando as mãos nas espinhas ilíacas ântero-superiores, empurrando a pelve contra a maca. O examinador aplica tração longitudinal constante com o joelho e o quadril fletidos, mantendo o membro em rotação interna e adução, podendo associar pequenos movimentos rotacionais. A tração deve sempre ser realizada no sentido da deformidade."},
+
+  {cat:"Redução — Outras Articulações", name:"Redução da Luxação de Patela", text:"A redução da luxação de patela é realizada provocando a extensão do joelho do paciente, concomitantemente com o deslocamento manual da patela de volta ao sulco troclear. É mais comum em adolescentes, provavelmente relacionada à intensidade das atividades físicas, ao crescimento rápido e à relativa instabilidade patelar dessa faixa etária."},
+  {cat:"Redução — Outras Articulações", name:"Redução da Luxação de Tornozelo", text:"Geralmente as luxações de tornozelo são posteriores ou póstero-mediais, e costumam ocorrer associadas a fraturas, já que o tálus se encontra entre os maléolos. Técnica: com sedação e analgesia, o paciente é posicionado em decúbito dorsal, com o pé na extremidade da maca e o joelho em leve flexão. Realiza-se tração-contratração para soltar o tálus da tíbia distal, seguida do reposicionamento da cúpula do tálus no encaixe articular, e uma tala é aplicada para estabilizar a redução até o tratamento definitivo, geralmente cirúrgico. Se houver sinais de isquemia na pele, a redução deve ser feita imediatamente para evitar necrose."},
+  {cat:"Redução — Outras Articulações", name:"Manobra de Parvin (cotovelo)", text:"Manobra para redução da luxação de cotovelo. Técnica: com o paciente em decúbito ventral e o membro pendente, o examinador traciona o punho do paciente enquanto faz contratração no úmero. Em seguida, empurra o olécrano em direção à tróclea usando o polegar e o indicador, em movimento de pinça."}
+];
+
+const TOTAL = DATA.length;
+let order = DATA.map((_, i) => i);
+let pos = 0;
+let rate = 1;
+let isPlaying = false;
+let ptVoice = null;
+
+const els = {
+  counter: document.getElementById('counter'),
+  progressFill: document.getElementById('progressFill'),
+  chip: document.getElementById('categoryChip'),
+  name: document.getElementById('maneuverName'),
+  caption: document.getElementById('caption'),
+  goniometer: document.getElementById('goniometer'),
+  playBtn: document.getElementById('playBtn'),
+  prevBtn: document.getElementById('prevBtn'),
+  nextBtn: document.getElementById('nextBtn'),
+  shuffleBtn: document.getElementById('shuffleBtn'),
+  listBtn: document.getElementById('listBtn'),
+  sheetOverlay: document.getElementById('sheetOverlay'),
+  sheetList: document.getElementById('sheetList'),
+  searchInput: document.getElementById('searchInput'),
+  cardArea: document.getElementById('cardArea'),
+};
+
+// Build goniometer ticks
+(function buildTicks(){
+  const group = document.getElementById('ticks');
+  for(let i=0;i<36;i++){
+    const angle = i*10;
+    const isMajor = angle % 90 === 0;
+    const outerR = 90, innerR = isMajor ? 74 : 82;
+    const rad = angle*Math.PI/180;
+    const x1 = 100 + innerR*Math.sin(rad), y1 = 100 - innerR*Math.cos(rad);
+    const x2 = 100 + outerR*Math.sin(rad), y2 = 100 - outerR*Math.cos(rad);
+    const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+    line.setAttribute('x1',x1); line.setAttribute('y1',y1);
+    line.setAttribute('x2',x2); line.setAttribute('y2',y2);
+    line.setAttribute('class', isMajor ? 'tick tick-major' : 'tick');
+    group.appendChild(line);
+  }
+})();
+
+function currentEntry(){ return DATA[order[pos]]; }
+
+function render(){
+  stopSpeech();
+  const entry = currentEntry();
+  els.chip.textContent = entry.cat;
+  els.name.textContent = entry.name;
+  els.counter.textContent = String(pos+1).padStart(2,'0') + ' / ' + TOTAL;
+  els.progressFill.style.width = ((pos+1)/TOTAL*100) + '%';
+  els.caption.textContent = 'Toque para ouvir o objetivo e a técnica';
+}
+
+function next(){ pos = (pos+1) % TOTAL; render(); }
+function prev(){ pos = (pos-1+TOTAL) % TOTAL; render(); }
+
+function setPlayingUI(playing){
+  isPlaying = playing;
+  els.playBtn.classList.toggle('is-playing', playing);
+  els.goniometer.classList.toggle('playing', playing);
+  els.caption.textContent = playing ? 'Reproduzindo…' : 'Toque para ouvir o objetivo e a técnica';
+}
+
+function pickVoice(){
+  const voices = window.speechSynthesis ? window.speechSynthesis.getVoices() : [];
+  ptVoice = voices.find(v => v.lang && v.lang.toLowerCase() === 'pt-br')
+        || voices.find(v => v.lang && v.lang.toLowerCase().startsWith('pt'))
+        || null;
+}
+if('speechSynthesis' in window){
+  pickVoice();
+  window.speechSynthesis.onvoiceschanged = pickVoice;
+}
+
+function speakCurrent(){
+  if(!('speechSynthesis' in window)){
+    alert('Este navegador não suporta leitura em voz alta (TTS).');
+    return;
+  }
+  const entry = currentEntry();
+  const utter = new SpeechSynthesisUtterance(entry.name + '. ' + entry.text);
+  utter.lang = 'pt-BR';
+  utter.rate = rate;
+  if(ptVoice) utter.voice = ptVoice;
+  utter.onend = () => setPlayingUI(false);
+  utter.onerror = () => setPlayingUI(false);
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(utter);
+  setPlayingUI(true);
+}
+function stopSpeech(){
+  if('speechSynthesis' in window) window.speechSynthesis.cancel();
+  setPlayingUI(false);
+}
+
+els.playBtn.addEventListener('click', () => {
+  if(isPlaying) stopSpeech();
+  else speakCurrent();
+});
+els.nextBtn.addEventListener('click', next);
+els.prevBtn.addEventListener('click', prev);
+
+document.querySelectorAll('.rate-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.rate-btn').forEach(b => b.classList.remove('is-active'));
+    btn.classList.add('is-active');
+    rate = parseFloat(btn.dataset.rate);
+  });
+});
+
+els.shuffleBtn.addEventListener('click', () => {
+  for(let i = order.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [order[i], order[j]] = [order[j], order[i]];
+  }
+  pos = 0;
+  els.shuffleBtn.classList.add('is-active');
+  render();
+});
+
+// Keyboard navigation
+document.addEventListener('keydown', (e) => {
+  if(e.key === 'ArrowRight') next();
+  if(e.key === 'ArrowLeft') prev();
+});
+
+// Swipe navigation
+let touchStartX = null;
+els.cardArea.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; }, {passive:true});
+els.cardArea.addEventListener('touchend', (e) => {
+  if(touchStartX === null) return;
+  const dx = e.changedTouches[0].clientX - touchStartX;
+  if(Math.abs(dx) > 46){ dx < 0 ? next() : prev(); }
+  touchStartX = null;
+}, {passive:true});
+
+// Bottom sheet / full list
+function buildSheetList(filter){
+  const q = (filter||'').trim().toLowerCase();
+  els.sheetList.innerHTML = '';
+  let lastCat = null;
+  DATA.forEach((entry, idx) => {
+    if(q && !entry.name.toLowerCase().includes(q) && !entry.cat.toLowerCase().includes(q)) return;
+    if(entry.cat !== lastCat){
+      const label = document.createElement('div');
+      label.className = 'sheet-group-label';
+      label.textContent = entry.cat;
+      els.sheetList.appendChild(label);
+      lastCat = entry.cat;
+    }
+    const item = document.createElement('button');
+    item.className = 'sheet-item' + (order[pos] === idx ? ' is-current' : '');
+    item.innerHTML = '<span>' + entry.name + '</span><span class="num">' + String(idx+1).padStart(2,'0') + '</span>';
+    item.addEventListener('click', () => {
+      const found = order.indexOf(idx);
+      pos = found >= 0 ? found : (order.push(idx), order.length-1);
+      closeSheet();
+      render();
+    });
+    els.sheetList.appendChild(item);
+  });
+}
+function openSheet(){
+  buildSheetList(els.searchInput.value);
+  els.sheetOverlay.classList.add('open');
+}
+function closeSheet(){
+  els.sheetOverlay.classList.remove('open');
+}
+els.listBtn.addEventListener('click', openSheet);
+els.sheetOverlay.addEventListener('click', (e) => { if(e.target === els.sheetOverlay) closeSheet(); });
+els.searchInput.addEventListener('input', () => buildSheetList(els.searchInput.value));
+
+render();
+</script>
+</body>
+</html>
